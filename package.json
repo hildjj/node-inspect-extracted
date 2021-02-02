@@ -1,0 +1,33 @@
+{
+  "name": "node-inspect-extracted",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "test": "ava",
+    "coverage": "nyc -r lcov ava"
+  },
+  "keywords": [
+    "inspect",
+    "util",
+    "polyfill",
+    "format",
+    "output",
+    "web",
+    "browserify"
+  ],
+  "author": "Joe Hildebrand <joe-github@cursive.net>",
+  "license": "MPL-2.0",
+  "devDependencies": {
+    "ava": "^3.15.0",
+    "nyc": "^15.1.0"
+  },
+  "ava": {
+    "files": [
+      "test/*.ava.js"
+    ]
+  },
+  "engines": {
+    "node": ">=10.18.0"
+  }
+}
