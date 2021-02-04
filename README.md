@@ -1,9 +1,14 @@
 # node-inspect-extracted
 
 This library provides an as-faithful-as-possible implementation of Node.js's
-[util.inspect](https://nodejs.org/api/util.html#util_util_inspect_object_options) function.
+[`util.inspect`](https://nodejs.org/api/util.html#util_util_inspect_object_options) function.
 
-It was built in such a way that it can be kept up-to-date with node's [implementation](https://github.com/nodejs/node/blob/master/lib/internal/util/inspect.js), by taking the code directly from node's repo, and changing nothing but the `require()` statements.  All of the node built-in functions are emulated.  Many of the incompatibilities generated from that emulation are not interesting for Web use cases.
+It was built in such a way that it can be kept up-to-date with node's
+[implementation](https://github.com/nodejs/node/blob/master/lib/internal/util/inspect.js),
+by taking the code directly from node's repo, and changing nothing but the
+`require()` statements.  All of the node built-in functions are emulated.
+Many of the incompatibilities generated from that emulation are not
+interesting for Web use cases.
 
 ## Installation
 
