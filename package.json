@@ -2,10 +2,13 @@
   "name": "node-inspect-extracted",
   "version": "1.0.0",
   "description": "Node's util.inspect, extracted for use on the Web",
-  "main": "lib/inspect.js",
+  "main": "dist/inspect.js",
+  "browser": "dist/inspect.js",
+  "module": "dist/inspect.js",
   "scripts": {
-    "check": "shasum -a 256 -c node-inspect.sha256",
+    "check": "node tools/check",
     "lint": "eslint lib/**/*.js test/**/*.js",
+    "build": "webpack",
     "test": "node --expose-internals test/parallel/test-util-inspect.js",
     "coverage": "c8 -r lcov npm test",
     "dev": "light-server -q -s. -w '*.js,test/*.js # npm run coverage' -o /coverage/lcov-report/index.html"
@@ -25,7 +28,9 @@
     "@babel/core": "^7.12.13",
     "@babel/plugin-syntax-class-properties": "^7.12.13",
     "c8": "^7.5.0",
-    "eslint": "^7.19.0"
+    "eslint": "^7.19.0",
+    "webpack": "^5.20.2",
+    "webpack-cli": "^4.5.0"
   },
   "lastExtract": {
     "file": "../node/lib/internal/util/inspect.js",

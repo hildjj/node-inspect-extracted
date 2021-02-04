@@ -85,6 +85,12 @@ const StringIterator = String.prototype[Symbol.iterator].call
   .bind(String.prototype[Symbol.iterator]);
 const StringIteratorPrototype = Reflect.getPrototypeOf(StringIterator(''));
 
+function ErrorCaptureStackTrace(targetObject) {
+  const stack = new Error().stack;
+  // Remove the second line, which is this function
+  targetObject.stack = stack.replace(/.*\n.*/, '$1');
+}
+
 module.exports = {
   Array,
   ArrayIsArray: Array.isArray,
@@ -111,7 +117,7 @@ module.exports = {
     Date.prototype.toISOString.call.bind(Date.prototype.toISOString),
   DatePrototypeToString:
     Date.prototype.toString.call.bind(Date.prototype.toString),
-  ErrorCaptureStackTrace: Error.captureStackTrace.bind(Error),
+  ErrorCaptureStackTrace,
   ErrorPrototypeToString:
     Error.prototype.toString.call.bind(Error.prototype.toString),
   FunctionPrototypeCall:
