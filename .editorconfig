@@ -1,19 +1,27 @@
-# EditorConfig is awesome: http://EditorConfig.org
-
-# top-most EditorConfig file
 root = true
 
-# Unix-style newlines with a newline ending every file
 [*]
+charset = utf-8
 end_of_line = lf
+indent_size = 2
+indent_style = space
 insert_final_newline = true
+trim_trailing_whitespace = true
+quote_type = single
 
-# Matches multiple files with brace expansion notation
-# Set default charset
-[*.{c,h}]
-indent_style = space
-indent_size = 2
+[vcbuild.bat]
+end_of_line = crlf
 
-[*.{js,coffee}]
-indent_style = space
-indent_size = 2
+[Makefile]
+indent_size = 8
+indent_style = tab
+
+[{deps}/**]
+charset = unset
+end_of_line = unset
+indent_size = unset
+indent_style = unset
+trim_trailing_whitespace = unset
+
+[{test/fixtures,deps,tools/node_modules,tools/gyp,tools/icu,tools/msvs}/**]
+insert_final_newline = false
