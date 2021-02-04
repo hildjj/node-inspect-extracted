@@ -3,3 +3,4 @@ coverage/
 node_modules/
 t.js
 dist/
+.vscode/

@@ -5,3 +5,10 @@ t.js
 test/
 tools/
 example/
+src/
+.editorconfig
+.eslintrc.js
+.jsdoc.conf
+webpack.config.js
+.vscode/
+dist/*.js.map
