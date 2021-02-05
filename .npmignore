@@ -12,3 +12,4 @@ src/
 webpack.config.js
 .vscode/
 dist/*.js.map
+.github/
