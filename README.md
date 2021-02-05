@@ -14,8 +14,6 @@ interesting for Web use cases.
 
     npm install node-inspect-extracted
 
-
-
 ## Use
 
 This should work in node (for testing) and browsers, using either `require`, `import`, or as `window.Inspect` if you include this in your page as a script tag.
@@ -51,3 +49,6 @@ copyright header.  The maintainers of this package will not assert copyright
 over this code, but will assign ownership to the Node.js contributors, with
 the same license as specified in the Node.js codebase; the portion adapted
 here should all be plain MIT license.
+
+[![Tests](https://github.com/hildjj/node-inspect-extracted/workflows/Tests/badge.svg)](https://github.com/hildjj/node-inspect-extracted/actions?query=workflow%3ATests)
+[![Coverage Status](https://coveralls.io/repos/github/hildjj/node-inspect-extracted/badge.svg?branch=master)](https://coveralls.io/github/hildjj/node-inspect-extracted?branch=master)
