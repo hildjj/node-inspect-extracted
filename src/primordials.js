@@ -83,8 +83,7 @@ const makeSafe = (unsafe, safe) => {
   return safe;
 };
 
-const StringIterator = String.prototype[Symbol.iterator].call
-  .bind(String.prototype[Symbol.iterator]);
+const StringIterator = Function.call.bind(String.prototype[Symbol.iterator]);
 const StringIteratorPrototype = Reflect.getPrototypeOf(StringIterator(''));
 
 function ErrorCaptureStackTrace(targetObject) {
@@ -96,39 +95,25 @@ function ErrorCaptureStackTrace(targetObject) {
 module.exports = {
   Array,
   ArrayIsArray: Array.isArray,
-  ArrayPrototypeFilter:
-    Array.prototype.filter.call.bind(Array.prototype.filter),
-  ArrayPrototypeForEach:
-    Array.prototype.forEach.call.bind(Array.prototype.forEach),
-  ArrayPrototypeIncludes:
-    Array.prototype.includes.call.bind(Array.prototype.includes),
-  ArrayPrototypePush:
-    Array.prototype.push.call.bind(Array.prototype.push),
-  ArrayPrototypePushApply:
-    Array.prototype.push.apply.bind(Array.prototype.push),
-  ArrayPrototypeSort: Array.prototype.sort.call.bind(Array.prototype.sort),
-  ArrayPrototypeUnshift:
-    Array.prototype.unshift.call.bind(Array.prototype.unshift),
-  BigIntPrototypeValueOf:
-    BigInt.prototype.valueOf.call.bind(BigInt.prototype.valueOf),
-  BooleanPrototypeValueOf:
-    Boolean.prototype.valueOf.call.bind(Boolean.prototype.valueOf),
-  DatePrototypeGetTime:
-    Date.prototype.getTime.call.bind(Date.prototype.getTime),
-  DatePrototypeToISOString:
-    Date.prototype.toISOString.call.bind(Date.prototype.toISOString),
-  DatePrototypeToString:
-    Date.prototype.toString.call.bind(Date.prototype.toString),
+  ArrayPrototypeFilter: Function.call.bind(Array.prototype.filter),
+  ArrayPrototypeForEach: Function.call.bind(Array.prototype.forEach),
+  ArrayPrototypeIncludes: Function.call.bind(Array.prototype.includes),
+  ArrayPrototypePush: Function.call.bind(Array.prototype.push),
+  ArrayPrototypePushApply: Function.apply.bind(Array.prototype.push),
+  ArrayPrototypeSort: Function.call.bind(Array.prototype.sort),
+  ArrayPrototypeUnshift: Function.call.bind(Array.prototype.unshift),
+  BigIntPrototypeValueOf: Function.call.bind(BigInt.prototype.valueOf),
+  BooleanPrototypeValueOf: Function.call.bind(Boolean.prototype.valueOf),
+  DatePrototypeGetTime: Function.call.bind(Date.prototype.getTime),
+  DatePrototypeToISOString: Function.call.bind(Date.prototype.toISOString),
+  DatePrototypeToString: Function.call.bind(Date.prototype.toString),
   ErrorCaptureStackTrace,
-  ErrorPrototypeToString:
-    Error.prototype.toString.call.bind(Error.prototype.toString),
-  FunctionPrototypeCall:
-    Function.prototype.call.call.bind(Function.prototype.call),
-  FunctionPrototypeToString:
-    Function.prototype.toString.call.bind(Function.prototype.toString),
+  ErrorPrototypeToString: Function.call.bind(Error.prototype.toString),
+  FunctionPrototypeCall: Function.call.bind(Function.prototype.call),
+  FunctionPrototypeToString: Function.call.bind(Function.prototype.toString),
   JSONStringify: JSON.stringify,
   MapPrototypeGetSize: getGetter(Map, 'size'),
-  MapPrototypeEntries: Map.prototype.entries.call.bind(Map.prototype.entries),
+  MapPrototypeEntries: Function.call.bind(Map.prototype.entries),
   MathFloor: Math.floor,
   MathMax: Math.max,
   MathMin: Math.min,
@@ -138,8 +123,7 @@ module.exports = {
   NumberIsNaN: Number.isNaN,
   NumberParseFloat: Number.parseFloat,
   NumberParseInt: Number.parseInt,
-  NumberPrototypeValueOf:
-    Number.prototype.valueOf.call.bind(Number.prototype.valueOf),
+  NumberPrototypeValueOf: Function.call.bind(Number.prototype.valueOf),
   Object,
   ObjectAssign: Object.assign,
   ObjectCreate: Object.create,
@@ -151,21 +135,19 @@ module.exports = {
   ObjectIs: Object.is,
   ObjectKeys: Object.keys,
   ObjectPrototypeHasOwnProperty:
-    Object.hasOwnProperty.call.bind(Object.prototype.hasOwnProperty),
+    Function.call.bind(Object.prototype.hasOwnProperty),
   ObjectPrototypePropertyIsEnumerable:
-    Object.prototype.propertyIsEnumerable.call.bind(
-      Object.prototype.propertyIsEnumerable),
+    Function.call.bind(Object.prototype.propertyIsEnumerable),
   ObjectSeal: Object.seal,
   ObjectSetPrototypeOf: Object.setPrototypeOf,
   ReflectApply: Reflect.apply,
   ReflectOwnKeys: Reflect.ownKeys,
   RegExp,
-  RegExpPrototypeTest: RegExp.prototype.test.call.bind(RegExp.prototype.test),
-  RegExpPrototypeToString:
-    RegExp.prototype.toString.call.bind(RegExp.prototype.toString),
+  RegExpPrototypeTest: Function.call.bind(RegExp.prototype.test),
+  RegExpPrototypeToString: Function.call.bind(RegExp.prototype.toString),
   SafeStringIterator: createSafeIterator(
     StringIterator,
-    StringIteratorPrototype.next.call.bind(StringIteratorPrototype.next)
+    Function.call.bind(StringIteratorPrototype.next)
   ),
   SafeMap: makeSafe(
     Map,
@@ -183,39 +165,24 @@ module.exports = {
       constructor(i) { super(i); } // eslint-disable-line no-useless-constructor
     }),
   SetPrototypeGetSize: getGetter(Set, 'size'),
-  SetPrototypeValues: Set.prototype.values.call.bind(Set.prototype.values),
+  SetPrototypeValues: Function.call.bind(Set.prototype.values),
   String,
-  StringPrototypeCharCodeAt:
-    String.prototype.charCodeAt.call.bind(String.prototype.charCodeAt),
-  StringPrototypeCodePointAt:
-    String.prototype.codePointAt.call.bind(String.prototype.codePointAt),
-  StringPrototypeEndsWith:
-    String.prototype.endsWith.call.bind(String.prototype.endsWith),
-  StringPrototypeIncludes:
-    String.prototype.includes.call.bind(String.prototype.includes),
-  StringPrototypeNormalize:
-    String.prototype.normalize.call.bind(String.prototype.normalize),
-  StringPrototypePadEnd:
-    String.prototype.padEnd.call.bind(String.prototype.padEnd),
-  StringPrototypePadStart:
-    String.prototype.padStart.call.bind(String.prototype.padStart),
-  StringPrototypeRepeat:
-    String.prototype.repeat.call.bind(String.prototype.repeat),
-  StringPrototypeReplace:
-    String.prototype.replace.call.bind(String.prototype.replace),
-  StringPrototypeSlice:
-    String.prototype.slice.call.bind(String.prototype.slice),
-  StringPrototypeSplit:
-    String.prototype.split.call.bind(String.prototype.split),
-  StringPrototypeToLowerCase:
-    String.prototype.toLowerCase.call.bind(String.prototype.toLowerCase),
-  StringPrototypeTrim: String.prototype.trim.call.bind(String.prototype.trim),
-  StringPrototypeValueOf:
-    String.prototype.valueOf.call.bind(String.prototype.valueOf),
-  SymbolPrototypeToString:
-    Symbol.prototype.toString.call.bind(Symbol.prototype.toString),
-  SymbolPrototypeValueOf:
-    Symbol.prototype.valueOf.call.bind(Symbol.prototype.valueOf),
+  StringPrototypeCharCodeAt: Function.call.bind(String.prototype.charCodeAt),
+  StringPrototypeCodePointAt: Function.call.bind(String.prototype.codePointAt),
+  StringPrototypeEndsWith: Function.call.bind(String.prototype.endsWith),
+  StringPrototypeIncludes: Function.call.bind(String.prototype.includes),
+  StringPrototypeNormalize: Function.call.bind(String.prototype.normalize),
+  StringPrototypePadEnd: Function.call.bind(String.prototype.padEnd),
+  StringPrototypePadStart: Function.call.bind(String.prototype.padStart),
+  StringPrototypeRepeat: Function.call.bind(String.prototype.repeat),
+  StringPrototypeReplace: Function.call.bind(String.prototype.replace),
+  StringPrototypeSlice: Function.call.bind(String.prototype.slice),
+  StringPrototypeSplit: Function.call.bind(String.prototype.split),
+  StringPrototypeToLowerCase: Function.call.bind(String.prototype.toLowerCase),
+  StringPrototypeTrim: Function.call.bind(String.prototype.trim),
+  StringPrototypeValueOf: Function.call.bind(String.prototype.valueOf),
+  SymbolPrototypeToString: Function.call.bind(Symbol.prototype.toString),
+  SymbolPrototypeValueOf: Function.call.bind(Symbol.prototype.valueOf),
   SymbolIterator: Symbol.iterator,
   SymbolFor: Symbol.for,
   SymbolToStringTag: Symbol.toStringTag,
