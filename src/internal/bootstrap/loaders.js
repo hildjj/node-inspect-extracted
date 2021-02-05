@@ -1,8 +1,8 @@
 'use strict';
 
 exports.NativeModule = {
-  exists() {
+  exists(name) {
     // TODO: hack
-    return true;
+    return !name.startsWith('/');
   }
 };

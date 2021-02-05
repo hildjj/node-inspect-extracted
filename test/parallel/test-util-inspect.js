@@ -20,11 +20,12 @@
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 'use strict';
+
+const util = require('./util');
 const common = require('../common');
 const assert = require('assert');
 const { internalBinding } = require('internal/test/binding');
 const JSStream = internalBinding('js_stream').JSStream;
-const util = require('./util');
 const vm = require('vm');
 const v8 = require('v8');
 const { previewEntries } = internalBinding('util');
@@ -32,6 +33,13 @@ const { inspect } = util;
 const { MessageChannel } = require('worker_threads');
 
 /* eslint-disable symbol-description */
+
+if (typeof assert.match !== 'function') {
+  // node 10
+  assert.match = (str, regex, msg) => {
+    assert(str.match(regex), msg);
+  };
+}
 
 assert.strictEqual(util.inspect(1), '1');
 assert.strictEqual(util.inspect(false), 'false');
@@ -2889,14 +2897,16 @@ assert.strictEqual(
 {
   // Tracing class respects inspect depth.
   try {
-    const trace = require('trace_events').createTracing({ categories: ['fo'] });
-    const actualDepth0 = util.inspect({ trace }, { depth: 0 });
-    assert.strictEqual(actualDepth0, '{ trace: [Tracing] }');
-    const actualDepth1 = util.inspect({ trace }, { depth: 1 });
-    assert.strictEqual(
-      actualDepth1,
-      "{ trace: Tracing { enabled: false, categories: 'fo' } }"
-    );
+    if (parseFloat(process.version.slice(1)) > 14) {
+      const trace = require('trace_events').createTracing({ categories: ['fo'] });
+      const actualDepth0 = util.inspect({ trace }, { depth: 0 });
+      assert.strictEqual(actualDepth0, '{ trace: [Tracing] }');
+      const actualDepth1 = util.inspect({ trace }, { depth: 1 });
+      assert.strictEqual(
+        actualDepth1,
+        "{ trace: Tracing { enabled: false, categories: 'fo' } }"
+      );
+    }
   } catch (err) {
     if (err.code !== 'ERR_TRACE_EVENTS_UNAVAILABLE')
       throw err;
@@ -2905,11 +2915,25 @@ assert.strictEqual(
 
 // Inspect prototype properties.
 {
+  function _defineProperty(obj, key, value) {
+    if (key in obj) {
+      Object.defineProperty(obj, key, {
+        value: value,
+        enumerable: true,
+        configurable: true,
+        writable: true
+      });
+    } else {
+      obj[key] = value;
+    } return obj;
+  }
+
   class Foo extends Map {
-    /* eslint-disable */
-    prop = false;
-    prop2 = true;
-    /* eslint-enable */
+    constructor(...args) {
+      super(...args);
+      _defineProperty(this, 'prop', false);
+      _defineProperty(this, 'prop2', true);
+    }
     get abc() {
       return true;
     }
@@ -2927,10 +2951,12 @@ assert.strictEqual(
   }
 
   class Bar extends Foo {
-    /* eslint-disable */
-    abc = true;
-    prop = true;
-    /* eslint-enable */
+    constructor(...args) {
+      super(...args);
+      _defineProperty(this, 'prop', true);
+      _defineProperty(this, 'abc', true);
+    }
+
     get xyz() {
       return 'YES!';
     }
@@ -2938,6 +2964,7 @@ assert.strictEqual(
       return this;
     }
   }
+
 
   const bar = new Bar();
 

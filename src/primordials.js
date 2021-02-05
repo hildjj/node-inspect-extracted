@@ -59,9 +59,11 @@ const makeSafe = (unsafe, safe) => {
           typeof desc.value === 'function' &&
           desc.value.length === 0 &&
           Symbol.iterator in (
-            Function.prototype.call.call(desc.value, dummy) ?? {})) {
+            Function.prototype.call.call(desc.value, dummy) || {})) {
           const createIterator = uncurryThis(desc.value);
-          next ??= uncurryThis(createIterator(dummy).next);
+          if (next == null) {
+            next = uncurryThis(createIterator(dummy).next);
+          }
           const SafeIterator = createSafeIterator(createIterator, next);
           desc.value = function() {
             return new SafeIterator(this);

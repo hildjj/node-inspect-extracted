@@ -186,6 +186,7 @@ const keyStrRegExp = /^[a-zA-Z_][a-zA-Z_0-9]*$/;
 const numberRegExp = /^(0|[1-9][0-9]*)$/;
 
 const coreModuleRegExp = /^    at (?:[^/\\(]+ \(|)node:(.+):\d+:\d+\)?$/;
+const coreModuleRegExpOld = /^    at (?:[^/\\(]+ \(|)((?<![/\\]).+)\.js:\d+:\d+\)?$/;
 const nodeModulesRegExp = /[/\\]node_modules[/\\](.+?)(?=[/\\])/g;
 
 const classRegExp = /^(\s+[^(]*?)\s*{/;
@@ -1216,7 +1217,8 @@ function formatError(err, constructor, tag, ctx, keys) {
     let newStack = stack.slice(0, stackStart);
     const lines = stack.slice(stackStart + 1).split('\n');
     for (const line of lines) {
-      const core = line.match(coreModuleRegExp);
+      const core = line.match(coreModuleRegExp) ||
+        line.match(coreModuleRegExpOld);
       if (core !== null && NativeModule.exists(core[1])) {
         newStack += `\n${ctx.stylize(line, 'undefined')}`;
       } else {
