@@ -7,11 +7,12 @@
   "module": "dist/inspect.js",
   "scripts": {
     "check": "node tools/check",
-    "lint": "eslint lib/**/*.js test/**/*.js",
+    "lint": "eslint src/**/*.js test/**/*.js",
     "build": "webpack",
     "test": "node --expose-internals test/parallel/test-util-inspect.js",
     "coverage": "c8 -r lcov npm test",
-    "dev": "light-server -q -s. -w '*.js,test/*.js # npm run coverage' -o /coverage/lcov-report/index.html"
+    "prestart": "npm run coverage || true",
+    "start": "light-server -q -s. -w 'src/**/*.js,test/**/*.js,dist/**,example/** # npm run coverage' -o /coverage/lcov-report/index.html"
   },
   "keywords": [
     "inspect",

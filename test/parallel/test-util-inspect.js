@@ -2898,7 +2898,8 @@ assert.strictEqual(
   // Tracing class respects inspect depth.
   try {
     if (parseFloat(process.version.slice(1)) > 14) {
-      const trace = require('trace_events').createTracing({ categories: ['fo'] });
+      const trace =
+        require('trace_events').createTracing({ categories: ['fo'] });
       const actualDepth0 = util.inspect({ trace }, { depth: 0 });
       assert.strictEqual(actualDepth0, '{ trace: [Tracing] }');
       const actualDepth1 = util.inspect({ trace }, { depth: 1 });
