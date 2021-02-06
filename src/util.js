@@ -32,6 +32,7 @@ module.exports = {
   getOwnNonIndexProperties,
   getPromiseDetails() { return [kPending, undefined]; },
   getProxyDetails: prxy.getProxyDetails,
+  Proxy: prxy.Proxy,
   kPending,
   kRejected,
   previewEntries(val) {

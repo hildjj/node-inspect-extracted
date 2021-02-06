@@ -90,7 +90,8 @@ const {
   propertyFilter: {
     ALL_PROPERTIES,
     ONLY_ENUMERABLE
-  }
+  },
+  Proxy
 } = require('./util');
 
 const {
@@ -2117,8 +2118,6 @@ module.exports = {
   inspect,
   format,
   formatWithOptions,
-  getStringWidth,
-  inspectDefaultOptions,
-  stripVTControlCharacters,
-  stylizeWithColor
+  stylizeWithColor,
+  Proxy
 };
