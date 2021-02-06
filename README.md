@@ -41,6 +41,40 @@ From the browser:
 </script>
 ```
 
+## Colors
+
+If you specify `{colors: true}` in the inspect options, you will get ANSI
+escape codes, just as you would in Node.  That's unlikely to be helpful to you
+on the Web, so you might want `stylizeWithHTML`, which is also exported from the package:
+
+```js
+inspect({a:1}, {
+  compact: false,
+  stylize: stylizeWithHTML
+}
+```
+
+which yields this ugly HTML:
+```html
+{
+  a: <span style="color:yellow;">1</span>
+}
+```
+
+If you want better HTML, the [lightly-documented](https://nodejs.org/api/util.html#util_custom_inspection_functions_on_objects) `stylize` option requires
+a function that takes two parameters, a string, and a class name.  The mappings
+from class names to colors is in `inspect.styles`, so start with this:
+
+```js
+stylizeWithHTML(str, styleType) {
+  const style = inspect.styles[styleType];
+  if (style !== undefined) {
+    return `<span style="color:${style};">${str}</span>`;
+  }
+  return str;
+}
+```
+
 ## Known Limiations
 
  - If you want your

@@ -4,11 +4,16 @@
 const path = require('path');
 const fs = require('fs');
 const child_process = require('child_process');
-const { stylizeWithColor } = require('../src/inspect');
+const { inspect } = require('../src/inspect');
 
 const root = path.resolve(__dirname, '..');
 const buf = Buffer.alloc(200);
 let retVal = 0;
+
+function c(str, color) {
+  const [fg, reset] = inspect.colors[color];
+  return `\u001b[${fg}m${str}\u001b[${reset}m`;
+}
 
 // This is all sync so that the output isn't garbled together.
 // The "parallel" directory is just copied from the Node
@@ -19,7 +24,7 @@ function walk(dir) {
     const fn = path.join(root, dir, f);
     const m = f.match(/^test-(.*)\.js$/);
     if (m) {
-      console.log(stylizeWithColor(m[1], 'special'));
+      console.log(c(m[1], 'cyan'));
       // read the first 200 bytes and look for
       // "// Flags: --expose-internals"
       const fd = fs.openSync(fn);
@@ -35,15 +40,15 @@ function walk(dir) {
         stdio: 'inherit'
       });
       if (res.error) {
-        console.log(stylizeWithColor(res.error, 'regexp'));
+        console.log(c(res.error, 'red'));
         retVal = 1;
       } else if (res.signal) {
         console.log(
-          stylizeWithColor(`${bare} killed by signal ${res.signal}`, 'regexp'));
+          c(`${bare} killed by signal ${res.signal}`, 'red'));
         retVal = 1;
       } else if (res.status !== 0) {
         console.log(
-          stylizeWithColor(`${bare} returned ${res.status}`, 'regexp'));
+          c(`${bare} returned ${res.status}`, 'red'));
         retVal = 1;
       }
     } else if (fs.statSync(fn).isDirectory()) {
@@ -55,8 +60,8 @@ function walk(dir) {
 walk('test');
 
 if (retVal === 0) {
-  console.log(stylizeWithColor('--- PASS ---', 'symbol'), new Date().toISOString());
+  console.log(c('--- PASS ---', 'green'), new Date().toISOString());
 } else {
-  console.log(stylizeWithColor('--- FAIL ---', 'regexp'), new Date().toISOString());
+  console.log(c('--- FAIL ---', 'red'), new Date().toISOString());
 }
 process.exit(retVal);

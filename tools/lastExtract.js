@@ -24,7 +24,7 @@ module.exports = {
     },
     {
       name: '../node/test/parallel/test-util-inspect-getters-accessing-this.js',
-      local: 'test/parallel/test-util-inspect-proxy.js',
+      local: 'test/parallel/test-util-inspect-getters-accessing-this.js',
       sha256: '1225345e3399896250305cc060146f7ba92e66686e6cd59ece4f03a2da9ca701',
       mtime: '2021-02-05T17:22:35.532Z',
       commit: '929c51f14acff11b39277f5f5fe4b5537bdc370f'

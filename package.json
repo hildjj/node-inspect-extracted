@@ -9,6 +9,7 @@
     "check": "node tools/check",
     "lint": "eslint src/**/*.js test/**/*.js",
     "build": "webpack",
+    "pretest": "npm run build",
     "test": "node tools/runtests",
     "coverage": "c8 -r lcov -n src npm test",
     "prestart": "npm run coverage || true",

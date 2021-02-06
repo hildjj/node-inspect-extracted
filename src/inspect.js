@@ -2119,5 +2119,12 @@ module.exports = {
   format,
   formatWithOptions,
   stylizeWithColor,
+  stylizeWithHTML(str, styleType) {
+    const style = inspect.styles[styleType];
+    if (style !== undefined) {
+      return `<span style="color:${style};">${str}</span>`;
+    }
+    return str;
+  },
   Proxy
 };

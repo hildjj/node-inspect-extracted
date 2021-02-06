@@ -13,7 +13,12 @@ const lastExtract = require(LAST_EXTRACT_FILE);
 
 const args = process.argv.slice(2);
 const update = args.includes('--update') || args.includes('-u')
-const diff = true || args.includes('--diff') || args.includes('-d')
+const diff = args.includes('--diff') || args.includes('-d')
+
+function c(str, color) {
+  const [fg, reset] = util.inspect.colors[color];
+  return `\u001b[${fg}m${str}\u001b[${reset}m`;
+}
 
 function exec(bin, opts = {}) {
   opts = {
@@ -80,7 +85,7 @@ async function checkAll() {
     const name = path.resolve(__dirname, '..', f.name);
     if (diff) {
       if (f.local) {
-        console.log(`---------- ${f.local} ----------`);
+        console.log(`---------- ${c(f.local, 'cyan')} ----------`);
         try {
           await exec('diff', {
                 args: [
@@ -91,11 +96,9 @@ async function checkAll() {
               });
         } catch (err) {
           if (!err.code) {
-            console.log(err);
+            console.log(c(err, 'red'));
           }
         }
-      } else {
-        console.log('NO LOCAL', f)
       }
     } else {
       const hash = await checkFileHash(name);
