@@ -33,12 +33,6 @@
     "webpack": "^5.20.2",
     "webpack-cli": "^4.5.0"
   },
-  "lastExtract": {
-    "file": "../node/lib/internal/util/inspect.js",
-    "date": "2021-02-03",
-    "commit": "728fee22e93df0f281bd3542b993e8384ba5eed1",
-    "sha256": "3599de1df94014eb1da104369f3a813c7d8df0f77038216f89d80ddd23054b19"
-  },
   "engines": {
     "node": ">=10.18.0"
   }

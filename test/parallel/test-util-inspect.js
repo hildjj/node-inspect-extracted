@@ -20,12 +20,11 @@
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
 'use strict';
-
-const util = require('./util');
 const common = require('../common');
 const assert = require('assert');
 const { internalBinding } = require('internal/test/binding');
 const JSStream = internalBinding('js_stream').JSStream;
+const util = require('./util');
 const vm = require('vm');
 const v8 = require('v8');
 const { previewEntries } = internalBinding('util');

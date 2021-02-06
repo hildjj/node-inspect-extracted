@@ -41,6 +41,36 @@ From the browser:
 </script>
 ```
 
+## Known Limiations
+
+ - If you want your
+   [`Proxy`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy)
+   objects to have their internal object inspected, you may use the `Proxy`
+   constructor exported by this project.  That was done mostly for test coverage
+   purposes, it is not recommended for production code.
+ - [`arguments`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/arguments)
+   objects are not treated specially.
+   [[bug](https://github.com/hildjj/node-inspect-extracted/issues/1)]
+ - Several of the existing type checks (corresponding to Node's
+   [`util.types`](https://nodejs.org/api/util.html#util_util_types)) are
+   weaker than the ones in Node, which has the freedom to use internal
+   capabilities of the runtime.  This means you can fake out the type
+   detection to get output different than node.
+   [[bug](https://github.com/hildjj/node-inspect-extracted/issues/2)]
+ - Objects that have been mangled with `Object.setPrototypeOf`
+   do not retain their original type information.
+   [[bug](https://github.com/hildjj/node-inspect-extracted/issues/3)]
+ - `Promise` state is not visible.  All Promises will show up as
+   `Promise< pending >` no matter what state they are in.
+ - `Map` and `Set` iterators will not show their internal state because that
+   cannot be done from unprivileged code without modifying the iterator.
+   Entry iterators are not distinguished from value iterators.
+   [[bug](https://github.com/hildjj/node-inspect-extracted/issues/4)]
+ - `WeakMap` and `WeakSet` will not show their contents, because those contents
+   cannot be iterated over in unprivileged code.
+ - Colorful stack traces are not completely accurate with respect to what
+   modules are Node-internal.  This doesn't matter on the Web.
+
 ## LICENSE
 
 This code is an adaptation of the Node.js internal implementation, mostly from

@@ -46,7 +46,7 @@ function walk(dir) {
           stylizeWithColor(`${bare} returned ${res.status}`, 'regexp'));
         retVal = 1;
       }
-    } else if (fs.lstatSync(fn).isDirectory()) {
+    } else if (fs.statSync(fn).isDirectory()) {
       walk(bare);
     }
   }

@@ -3,6 +3,16 @@
 const { getConstructorName } = require('../../util');
 
 function constructorNamed(val, ...name) {
+  // pass in names rather than types, in case SharedArrayBuffer (e.g.) isn't
+  // in your browser
+  for (const n of name) {
+    const typ = globalThis[name];
+    if (typ) {
+      if (val instanceof typ) {
+        return true;
+      }
+    }
+  }
   // instanceOf doesn't work across vm boundaries, so check the whole
   // inheritance chain
   while (val) {
@@ -87,8 +97,10 @@ module.exports = {
       '[object Map Iterator]';
   },
   isModuleNamespaceObject(val) {
-    // TODO: figure this out
-    return false;
+    // TODO: this is weak and easily faked
+    return val &&
+      (typeof val === 'object') &&
+      (val[Symbol.toStringTag] === 'Module');
   },
   isNativeError(val) {
     return (val instanceof Error) && constructorNamed(

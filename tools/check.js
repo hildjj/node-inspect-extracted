@@ -1,15 +1,137 @@
 #!/usr/bin/env node
 'use strict';
 
-const pkg = require('../package.json');
 const crypto = require('crypto');
 const fs = require('fs');
-const hash = crypto.createHash('sha256');
+const fsp = fs.promises;
+const path = require('path');
+const { spawn } = require('child_process');
+const util = require('util');
 
-const inp = fs.createReadStream(pkg.lastExtract.file);
-inp.pipe(hash).setEncoding('hex').on('data', (d) => {
-  if (d !== pkg.lastExtract.sha256) {
-    console.log('Hash mismatch, now:', d);
-    process.exit(1);
+const LAST_EXTRACT_FILE = path.join(__dirname, 'lastExtract.js');
+const lastExtract = require(LAST_EXTRACT_FILE);
+
+const args = process.argv.slice(2);
+const update = args.includes('--update') || args.includes('-u')
+const diff = true || args.includes('--diff') || args.includes('-d')
+
+function exec(bin, opts = {}) {
+  opts = {
+    args: [],
+    encoding: 'utf8',
+    env: {},
+    ...opts
   }
-});
+  return new Promise((resolve, reject) => {
+    opts.env = {
+      ...process.env,
+      ...opts.env
+    }
+    // console.log(`SPAWN: (${opts.cwd || process.cwd()})`, bin, ...opts.args)
+    const args = opts.args || [];
+    delete opts.args;
+    const c = spawn(bin, args, {
+      stdio: 'pipe',
+      ...opts
+    })
+    const bufs = []
+    c.on('error', reject)
+    c.on('close', code => {
+      const buf = Buffer.concat(bufs)
+      const str = buf.toString(opts.encoding)
+      if (code !== 0) {
+        const err = new Error(`process fail, code ${code}`)
+        err.buf = buf
+        err.str = str
+        err.code = code
+        reject(err)
+      } else {
+        resolve(str)
+      }
+    })
+    if (opts.stdio !== 'inherit') {
+      c.stdout.on('data', b => bufs.push(b))
+      c.stderr.on('data', b => bufs.push(b))
+
+      if (opts.stdin != null) {
+        c.stdin.write(opts.stdin)
+      }
+      c.stdin.end()
+    }
+  })
+}
+
+function checkFileHash(filename) {
+  return new Promise((resolve, reject) => {
+    const hash = crypto.createHash('sha256');
+    const inp = fs.createReadStream(filename);
+    const p = inp.pipe(hash).setEncoding('hex');
+    p.on('data', resolve);
+    p.on('error', reject);
+  });
+}
+
+async function checkAll() {
+  const lastTime = new Date(lastExtract.time);
+  lastExtract.time = new Date().toISOString();
+
+  let fail = false
+  for (const f of lastExtract.files) {
+    const name = path.resolve(__dirname, '..', f.name);
+    if (diff) {
+      if (f.local) {
+        console.log(`---------- ${f.local} ----------`);
+        try {
+          await exec('diff', {
+                args: [
+                  '-u', name, path.resolve(__dirname, '..', f.local)
+                ],
+                cwd: path.resolve(__dirname, '..'),
+                stdio: 'inherit'
+              });
+        } catch (err) {
+          if (!err.code) {
+            console.log(err);
+          }
+        }
+      } else {
+        console.log('NO LOCAL', f)
+      }
+    } else {
+      const hash = await checkFileHash(name);
+      if (hash !== f.sha256) {
+        if (update) {
+          f.sha256 = hash;
+          const s = await fsp.stat(name);
+          f.mtime = s.mtime.toISOString();
+          f.commit = await exec('git', {
+            args: [
+              'log', '-n1', '--pretty=format:%H', '--', path.basename(name)
+            ],
+            cwd: path.dirname(name)
+          })
+        } else {
+          fail = true
+          console.error(`Hash mismatch, now: "${hash}"`);
+        }
+      }
+    }
+  }
+  return fail;
+}
+
+checkAll().then(async fail => {
+  if (fail) {
+    process.exit(1);
+  } else if (update) {
+    await fsp.writeFile(
+      LAST_EXTRACT_FILE,
+      'module.exports = ' + util.inspect(lastExtract, {
+        depth: Infinity,
+        compact: false
+      }));
+  }
+}, e => {
+  console.log(e)
+  process.exit(1);
+})

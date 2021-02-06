@@ -1,4 +1,3 @@
-// Flags: --expose-internals
 'use strict';
 
 const {
@@ -8,8 +7,8 @@ const {
 require('../common');
 const assert = require('assert');
 const util = require('./util');
-const { internalBinding } = require('internal/test/binding');
-const processUtil = { getProxyDetails }; //internalBinding('util');
+// NOT NEEDED: const { internalBinding } = require('internal/test/binding');
+const processUtil = { getProxyDetails };
 const opts = { showProxy: true };
 
 let proxyObj;

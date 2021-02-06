@@ -1483,7 +1483,7 @@ function formatArrayBuffer(ctx, value) {
     return [ctx.stylize('(detached)', 'special')];
   }
   if (hexSlice === undefined)
-    hexSlice = uncurryThis(require('buffer').Buffer.prototype.hexSlice);
+    hexSlice = uncurryThis(require('./buffer').Buffer.prototype.hexSlice);
   let str = StringPrototypeTrim(StringPrototypeReplace(
     hexSlice(buffer, 0, MathMin(ctx.maxArrayLength, buffer.length)),
     /(.{2})/g, '$1 '));
