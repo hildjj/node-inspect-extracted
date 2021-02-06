@@ -15,4 +15,7 @@ import('./fixture.mjs').then(m => {
   };
   // TODO: this should fail
   assert.strictEqual(inspect(m), '[Module: null prototype] { default: 4 }');
+}, e => {
+  // Node 10 doesn't have import
+  assert(e.message, 'Not supported');
 });
