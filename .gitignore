@@ -2,5 +2,4 @@ coverage/
 .nyc_output/
 node_modules/
 t.js
-dist/
 .vscode/
