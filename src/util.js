@@ -1,5 +1,6 @@
 'use strict';
 
+const prxy = require('./proxy');
 const ALL_PROPERTIES = 0;
 const ONLY_ENUMERABLE = 2;
 const kPending = Symbol('kPending');
@@ -30,7 +31,7 @@ function getOwnNonIndexProperties(a, filter = ONLY_ENUMERABLE) {
 module.exports = {
   getOwnNonIndexProperties,
   getPromiseDetails() { return [kPending, undefined]; },
-  getProxyDetails() {},
+  getProxyDetails: prxy.getProxyDetails,
   kPending,
   kRejected,
   previewEntries(val) {

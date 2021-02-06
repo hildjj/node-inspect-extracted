@@ -1,9 +1,7 @@
 'use strict';
 
-// This should never get called
-const internalBinding = () => { throw new Error('Not Implemented'); };
-
 const {
+  internalBinding,
   Array,
   ArrayIsArray,
   ArrayPrototypeFilter,
@@ -2007,7 +2005,7 @@ function formatWithOptionsInternal(inspectOptions, args) {
   return str;
 }
 
-if (false) { // (internalBinding('config').hasIntl) {
+if (internalBinding('config').hasIntl) {
   const icu = internalBinding('icu');
   // icu.getStringWidth(string, ambiguousAsFullWidth, expandEmojiSequence)
   // Defaults: ambiguousAsFullWidth = false; expandEmojiSequence = true;
@@ -2121,5 +2119,6 @@ module.exports = {
   formatWithOptions,
   getStringWidth,
   inspectDefaultOptions,
-  stripVTControlCharacters
+  stripVTControlCharacters,
+  stylizeWithColor
 };

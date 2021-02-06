@@ -9,8 +9,8 @@
     "check": "node tools/check",
     "lint": "eslint src/**/*.js test/**/*.js",
     "build": "webpack",
-    "test": "node --expose-internals test/parallel/test-util-inspect.js",
-    "coverage": "c8 -r lcov npm test",
+    "test": "node tools/runtests",
+    "coverage": "c8 -r lcov -n src npm test",
     "prestart": "npm run coverage || true",
     "start": "light-server -q -s. -w 'src/**/*.js,test/**/*.js,dist/**,example/** # npm run coverage' -o /coverage/lcov-report/index.html"
   },

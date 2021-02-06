@@ -18,7 +18,6 @@ const {
   ArrayPrototypePop,
   ArrayPrototypePush,
   ArrayPrototypeSplice,
-  ArrayPrototypeUnshift,
   ErrorCaptureStackTrace,
   ObjectDefineProperty,
   ReflectApply,
@@ -26,7 +25,6 @@ const {
   SafeMap,
   StringPrototypeEndsWith,
   StringPrototypeIncludes,
-  StringPrototypeMatch,
   StringPrototypeSlice,
   StringPrototypeToLowerCase,
 } = require('../primordials');
@@ -71,16 +69,7 @@ const addCodeToName = hideStackFrames(function addCodeToName(err, name, code) {
   // from the name.
   err.stack; // eslint-disable-line no-unused-expressions
   // Reset the name to the actual name.
-  if (name === 'SystemError') {
-    ObjectDefineProperty(err, 'name', {
-      value: name,
-      enumerable: false,
-      writable: true,
-      configurable: true
-    });
-  } else {
-    delete err.name;
-  }
+  delete err.name;
 });
 
 function makeNodeErrorWithCode(Base, key) {
@@ -134,27 +123,13 @@ function getMessage(key, args, self) {
 
   if (assert === undefined) assert = require('./assert');
 
-  if (typeof msg === 'function') {
-    assert(
-      msg.length <= args.length, // Default options do not count.
-      `Code: ${key}; The provided arguments length (${args.length}) does not ` +
-        `match the required ones (${msg.length}).`
-    );
-    return ReflectApply(msg, self, args);
-  }
-
-  const expectedLength =
-    (StringPrototypeMatch(msg, /%[dfijoOs]/g) || []).length;
+  assert(typeof msg === 'function');
   assert(
-    expectedLength === args.length,
+    msg.length <= args.length, // Default options do not count.
     `Code: ${key}; The provided arguments length (${args.length}) does not ` +
-      `match the required ones (${expectedLength}).`
+      `match the required ones (${msg.length}).`
   );
-  if (args.length === 0)
-    return msg;
-
-  ArrayPrototypeUnshift(args, msg);
-  return ReflectApply(lazyInternalUtilInspect().format, null, args);
+  return ReflectApply(msg, self, args);
 }
 
 const captureLargerStackTrace = hideStackFrames(
@@ -199,22 +174,6 @@ module.exports = {
   isStackOverflowError,
 };
 
-// To declare an error message, use the E(sym, val, def) function above. The sym
-// must be an upper case string. The val can be either a function or a string.
-// The def must be an error class.
-// The return value of the function must be a string.
-// Examples:
-// E('EXAMPLE_KEY1', 'This is the error value', Error);
-// E('EXAMPLE_KEY2', (a, b) => return `${a} ${b}`, RangeError);
-//
-// Once an error code has been assigned, the code itself MUST NOT change and
-// any given error code must never be reused to identify a different error.
-//
-// Any error code added here should also be added to the documentation
-//
-// Note: Please try to keep these in alphabetical order
-//
-// Note: Node.js specific errors must begin with the prefix ERR_
 E('ERR_INVALID_ARG_TYPE',
   (name, expected, actual) => {
     assert(typeof name === 'string', "'name' must be a string");
