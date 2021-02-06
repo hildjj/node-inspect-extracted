@@ -2,13 +2,14 @@
 'use strict';
 
 const {
-  Proxy
+  Proxy,
+  getProxyDetails
 } = require('../../src/proxy');
 require('../common');
 const assert = require('assert');
 const util = require('./util');
 const { internalBinding } = require('internal/test/binding');
-const processUtil = internalBinding('util');
+const processUtil = { getProxyDetails }; //internalBinding('util');
 const opts = { showProxy: true };
 
 let proxyObj;

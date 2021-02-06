@@ -8,7 +8,7 @@ function makeProxy(target, handler) {
   return p;
 }
 
-function getProxyDetails(obj, getFullProxy = false) {
+function getProxyDetails(obj, getFullProxy = true) {
   const deets = ALL_PROXIES.get(obj);
   if (!deets) {
     return undefined;
