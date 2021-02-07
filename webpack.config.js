@@ -8,7 +8,7 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'inspect.js',
-    library: 'Inspect',
+    library: 'util',
     libraryTarget: 'umd',
     globalObject: 'this'
   },

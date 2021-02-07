@@ -21,8 +21,8 @@ This should work in node (for testing) and browsers, using either `require`, `im
 With `require`:
 
 ```js
-const { inspect } = require('node-inspect-extracted');
-console.log(inspect(1));
+const util = require('node-inspect-extracted');
+console.log(util.inspect(1));
 ```
 
 With `import`:
@@ -37,7 +37,7 @@ From the browser:
 ```html
 <script src="https://unpkg.com/node-inspect-extracted/dist/inspect.js"></script>
 <script>
-  console.log(Inspect.inspect(3));
+  console.log(util.inspect(3));
 </script>
 ```
 

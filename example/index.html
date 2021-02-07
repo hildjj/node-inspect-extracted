@@ -4,18 +4,27 @@
   <meta charset="UTF-8">
   <title>Document</title>
   <script src="../dist/inspect.js"></script>
+  <style>
+body {
+  background-color: black;
+}
+pre {
+  color: white;
+}
+  </style>
 </head>
 <body>
 
 </body>
 <script>
   const pre = document.createElement('pre');
-  pre.innerHTML = Inspect.inspect({
+  pre.innerHTML = util.inspect({
     a: 1,
     [Symbol('b')]: false,
     buf: new Uint8Array([1, 2, 3, 4])
   }, {
-    compact: false
+    compact: false,
+    stylize: util.stylizeWithHTML
   });
   document.body.appendChild(pre);
 </script>
