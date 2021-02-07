@@ -119,6 +119,33 @@ stylizeWithHTML(str, styleType) {
  - Colorful stack traces are not completely accurate with respect to what
    modules are Node-internal.  This doesn't matter on the Web.
 
+## Developing
+
+Check out NodeJS and this package next to one another:
+
+    git clone https://github.com/hildjj/node-inspect-extracted.git
+    git clone https://github.com/nodejs/node.git
+    cd node-inspect-extracted
+    npm install -g pnpm
+    pnpm install
+
+ - `npm start` to build, run all tests and start an auto-refreshing web server
+   to watch coverage change.
+ - `npm run check` to see if there have been any changes to node that need to be integrated.
+ - `npm run check -- -d` to see the diffs with node
+ - `npm run check -- -u` to indicate that we have merged the current changes
+
+Tests run mostly against the pre-webpack source at the moment, but there are
+some spot checks for the webpack output.
+
+## Supported Node.js versions
+
+This project only supports versions of Node that the Node team is [currently
+supporting](https://github.com/nodejs/Release#release-schedule).  Ava's
+[support statement](https://github.com/avajs/ava/blob/master/docs/support-statement.md)
+is what we will be using as well.  Currently, that means Node `10`+ is
+required.
+
 ## LICENSE
 
 This code is an adaptation of the Node.js internal implementation, mostly from
