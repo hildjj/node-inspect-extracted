@@ -5,6 +5,9 @@ const path = require('path');
 const fs = require('fs');
 const child_process = require('child_process');
 const { inspect } = require('../src/inspect');
+const nodeVersion = parseFloat(process.version.slice(1));
+
+let TEST_RE = (nodeVersion > 12) ? /^test-(.*)(\.m?js)$/ : /^test-(.*)(\.js)$/;
 
 const root = path.resolve(__dirname, '..');
 const buf = Buffer.alloc(200);
@@ -22,9 +25,9 @@ function walk(dir) {
   for (const f of fs.readdirSync(dir)) {
     const bare = path.join(dir, f);
     const fn = path.join(root, dir, f);
-    const m = f.match(/^test-(.*)\.js$/);
+    const m = f.match(TEST_RE);
     if (m) {
-      console.log(c(m[1], 'cyan'));
+      console.log(c(m[1], 'cyan') + m[2]);
       // read the first 200 bytes and look for
       // "// Flags: --expose-internals"
       const fd = fs.openSync(fn);

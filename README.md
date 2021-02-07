@@ -28,8 +28,8 @@ console.log(inspect(1));
 With `import`:
 
 ```js
-import * as inspect from 'node-inspect-extracted';
-console.log(inspect.inspect(2));
+import util from 'node-inspect-extracted';
+console.log(util.inspect(2));
 ```
 
 From the browser:
@@ -40,6 +40,20 @@ From the browser:
   console.log(Inspect.inspect(3));
 </script>
 ```
+
+## API
+
+The following [`util`](https://nodejs.org/api/util.html) functions:
+
+ - [`inspect(object[,showHidden|options[,depth [, colors]]])`](https://nodejs.org/api/util.html#util_util_inspect_object_showhidden_depth_colors)
+ - [`format(format[, ...args])`](https://nodejs.org/api/util.html#util_util_format_format_args)
+ - [`formatWithOptions(inspectOptions, format[, ...args])`](https://nodejs.org/api/util.html#util_util_formatwithoptions_inspectoptions_format_args)
+
+And these extras:
+
+ - `Proxy(target, handler)`: a wrapper for the normal [`Proxy`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy) class that allows the `showProxy` option of inspect to work.
+ - `stylizeWithColor(str, styleType)`: colorize `str` with ANSI escapes according to the styleType
+ - `stylizeWithHTML(str, styleType)`: colorize `str` with HTML span tags
 
 ## Colors
 
