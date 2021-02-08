@@ -3,6 +3,7 @@
 const { getConstructorName } = require('../../util');
 
 // From https://mathiasbynens.be/notes/globalthis
+/* c8 ignore start */ // only needed for node 10
 (function() {
   if (typeof globalThis === 'object') return;
   Object.defineProperty(Object.prototype, '__magic__', {
@@ -11,15 +12,17 @@ const { getConstructorName } = require('../../util');
     },
     configurable: true
   });
+  // eslint-disable-next-line no-undef
   __magic__.globalThis = __magic__;
   delete Object.prototype.__magic__;
 }());
+/* c8 ignore stop */
 
 function constructorNamed(val, ...name) {
-  // pass in names rather than types, in case SharedArrayBuffer (e.g.) isn't
+  // Pass in names rather than types, in case SharedArrayBuffer (e.g.) isn't
   // in your browser
   for (const n of name) {
-    const typ = globalThis[name];
+    const typ = globalThis[n];
     if (typ) {
       if (val instanceof typ) {
         return true;
