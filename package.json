@@ -24,6 +24,11 @@
     "web",
     "browserify"
   ],
+  "homepage": "https://github.com/hildjj/node-inspect-extracted",
+  "repository": {
+    "type": "git",
+    "url": "http://github.com/hildjj/node-inspect-extracted.git"
+  },
   "author": "Joe Hildebrand <joe-github@cursive.net>",
   "license": "MIT",
   "devDependencies": {
