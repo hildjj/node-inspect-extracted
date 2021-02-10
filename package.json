@@ -1,6 +1,6 @@
 {
   "name": "node-inspect-extracted",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "description": "Node's util.inspect, extracted for use on the Web",
   "main": "dist/inspect.js",
   "browser": "dist/inspect.js",
