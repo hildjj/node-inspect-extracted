@@ -185,7 +185,7 @@ const keyStrRegExp = /^[a-zA-Z_][a-zA-Z_0-9]*$/;
 const numberRegExp = /^(0|[1-9][0-9]*)$/;
 
 const coreModuleRegExp = /^    at (?:[^/\\(]+ \(|)node:(.+):\d+:\d+\)?$/;
-const coreModuleRegExpOld = /^    at (?:[^/\\(]+ \(|)((?<![/\\]).+)\.js:\d+:\d+\)?$/;
+const coreModuleRegExpOld = /^    at (?:[^/\\(]+ \(|)(.+)\.js:\d+:\d+\)?$/;
 const nodeModulesRegExp = /[/\\]node_modules[/\\](.+?)(?=[/\\])/g;
 
 const classRegExp = /^(\s+[^(]*?)\s*{/;
@@ -1390,8 +1390,10 @@ function formatPrimitive(fn, value, ctx) {
         value.length > kMinLineLength &&
         value.length > ctx.breakLength - ctx.indentationLvl - 4) {
       return value
-        .split(/(?<=\n)/)
-        .map((line) => fn(strEscape(line), 'string'))
+        .split(/\n/) // Safari hack to avoid negative lookbehind
+        .map((line, i, a) => fn(strEscape(
+          line + ((i === a.length - 1) ? '' : '\n')
+        ), 'string'))
         .join(` +\n${' '.repeat(ctx.indentationLvl + 2)}`) + trailer;
     }
     return fn(strEscape(value), 'string') + trailer;
