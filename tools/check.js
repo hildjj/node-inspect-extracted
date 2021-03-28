@@ -12,8 +12,8 @@ const LAST_EXTRACT_FILE = path.join(__dirname, 'lastExtract.js');
 const lastExtract = require(LAST_EXTRACT_FILE);
 
 const args = process.argv.slice(2);
-const update = args.includes('--update') || args.includes('-u')
-const diff = args.includes('--diff') || args.includes('-d')
+const update = args.includes('--update') || args.includes('-u');
+const diff = args.includes('--diff') || args.includes('-d');
 
 function c(str, color) {
   const [fg, reset] = util.inspect.colors[color];
@@ -26,44 +26,44 @@ function exec(bin, opts = {}) {
     encoding: 'utf8',
     env: {},
     ...opts
-  }
+  };
   return new Promise((resolve, reject) => {
     opts.env = {
       ...process.env,
       ...opts.env
-    }
+    };
     // console.log(`SPAWN: (${opts.cwd || process.cwd()})`, bin, ...opts.args)
     const args = opts.args || [];
     delete opts.args;
     const c = spawn(bin, args, {
       stdio: 'pipe',
       ...opts
-    })
-    const bufs = []
-    c.on('error', reject)
-    c.on('close', code => {
-      const buf = Buffer.concat(bufs)
-      const str = buf.toString(opts.encoding)
+    });
+    const bufs = [];
+    c.on('error', reject);
+    c.on('close', (code) => {
+      const buf = Buffer.concat(bufs);
+      const str = buf.toString(opts.encoding);
       if (code !== 0) {
-        const err = new Error(`process fail, code ${code}`)
-        err.buf = buf
-        err.str = str
-        err.code = code
-        reject(err)
+        const err = new Error(`process fail, code ${code}`);
+        err.buf = buf;
+        err.str = str;
+        err.code = code;
+        reject(err);
       } else {
-        resolve(str)
+        resolve(str);
       }
-    })
+    });
     if (opts.stdio !== 'inherit') {
-      c.stdout.on('data', b => bufs.push(b))
-      c.stderr.on('data', b => bufs.push(b))
+      c.stdout.on('data', (b) => bufs.push(b));
+      c.stderr.on('data', (b) => bufs.push(b));
 
       if (opts.stdin != null) {
-        c.stdin.write(opts.stdin)
+        c.stdin.write(opts.stdin);
       }
-      c.stdin.end()
+      c.stdin.end();
     }
-  })
+  });
 }
 
 function checkFileHash(filename) {
@@ -77,10 +77,10 @@ function checkFileHash(filename) {
 }
 
 async function checkAll() {
-  const lastTime = new Date(lastExtract.time);
+  // const lastTime = new Date(lastExtract.time);
   lastExtract.time = new Date().toISOString();
 
-  let fail = false
+  let fail = false;
   for (const f of lastExtract.files) {
     const name = path.resolve(__dirname, '..', f.name);
     if (diff) {
@@ -88,12 +88,12 @@ async function checkAll() {
         console.log(`---------- ${c(f.local, 'cyan')} ----------`);
         try {
           await exec('diff', {
-                args: [
-                  '-u', name, path.resolve(__dirname, '..', f.local)
-                ],
-                cwd: path.resolve(__dirname, '..'),
-                stdio: 'inherit'
-              });
+            args: [
+              '-u', name, path.resolve(__dirname, '..', f.local)
+            ],
+            cwd: path.resolve(__dirname, '..'),
+            stdio: 'inherit'
+          });
         } catch (err) {
           if (!err.code) {
             console.log(c(err, 'red'));
@@ -112,10 +112,10 @@ async function checkAll() {
               'log', '-n1', '--pretty=format:%H', '--', path.basename(name)
             ],
             cwd: path.dirname(name)
-          })
+          });
         } else {
-          fail = true
-          console.error(`Hash mismatch, now: "${hash}"`);
+          fail = true;
+          console.error(`Hash mismatch for ${name}, now: "${hash}"`);
         }
       }
     }
@@ -123,18 +123,24 @@ async function checkAll() {
   return fail;
 }
 
-checkAll().then(async fail => {
+checkAll().then(async (fail) => {
   if (fail) {
     process.exit(1);
   } else if (update) {
     await fsp.writeFile(
       LAST_EXTRACT_FILE,
-      'module.exports = ' + util.inspect(lastExtract, {
-        depth: Infinity,
-        compact: false
-      }));
+      `\
+/* eslint-disable max-len */
+'use strict';
+
+// This file is generated from \`node tools/check.js -u\`
+// DO NOT MODIFY BY HAND
+module.exports = ${util.inspect(lastExtract, {
+    depth: Infinity,
+    compact: false
+  })};`);
   }
-}, e => {
-  console.log(e)
+}, (e) => {
+  console.log(e);
   process.exit(1);
-})
+});

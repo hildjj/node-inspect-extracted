@@ -7,10 +7,12 @@
   "module": "dist/inspect.js",
   "scripts": {
     "check": "node tools/check",
-    "lint": "eslint src/**.js test/**.js",
+    "lint": "eslint src/**.js test/**.js tools/**.js",
     "build": "webpack",
     "pretest": "npm run build",
     "test": "node tools/runtests",
+    "pretest:all": "npm run build",
+    "test:all": "nve 10,12,14,15 node tools/runtests",
     "coverage": "c8 -r lcov -n src npm test",
     "prestart": "npm run coverage || true",
     "start": "light-server -q -s. -w 'src/**/*.js,test/**/*.js,dist/**,example/** # npm run coverage' -o /coverage/lcov-report/index.html"

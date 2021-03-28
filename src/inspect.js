@@ -1,5 +1,6 @@
 'use strict';
 
+const primordials = require('./primordials');
 const {
   internalBinding,
   Array,
@@ -76,7 +77,7 @@ const {
   TypedArrayPrototypeGetSymbolToStringTag,
   Uint8Array,
   uncurryThis,
-} = require('./primordials');
+} = primordials;
 
 const {
   getOwnNonIndexProperties,
@@ -710,7 +711,7 @@ function formatProxy(ctx, proxy, recurseTimes) {
   ctx.indentationLvl += 2;
   const res = [
     formatValue(ctx, proxy[0], recurseTimes),
-    formatValue(ctx, proxy[1], recurseTimes)
+    formatValue(ctx, proxy[1], recurseTimes),
   ];
   ctx.indentationLvl -= 2;
   return reduceToSingleString(
@@ -867,7 +868,7 @@ function formatRaw(ctx, value, recurseTimes, typedArray) {
       if (constructor === null) {
         fallback = TypedArrayPrototypeGetSymbolToStringTag(value);
         // Reconstruct the array information.
-        bound = new fallback(value);
+        bound = new primordials[fallback](value);
       }
       const size = TypedArrayPrototypeGetLength(value);
       const prefix = getPrefix(constructor, tag, fallback, `(${size})`);
@@ -1364,7 +1365,8 @@ function handleMaxCallStackSize(ctx, err, constructorName, indentationLvl) {
       'special'
     );
   }
-  throw err;
+  /* c8 ignore next */
+  assert.fail(err.stack);
 }
 
 function formatNumber(fn, value) {
@@ -1534,7 +1536,7 @@ function formatTypedArray(value, length, ctx, ignored, recurseTimes) {
       'length',
       'byteLength',
       'byteOffset',
-      'buffer'
+      'buffer',
     ]) {
       const str = formatValue(ctx, value[key], recurseTimes, true);
       ArrayPrototypePush(output, `[${key}]: ${str}`);
@@ -1557,7 +1559,7 @@ function formatSet(value, ctx, ignored, recurseTimes) {
 function formatMap(value, ctx, ignored, recurseTimes) {
   const output = [];
   ctx.indentationLvl += 2;
-  for (const [k, v] of value) {
+  for (const { 0: k, 1: v } of value) {
     output.push(`${formatValue(ctx, k, recurseTimes)} => ` +
                 formatValue(ctx, v, recurseTimes));
   }
@@ -1613,7 +1615,7 @@ function formatMapIterInner(ctx, recurseTimes, entries, state) {
       const pos = i * 2;
       const res = [
         formatValue(ctx, entries[pos], recurseTimes),
-        formatValue(ctx, entries[pos + 1], recurseTimes)
+        formatValue(ctx, entries[pos + 1], recurseTimes),
       ];
       output[i] = reduceToSingleString(
         ctx, res, '', ['[', ']'], kArrayExtrasType, recurseTimes);
@@ -1641,7 +1643,7 @@ function formatWeakMap(ctx, value, recurseTimes) {
 }
 
 function formatIterator(braces, ctx, value, recurseTimes) {
-  const [entries, isKeyValue] = previewEntries(value, true);
+  const { 0: entries, 1: isKeyValue } = previewEntries(value, true);
   if (isKeyValue) {
     // Mark entry iterators as such.
     braces[0] = braces[0].replace(/ Iterator] {$/, ' Entries] {');
@@ -1653,7 +1655,7 @@ function formatIterator(braces, ctx, value, recurseTimes) {
 
 function formatPromise(ctx, value, recurseTimes) {
   let output;
-  const [state, result] = getPromiseDetails(value);
+  const { 0: state, 1: result } = getPromiseDetails(value);
   if (state === kPending) {
     output = [ctx.stylize('<pending>', 'special')];
   } else {
@@ -1663,7 +1665,7 @@ function formatPromise(ctx, value, recurseTimes) {
     output = [
       state === kRejected ?
         `${ctx.stylize('<rejected>', 'special')} ${str}` :
-        str
+        str,
     ];
   }
   return output;
@@ -1723,6 +1725,8 @@ function formatProperty(ctx, value, recurseTimes, key, type, desc,
       strEscapeSequencesReplacer, escapeFn
     );
     name = `[${ctx.stylize(tmp, 'symbol')}]`;
+  } else if (key === '__proto__') {
+    name = "['__proto__']";
   } else if (desc.enumerable === false) {
     const tmp = StringPrototypeReplace(key,
                                        strEscapeSequencesReplacer, escapeFn);
@@ -1763,7 +1767,7 @@ function reduceToSingleString(
   ctx, output, base, braces, extrasType, recurseTimes, value) {
   if (ctx.compact !== true) {
     if (typeof ctx.compact === 'number' && ctx.compact >= 1) {
-      // Memorize the original output length. In case the the output is grouped,
+      // Memorize the original output length. In case the output is grouped,
       // prevent lining up the entries on a single line.
       const entries = output.length;
       // Group array elements together if the array contains at least six
@@ -2120,6 +2124,9 @@ module.exports = {
   inspect,
   format,
   formatWithOptions,
+  getStringWidth,
+  inspectDefaultOptions,
+  stripVTControlCharacters,
   stylizeWithColor,
   stylizeWithHTML(str, styleType) {
     const style = inspect.styles[styleType];
