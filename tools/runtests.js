@@ -7,7 +7,7 @@ const child_process = require('child_process');
 const { inspect } = require('../src/inspect');
 const nodeVersion = parseFloat(process.version.slice(1));
 
-let TEST_RE = (nodeVersion > 12) ? /^test-(.*)(\.m?js)$/ : /^test-(.*)(\.js)$/;
+const TEST_RE = (nodeVersion > 12) ? /^test-(.*)(\.m?js)$/ : /^test-(.*)(\.js)$/;
 
 const root = path.resolve(__dirname, '..');
 const buf = Buffer.alloc(200);
@@ -28,14 +28,14 @@ function walk(dir) {
     const m = f.match(TEST_RE);
     if (m) {
       console.log(c(m[1], 'cyan') + m[2]);
-      // read the first 200 bytes and look for
+      // Read the first 200 bytes and look for
       // "// Flags: --expose-internals"
       const fd = fs.openSync(fn);
       const bytes = fs.readSync(fd, buf, 0, buf.length);
       fs.closeSync(fd);
       const head = buf.toString('utf8', 0, bytes);
       const flags = head.match(/^\s*\/\/\s*Flags:\s*(.*)$/m);
-      let args = [fn];
+      let args = ['--no-warnings', fn];
       if (flags) {
         args = flags[1].split(/\s+/).concat(args);
       }

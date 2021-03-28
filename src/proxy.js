@@ -6,6 +6,7 @@ class Prxy {
   constructor(target, handler) {
     const p = new Proxy(target, handler);
     ALL_PROXIES.set(p, [target, handler]);
+    // eslint-disable-next-line no-constructor-return
     return p;
   }
   static getProxyDetails(obj, getFullProxy = true) {

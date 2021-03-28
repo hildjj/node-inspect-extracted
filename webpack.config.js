@@ -8,9 +8,11 @@ module.exports = {
   output: {
     path: path.resolve(__dirname, 'dist'),
     filename: 'inspect.js',
-    library: 'util',
-    libraryTarget: 'umd',
-    globalObject: 'this'
-  },
+    library: {
+      type: 'umd',
+      name: 'util'
+    },
+    globalObject: 'this',
+  }
   // devtool: 'source-map'
 };
