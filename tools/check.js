@@ -81,17 +81,14 @@ async function checkAll() {
   lastExtract.time = new Date().toISOString();
 
   let fail = false;
+  const nodeRoot = path.resolve(__dirname, '..', '..', 'node');
   for (const f of lastExtract.files) {
-    const name = path.resolve(__dirname, '..', f.name);
     if (diff) {
       if (f.local) {
-        console.log(`---------- ${c(f.local, 'cyan')} ----------`);
         try {
-          await exec('diff', {
-            args: [
-              '-u', name, path.resolve(__dirname, '..', f.local)
-            ],
-            cwd: path.resolve(__dirname, '..'),
+          await exec('git', {
+            args: ['--no-pager', 'diff', f.commit, '--', f.name],
+            cwd: nodeRoot,
             stdio: 'inherit'
           });
         } catch (err) {
@@ -101,6 +98,7 @@ async function checkAll() {
         }
       }
     } else {
+      const name = path.resolve(nodeRoot, f.name);
       const hash = await checkFileHash(name);
       if (hash !== f.sha256) {
         if (update) {
@@ -109,9 +107,9 @@ async function checkAll() {
           f.mtime = s.mtime.toISOString();
           f.commit = await exec('git', {
             args: [
-              'log', '-n1', '--pretty=format:%H', '--', path.basename(name)
+              'log', '-n1', '--pretty=format:%H', '--', f.name
             ],
-            cwd: path.dirname(name)
+            cwd: nodeRoot
           });
         } else {
           fail = true;
