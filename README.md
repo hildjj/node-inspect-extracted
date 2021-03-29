@@ -156,4 +156,4 @@ the same license as specified in the Node.js codebase; the portion adapted
 here should all be plain MIT license.
 
 [![Tests](https://github.com/hildjj/node-inspect-extracted/workflows/Tests/badge.svg)](https://github.com/hildjj/node-inspect-extracted/actions?query=workflow%3ATests)
-[![Coverage Status](https://coveralls.io/repos/github/hildjj/node-inspect-extracted/badge.svg?branch=master)](https://coveralls.io/github/hildjj/node-inspect-extracted?branch=master)
+[![Coverage Status](https://coveralls.io/repos/github/hildjj/node-inspect-extracted/badge.svg?branch=main)](https://coveralls.io/github/hildjj/node-inspect-extracted?branch=main)
