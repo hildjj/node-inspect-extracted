@@ -107,7 +107,7 @@ async function checkAll() {
           f.mtime = s.mtime.toISOString();
           f.commit = await exec('git', {
             args: [
-              'log', '-n1', '--pretty=format:%H', '--', f.name
+              'log', '-n1', '--pretty=format:%H', '--', f.name,
             ],
             cwd: nodeRoot
           });
@@ -136,7 +136,8 @@ checkAll().then(async (fail) => {
 module.exports = ${util.inspect(lastExtract, {
     depth: Infinity,
     compact: false
-  })};`);
+  })};
+`);
   }
 }, (e) => {
   console.log(e);

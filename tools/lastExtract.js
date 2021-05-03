@@ -4,21 +4,21 @@
 // This file is generated from `node tools/check.js -u`
 // DO NOT MODIFY BY HAND
 module.exports = {
-  time: '2021-03-29T00:11:39.087Z',
+  time: '2021-05-03T21:57:34.774Z',
   files: [
     {
       name: 'lib/internal/util/inspect.js',
       local: 'src/inspect.js',
-      mtime: '2021-03-28T18:17:59.186Z',
-      sha256: '18f51dc8e2975e71d6b5f0328f7084fe2fc76fcba7e695e971060c3ad38120d0',
-      commit: '7296bcb3cb937ee6b3d607f8cfb84db21ebb069d'
+      mtime: '2021-05-03T21:00:50.486Z',
+      sha256: '3ff2385765ba6d1d4eb301797b664fbe4c0df7a074761054931896ce97e3f1a7',
+      commit: 'd756d2b99c5d030f7d5da59d2ba443d0c9a6d5a7'
     },
     {
       name: 'test/parallel/test-util-inspect.js',
       local: 'test/parallel/test-util-inspect.js',
-      sha256: '347c0e31c97940abb714a82b3ea6be219ff09e0ad7e8fc372554067ddaae53d0',
-      mtime: '2021-03-28T18:23:14.187Z',
-      commit: '7296bcb3cb937ee6b3d607f8cfb84db21ebb069d'
+      sha256: '48d8c077edc42556c5667b44e56d24b752a58c1e8a71943fafd122d99d739741',
+      mtime: '2021-05-03T21:32:22.246Z',
+      commit: '330f25ef822dac6ed8a0afb3422bd920726eb43d'
     },
     {
       name: 'test/parallel/test-util-inspect-proxy.js',

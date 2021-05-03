@@ -76,6 +76,7 @@ const {
   TypedArrayPrototypeGetLength,
   TypedArrayPrototypeGetSymbolToStringTag,
   Uint8Array,
+  globalThis,
   uncurryThis,
 } = primordials;
 
@@ -147,7 +148,7 @@ let hexSlice;
 
 const builtInObjects = new SafeSet(
   ArrayPrototypeFilter(
-    ObjectGetOwnPropertyNames(global),
+    ObjectGetOwnPropertyNames(globalThis),
     (e) => RegExpPrototypeTest(/^[A-Z][a-zA-Z0-9]+$/, e)
   )
 );
@@ -1419,9 +1420,7 @@ function formatNamespaceObject(keys, ctx, value, recurseTimes) {
       output[i] = formatProperty(ctx, value, recurseTimes, keys[i],
                                  kObjectType);
     } catch (err) {
-      if (!(isNativeError(err) && err.name === 'ReferenceError')) {
-        throw err;
-      }
+      assert(isNativeError(err) && err.name === 'ReferenceError');
       // Use the existing functionality. This makes sure the indentation and
       // line breaks are always correct. Otherwise it is very difficult to keep
       // this aligned, even though this is a hacky way of dealing with this.
@@ -1560,8 +1559,9 @@ function formatMap(value, ctx, ignored, recurseTimes) {
   const output = [];
   ctx.indentationLvl += 2;
   for (const { 0: k, 1: v } of value) {
-    output.push(`${formatValue(ctx, k, recurseTimes)} => ` +
-                formatValue(ctx, v, recurseTimes));
+    output.push(
+      `${formatValue(ctx, k, recurseTimes)} => ${formatValue(ctx, v, recurseTimes)}`
+    );
   }
   ctx.indentationLvl -= 2;
   return output;
@@ -1602,8 +1602,8 @@ function formatMapIterInner(ctx, recurseTimes, entries, state) {
   if (state === kWeak) {
     for (; i < maxLength; i++) {
       const pos = i * 2;
-      output[i] = `${formatValue(ctx, entries[pos], recurseTimes)}` +
-        ` => ${formatValue(ctx, entries[pos + 1], recurseTimes)}`;
+      output[i] =
+        `${formatValue(ctx, entries[pos], recurseTimes)} => ${formatValue(ctx, entries[pos + 1], recurseTimes)}`;
     }
     // Sort all entries to have a halfway reliable output (if more entries than
     // retrieved ones exist, we can not reliably return the same output) if the

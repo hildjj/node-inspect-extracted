@@ -13,6 +13,20 @@ module.exports = {
       name: 'util'
     },
     globalObject: 'this',
+  },
+  module: {
+    rules: [
+      {
+        test: /\.js$/,
+        include: path.resolve(__dirname, 'src'),
+        use: {
+          loader: 'babel-loader',
+          options: {
+            presets: ['@babel/preset-env']
+          }
+        }
+      }
+    ]
   }
   // devtool: 'source-map'
 };

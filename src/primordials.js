@@ -133,6 +133,7 @@ module.exports = {
     Function.prototype.call.bind(Function.prototype.call),
   FunctionPrototypeToString:
     Function.prototype.call.bind(Function.prototype.toString),
+  globalThis,
   JSONStringify: JSON.stringify,
   MapPrototypeGetSize: getGetter(Map, 'size'),
   MapPrototypeEntries: Function.prototype.call.bind(Map.prototype.entries),

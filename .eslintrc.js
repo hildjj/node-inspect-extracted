@@ -39,21 +39,32 @@ Module._findPath = (request, paths, isMain) => {
 
 module.exports = {
   root: true,
-  plugins: ['node-core'],
+  plugins: ['markdown', 'node-core'],
   parser: '@babel/eslint-parser',
   parserOptions: {
-    requireConfigFile: false,
-    sourceType: 'script',
     babelOptions: {
       plugins: [
-        '@babel/plugin-syntax-class-properties'
-      ]
+        Module._findPath('@babel/plugin-syntax-class-properties'),
+        Module._findPath('@babel/plugin-syntax-top-level-await'),
+      ],
     },
+    requireConfigFile: false,
+    sourceType: 'script',
   },
   env: {
     node: true,
     es6: true
   },
+  overrides: [
+    {
+      files: [
+        'tools/lastExtract.js',
+      ],
+      rules: {
+        'comma-dangle': ['error', 'never'],
+      }
+    },
+  ],
   rules: {
     // ESLint built-in rules
     // https://eslint.org/docs/rules/
@@ -77,7 +88,13 @@ module.exports = {
         ignorePattern: '.*',
       },
     }],
-    'comma-dangle': ['error', 'only-multiline'],
+    'comma-dangle': ['error', {
+      arrays: 'always-multiline',
+      exports: 'only-multiline',
+      functions: 'only-multiline',
+      imports: 'only-multiline',
+      objects: 'only-multiline',
+    }],
     'comma-spacing': 'error',
     'comma-style': 'error',
     'computed-property-spacing': 'error',
@@ -108,6 +125,7 @@ module.exports = {
       code: 80,
       ignorePattern: '^// Flags:',
       ignoreRegExpLiterals: true,
+      ignoreTemplateLiterals: true,
       ignoreUrls: true,
       tabWidth: 2,
     }],
@@ -274,7 +292,7 @@ module.exports = {
     'template-curly-spacing': 'error',
     'unicode-bom': 'error',
     'use-isnan': 'error',
-    'valid-typeof': 'error',
+    'valid-typeof': ['error', { requireStringLiterals: true }],
 
     // Custom rules from eslint-plugin-node-core
     'node-core/no-unescaped-regexp-dot': 'error',
@@ -282,6 +300,7 @@ module.exports = {
   },
   globals: {
     AbortController: 'readable',
+    AbortSignal: 'readable',
     Atomics: 'readable',
     BigInt: 'readable',
     BigInt64Array: 'readable',
@@ -296,5 +315,8 @@ module.exports = {
     TextDecoder: 'readable',
     queueMicrotask: 'readable',
     globalThis: 'readable',
+    btoa: 'readable',
+    atob: 'readable',
+    performance: 'readable',
   },
 };
