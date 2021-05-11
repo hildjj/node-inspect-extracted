@@ -2,9 +2,13 @@
   "name": "node-inspect-extracted",
   "version": "1.0.7",
   "description": "Node's util.inspect, extracted for use on the Web",
-  "main": "dist/inspect.js",
-  "browser": "dist/inspect.js",
-  "module": "dist/inspect.js",
+  "main": "./dist/inspect.js",
+  "module": "./index.mjs",
+  "browser": "./dist/inspect.js",
+  "exports": {
+    "import": "./index.mjs",
+    "require": "./dist/inspect.js"
+  },
   "scripts": {
     "check": "node tools/check",
     "lint": "eslint . --ext js --ext mjs",
