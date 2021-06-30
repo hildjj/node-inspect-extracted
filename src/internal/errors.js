@@ -44,7 +44,7 @@ const kTypes = [
   'Object',
   'boolean',
   'bigint',
-  'symbol'
+  'symbol',
 ];
 
 let userStackTraceLimit;

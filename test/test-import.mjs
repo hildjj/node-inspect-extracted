@@ -1,7 +1,11 @@
-import util from '../dist/inspect.js';
+import {
+  default as util,
+  inspect
+} from '../index.mjs';
 import assert from 'assert';
 
 assert(typeof util.inspect === 'function');
+assert(util.inspect === inspect);
 assert.strictEqual(util.inspect(null), 'null');
 assert.strictEqual(util.inspect({ a: 1 }, { compact: false }), '{\n  a: 1\n}');
 
