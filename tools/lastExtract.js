@@ -4,14 +4,14 @@
 // This file is generated from `node tools/check.js -u`
 // DO NOT MODIFY BY HAND
 module.exports = {
-  time: '2021-05-03T21:57:34.774Z',
+  time: '2021-06-30T20:53:25.216Z',
   files: [
     {
       name: 'lib/internal/util/inspect.js',
       local: 'src/inspect.js',
-      mtime: '2021-05-03T21:00:50.486Z',
-      sha256: '3ff2385765ba6d1d4eb301797b664fbe4c0df7a074761054931896ce97e3f1a7',
-      commit: 'd756d2b99c5d030f7d5da59d2ba443d0c9a6d5a7'
+      mtime: '2021-06-30T20:41:33.196Z',
+      sha256: '39d0567471ede7c5fe0fbf19874532e54497f7e1d3698b759bf805011a04a3cb',
+      commit: '08ad2f6c181e31477079ae0918905af9bed321dc'
     },
     {
       name: 'test/parallel/test-util-inspect.js',
@@ -30,9 +30,9 @@ module.exports = {
     {
       name: 'test/parallel/test-util-inspect-getters-accessing-this.js',
       local: 'test/parallel/test-util-inspect-getters-accessing-this.js',
-      sha256: '1225345e3399896250305cc060146f7ba92e66686e6cd59ece4f03a2da9ca701',
-      mtime: '2021-02-05T17:22:35.532Z',
-      commit: '929c51f14acff11b39277f5f5fe4b5537bdc370f'
+      sha256: '7e8f55a19321e2dfeca5868d4ad498371894debed6d8bcf5b2a3af9c3126ce8f',
+      mtime: '2021-05-03T22:16:13.727Z',
+      commit: 'ec5b06eae385700391ea1e6e56e751978f097212'
     }
   ]
 };

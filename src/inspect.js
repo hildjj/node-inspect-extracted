@@ -7,6 +7,7 @@ const {
   ArrayIsArray,
   ArrayPrototypeFilter,
   ArrayPrototypeForEach,
+  ArrayPrototypePop,
   ArrayPrototypePush,
   ArrayPrototypePushApply,
   ArrayPrototypeSort,
@@ -221,7 +222,7 @@ const meta = [
 ];
 
 // Regex used for ansi escape code splitting
-// Adopted from https://github.com/chalk/ansi-regex/blob/master/index.js
+// Adopted from https://github.com/chalk/ansi-regex/blob/HEAD/index.js
 // License: MIT, authors: @sindresorhus, Qix-, arjunmehta and LitoMore
 // Matches all ansi escape code sequences in a string
 const ansiPattern = '[\\u001B\\u009B][[\\]()#;?]*' +
@@ -364,7 +365,7 @@ inspect.colors = ObjectAssign(ObjectCreate(null), {
   italic: [3, 23],
   underline: [4, 24],
   blink: [5, 25],
-  // Swap forground and background colors
+  // Swap foreground and background colors
   inverse: [7, 27], // Alias: swapcolors, swapColors
   hidden: [8, 28], // Alias: conceal
   strikethrough: [9, 29], // Alias: strikeThrough, crossedout, crossedOut
@@ -624,6 +625,7 @@ function addPrototypeProperties(ctx, main, obj, recurseTimes, output) {
     }
     // Get all own property names and symbols.
     keys = ReflectOwnKeys(obj);
+    ArrayPrototypePush(ctx.seen, main);
     for (const key of keys) {
       // Ignore the `constructor` property and keys that exist on layers above.
       if (key === 'constructor' ||
@@ -644,6 +646,7 @@ function addPrototypeProperties(ctx, main, obj, recurseTimes, output) {
         ArrayPrototypePush(output, value);
       }
     }
+    ArrayPrototypePop(ctx.seen);
   // Limit the inspection to up to three prototype layers. Using `recurseTimes`
   // is not a good choice here, because it's as if the properties are declared
   // on the current object from the users perspective.
