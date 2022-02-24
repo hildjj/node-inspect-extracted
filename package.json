@@ -9,6 +9,7 @@
     "import": "./index.mjs",
     "require": "./dist/inspect.js"
   },
+  "types": "./types/util.d.ts",
   "scripts": {
     "check": "node tools/check",
     "lint": "eslint . --ext js --ext mjs",
