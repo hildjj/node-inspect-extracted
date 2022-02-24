@@ -2045,9 +2045,8 @@ util.inspect(process);
 }
 
 { // Test argument objects.
-  // TODO: No arguments support
-  // const args = (function() { return arguments; })('a');
-  // assert.strictEqual(util.inspect(args), "[Arguments] { '0': 'a' }");
+  const args = (function() { return arguments; })('a');
+  assert.strictEqual(util.inspect(args), "[Arguments] { '0': 'a' }");
 }
 
 {

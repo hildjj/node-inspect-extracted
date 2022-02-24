@@ -79,7 +79,16 @@ module.exports = {
     return constructorNamed(val, 'ArrayBuffer');
   },
   isArgumentsObject(val) {
-    // TODO: is this possible to determine?
+    const cond = (val !== null) &&
+      (typeof val === 'object') &&
+      !Array.isArray(val) &&
+      (typeof val.length === 'number') &&
+      (val.length === (val.length | 0)) &&
+      (val.length >= 0);
+    if (cond) {
+      const prop = Object.getOwnPropertyDescriptor(val, 'callee');
+      return prop && !prop.enumerable;
+    }
     return false;
   },
   isBoxedPrimitive(val) {
