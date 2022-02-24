@@ -163,7 +163,7 @@ module.exports = {
         Date.prototype.getTime.call(val); // Throws for pseudo-dates
         return true;
       } catch {
-
+        // Ignored
       }
     }
     return false;
