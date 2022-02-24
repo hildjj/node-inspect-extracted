@@ -40,6 +40,13 @@ if (typeof assert.match !== 'function') {
   };
 }
 
+if (typeof assert.doesNotMatch !== 'function') {
+  // node 10
+  assert.doesNotMatch = (str, regex, msg) => {
+    assert(!str.match(regex), msg);
+  };
+}
+
 assert.strictEqual(util.inspect(1), '1');
 assert.strictEqual(util.inspect(false), 'false');
 assert.strictEqual(util.inspect(''), "''");
@@ -3362,22 +3369,22 @@ if (parseFloat(process.version.slice(1)) >= 15) {
     '123_456_789.123_456_78'
   );
 
-  assert.strictEqual(util.inspect(10_000_000), '10_000_000');
-  assert.strictEqual(util.inspect(1_000_000), '1_000_000');
-  assert.strictEqual(util.inspect(100_000), '100_000');
-  assert.strictEqual(util.inspect(99_999.9), '99_999.9');
-  assert.strictEqual(util.inspect(9_999), '9_999');
+  assert.strictEqual(util.inspect(10000000), '10_000_000');
+  assert.strictEqual(util.inspect(1000000), '1_000_000');
+  assert.strictEqual(util.inspect(100000), '100_000');
+  assert.strictEqual(util.inspect(99999.9), '99_999.9');
+  assert.strictEqual(util.inspect(9999), '9_999');
   assert.strictEqual(util.inspect(999), '999');
   assert.strictEqual(util.inspect(NaN), 'NaN');
   assert.strictEqual(util.inspect(Infinity), 'Infinity');
   assert.strictEqual(util.inspect(-Infinity), '-Infinity');
 
   assert.strictEqual(
-    util.inspect(new Float64Array([100_000_000])),
+    util.inspect(new Float64Array([100000000])),
     'Float64Array(1) [ 100_000_000 ]'
   );
   assert.strictEqual(
-    util.inspect(new BigInt64Array([9_100_000_100n])),
+    util.inspect(new BigInt64Array([9100000100n])),
     'BigInt64Array(1) [ 9_100_000_100n ]'
   );
 

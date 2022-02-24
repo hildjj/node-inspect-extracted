@@ -16,7 +16,7 @@
     "pretest": "npm run build",
     "test": "node tools/runtests",
     "pretest:all": "npm run build",
-    "test:all": "nve 10,12,14,16 node tools/runtests",
+    "test:all": "nve --arch x64 -p 10,12,14,16,17 node tools/runtests",
     "coverage": "c8 -r lcov -n src node tools/runtests",
     "prestart": "npm run coverage || true",
     "start": "light-server -q -s. -w 'src/**/*.js,test/**/*.js,dist/**,example/** # npm run coverage' -o /coverage/lcov-report/index.html"
@@ -48,6 +48,6 @@
     "webpack-cli": "^4.9.2"
   },
   "engines": {
-    "node": ">=12.19"
+    "node": ">=10.18.0"
   }
 }
