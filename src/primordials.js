@@ -111,11 +111,13 @@ module.exports = {
     Function.prototype.call.bind(Array.prototype.includes),
   ArrayPrototypeIndexOf: Function.prototype.call.bind(Array.prototype.indexOf),
   ArrayPrototypeJoin: Function.prototype.call.bind(Array.prototype.join),
+  ArrayPrototypeMap: Function.prototype.call.bind(Array.prototype.map),
   ArrayPrototypePop: Function.prototype.call.bind(Array.prototype.pop),
   ArrayPrototypePush: Function.prototype.call.bind(Array.prototype.push),
   ArrayPrototypePushApply: Function.apply.bind(Array.prototype.push),
+  ArrayPrototypeSlice: Function.prototype.call.bind(Array.prototype.slice),
   ArrayPrototypeSort: Function.prototype.call.bind(Array.prototype.sort),
-  ArrayPrototypeSplice: Function.prototype.call.bind(Array.prototype.slice),
+  ArrayPrototypeSplice: Function.prototype.call.bind(Array.prototype.splice),
   ArrayPrototypeUnshift: Function.prototype.call.bind(Array.prototype.unshift),
   BigIntPrototypeValueOf:
     Function.prototype.call.bind(BigInt.prototype.valueOf),
@@ -129,6 +131,7 @@ module.exports = {
   ErrorCaptureStackTrace,
   ErrorPrototypeToString:
     Function.prototype.call.bind(Error.prototype.toString),
+  FunctionPrototypeBind: Function.prototype.call.bind(Function.prototype.bind),
   FunctionPrototypeCall:
     Function.prototype.call.bind(Function.prototype.call),
   FunctionPrototypeToString:
@@ -148,6 +151,7 @@ module.exports = {
   NumberIsNaN: Number.isNaN,
   NumberParseFloat: Number.parseFloat,
   NumberParseInt: Number.parseInt,
+  NumberPrototypeToString: Function.prototype.call.bind(Number.prototype.toString),
   NumberPrototypeValueOf:
     Function.prototype.call.bind(Number.prototype.valueOf),
   Object,
@@ -169,6 +173,9 @@ module.exports = {
   ReflectApply: Reflect.apply,
   ReflectOwnKeys: Reflect.ownKeys,
   RegExp,
+  RegExpPrototypeExec: Function.prototype.call.bind(RegExp.prototype.exec),
+  RegExpPrototypeSymbolReplace: Function.prototype.call.bind(RegExp.prototype[Symbol.replace]),
+  RegExpPrototypeSymbolSplit: Function.prototype.call.bind(RegExp.prototype[Symbol.split]),
   RegExpPrototypeTest: Function.prototype.call.bind(RegExp.prototype.test),
   RegExpPrototypeToString:
     Function.prototype.call.bind(RegExp.prototype.toString),
@@ -197,6 +204,10 @@ module.exports = {
     Function.prototype.call.bind(String.prototype.endsWith),
   StringPrototypeIncludes:
     Function.prototype.call.bind(String.prototype.includes),
+  StringPrototypeIndexOf:
+    Function.prototype.call.bind(String.prototype.indexOf),
+  StringPrototypeLastIndexOf:
+    Function.prototype.call.bind(String.prototype.lastIndexOf),
   StringPrototypeNormalize:
     Function.prototype.call.bind(String.prototype.normalize),
   StringPrototypePadEnd:
@@ -206,8 +217,11 @@ module.exports = {
   StringPrototypeRepeat: Function.prototype.call.bind(String.prototype.repeat),
   StringPrototypeReplace:
     Function.prototype.call.bind(String.prototype.replace),
+  StringPrototypeReplaceAll:
+    Function.prototype.call.bind(String.prototype.replaceAll),
   StringPrototypeSlice: Function.prototype.call.bind(String.prototype.slice),
   StringPrototypeSplit: Function.prototype.call.bind(String.prototype.split),
+  StringPrototypeStartsWith: Function.prototype.call.bind(String.prototype.startsWith),
   StringPrototypeToLowerCase:
     Function.prototype.call.bind(String.prototype.toLowerCase),
   StringPrototypeTrim: Function.prototype.call.bind(String.prototype.trim),
