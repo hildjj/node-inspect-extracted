@@ -19,6 +19,8 @@
 // DAMAGES OR OTHER LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR
 // OTHERWISE, ARISING FROM, OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE
 // USE OR OTHER DEALINGS IN THE SOFTWARE.
+/* eslint-disable symbol-description */
+
 'use strict';
 const common = require('../common');
 const assert = require('assert');
@@ -2971,14 +2973,14 @@ assert.strictEqual(
   if (process.platform === 'win32') {
     err.stack = stack.map((frame) => (frame.includes('node:') ?
       frame :
-      frame.replaceAll('/', '\\'))
+      frame.replace(/\//g, '\\')) // Node 14 compat
     ).join('\n');
   }
   const escapedCWD = util.inspect(process.cwd()).slice(1, -1);
   util.inspect(err, { colors: true }).split('\n').forEach((line, i) => {
     let expected = stack[i].replace(/node_modules\/([^/]+)/gi, (_, m) => {
       return `node_modules/\u001b[4m${m}\u001b[24m`;
-    }).replaceAll(new RegExp(`(\\(?${escapedCWD}(\\\\|/))`, 'gi'), (_, m) => {
+    }).replace(new RegExp(`(\\(?${escapedCWD}(\\\\|/))`, 'gi'), (_, m) => { // Node14 compat
       return `\x1B[90m${m}\x1B[39m`;
     });
     if (expected.includes(process.cwd()) && expected.endsWith(')')) {
@@ -2989,7 +2991,7 @@ assert.strictEqual(
         expected = `\u001b[90m${expected}\u001b[39m`;
       }
     } else if (process.platform === 'win32') {
-      expected = expected.replaceAll('/', '\\');
+      expected = expected.replaceAll(/\//g, '\\'); // Node 14 compat
     }
     assert.strictEqual(line, expected);
   });
@@ -3020,7 +3022,7 @@ assert.strictEqual(
     '/home/user/repository/node');
   let expectedCwd = process.cwd();
   if (process.platform === 'win32') {
-    expectedCwd = `/${expectedCwd.replaceAll('\\', '/')}`;
+    expectedCwd = `/${expectedCwd.replaceAll(/\\/g, '/')}`; // node 14 compat
   }
   // Use a fake stack to verify the expected colored outcome.
   err.stack = 'Error: ESM without need for encoding!\n' +

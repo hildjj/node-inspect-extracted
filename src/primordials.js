@@ -238,3 +238,87 @@ module.exports = {
   Uint8Array,
   uncurryThis
 };
+
+// Node 14
+if (!String.prototype.replaceAll) {
+  // Lifted and simplified from core-js for the moment.  Will remove when we
+  // drop node 14 support.
+
+  function requireObjectCoercible(it) {
+    if (it == null) throw new TypeError("Can't call method on " + it);
+    return it;
+  }
+
+  function getSubstitution(matched, str, position, captures, namedCaptures, replacement) {
+    var tailPos = position + matched.length;
+    var m = captures.length;
+    var symbols = /\$([$&'`]|\d{1,2})/;
+    if (namedCaptures !== undefined) {
+      namedCaptures = Object(requireObjectCoercible(namedCaptures));
+      symbols = /\$([$&'`]|\d{1,2}|<[^>]*>)/g;
+    }
+    return replacement.replace(symbols, (match, ch) => {
+      var capture;
+      switch (ch.charAt(0)) {
+        case '$': return '$';
+        case '&': return matched;
+        case '`': return str.slice(0, position);
+        case "'": return str.slice(tailPos);
+        case '<':
+          capture = namedCaptures[ch.slice(1, -1)];
+          break;
+        default: // \d\d?
+          var n = +ch;
+          if (n === 0) return match;
+          if (n > m) {
+            var f = Math.floor(n / 10);
+            if (f === 0) return match;
+            if (f <= m) return captures[f - 1] === undefined ? ch.charAt(1) : captures[f - 1] + ch.charAt(1);
+            return match;
+          }
+          capture = captures[n - 1];
+      }
+      return capture === undefined ? '' : capture;
+    });
+  };
+
+  module.exports.StringPrototypeReplaceAll = (str, searchValue, replaceValue) => {
+    var O = requireObjectCoercible(str);
+    var IS_REG_EXP, flags, replacer, string, searchString, functionalReplace, searchLength, advanceBy, replacement;
+    var position = 0;
+    var endOfLastMatch = 0;
+    var result = '';
+    if (searchValue != null) {
+      IS_REG_EXP = searchValue instanceof RegExp;
+      if (IS_REG_EXP) {
+        flags = searchValue.flags;
+        if (!~flags.indexOf('g')) {
+          throw new TypeError('`.replaceAll` does not allow non-global regexes');
+        }
+      }
+      replacer = searchValue[Symbol.replace];
+      if (replacer) {
+        return replacer.call(searchValue, O, replaceValue);
+      }
+    }
+    string = String(O);
+    searchString = String(searchValue);
+    functionalReplace = (typeof replaceValue === 'function');
+    if (!functionalReplace) replaceValue = String(replaceValue);
+    searchLength = searchString.length;
+    advanceBy = Math.max(1, searchLength);
+    position = string.indexOf(searchString, 0);
+    while (position !== -1) {
+      replacement = functionalReplace ?
+        String(replaceValue(searchString, position, string)) :
+        getSubstitution(searchString, string, position, [], undefined, replaceValue);
+      result += string.slice(endOfLastMatch, position) + replacement;
+      endOfLastMatch = position + searchLength;
+      position = string.indexOf(searchString, position + advanceBy);
+    }
+    if (endOfLastMatch < string.length) {
+      result += string.slice(endOfLastMatch);
+    }
+    return result;
+  };
+}
