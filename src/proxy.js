@@ -2,6 +2,7 @@
 
 const ALL_PROXIES = new WeakMap();
 
+// Wrap Proxy's to remember their details.
 class Prxy {
   constructor(target, handler) {
     const p = new Proxy(target, handler);
@@ -18,6 +19,16 @@ class Prxy {
       return deets;
     }
     return deets[0];
+  }
+  static revocable(target, handler) {
+    const p = Proxy.revocable(target, handler);
+    ALL_PROXIES.set(p.proxy, [target, handler]);
+    const revoke = p.revoke;
+    p.revoke = () => {
+      ALL_PROXIES.set(p.proxy, [null, null]);
+      revoke();
+    };
+    return p;
   }
 }
 

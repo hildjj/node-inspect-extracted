@@ -64,3 +64,4 @@ function mustCall(fn, exact) {
 }
 
 exports.mustCall = mustCall;
+exports.isWindows = false;

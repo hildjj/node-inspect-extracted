@@ -37,8 +37,7 @@ assert.strictEqual(
 e = new ERR_INVALID_ARG_TYPE('foo', ['Foo', 'object'], 4);
 assert.strictEqual(
   e.message,
-  'The "foo" argument must be of type object or an instance of Foo or ' +
-  'Object. Received type number (4)');
+  'The "foo" argument must be an instance of Foo or Object. Received type number (4)');
 
 e = new ERR_INVALID_ARG_TYPE('foo', ['Foo', 'Bar'], 4);
 assert.strictEqual(
