@@ -1,12 +1,6 @@
 'use strict';
 
-exports.NativeModule = {
-  exists(name) {
-    // TODO: hack
-    return !name.startsWith('/');
-  }
-};
-
+// This is a snapshot from node 18.11.0
 const builtinModules = [
   '_http_agent',
   '_http_client',

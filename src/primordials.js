@@ -240,6 +240,7 @@ module.exports = {
 };
 
 // Node 14
+/* c8 ignore start */
 if (!String.prototype.replaceAll) {
   // Lifted and simplified from core-js for the moment.  Will remove when we
   // drop node 14 support.
@@ -280,7 +281,7 @@ if (!String.prototype.replaceAll) {
       }
       return capture === undefined ? '' : capture;
     });
-  };
+  }
 
   module.exports.StringPrototypeReplaceAll = (str, searchValue, replaceValue) => {
     var O = requireObjectCoercible(str);
@@ -322,3 +323,4 @@ if (!String.prototype.replaceAll) {
     return result;
   };
 }
+/* c8 ignore stop */
