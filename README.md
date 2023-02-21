@@ -62,10 +62,10 @@ escape codes, just as you would in Node.  That's unlikely to be helpful to you
 on the Web, so you might want `stylizeWithHTML`, which is also exported from the package:
 
 ```js
-inspect({a:1}, {
+inspect({ a: 1 }, {
   compact: false,
   stylize: stylizeWithHTML
-}
+});
 ```
 
 which yields this ugly HTML:
@@ -80,7 +80,7 @@ a function that takes two parameters, a string, and a class name.  The mappings
 from class names to colors is in `inspect.styles`, so start with this:
 
 ```js
-stylizeWithHTML(str, styleType) {
+function stylizeWithHTML(str, styleType) {
   const style = inspect.styles[styleType];
   if (style !== undefined) {
     return `<span style="color:${style};">${str}</span>`;
@@ -89,13 +89,13 @@ stylizeWithHTML(str, styleType) {
 }
 ```
 
-## Known Limiations
+## Known Limitations
 
  - If you want your
    [`Proxy`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy)
    objects to have their internal object inspected, you may use the `Proxy`
    constructor exported by this project.  That was done mostly for test coverage
-   purposes, it is not recommended for production code.
+   purposes. It is not recommended for production code.
  - [`arguments`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/arguments)
    objects are not treated specially.
    [[bug](https://github.com/hildjj/node-inspect-extracted/issues/1)]
