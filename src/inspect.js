@@ -1554,7 +1554,6 @@ function handleMaxCallStackSize(ctx, err, constructorName, indentationLvl) {
       'special'
     );
   }
-  /* c8 ignore next */
   assert.fail(err.stack);
 }
 
