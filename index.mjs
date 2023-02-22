@@ -10,4 +10,5 @@ export const inspectDefaultOptions = util.inspectDefaultOptions;
 export const stripVTControlCharacters = util.stripVTControlCharacters;
 export const stylizeWithColor = util.stylizeWithColor;
 export const stylizeWithHTML = util.stylizeWithHTML;
+export const InspectOptions = util.InspectOptions;
 export const Proxy = util.Proxy;
