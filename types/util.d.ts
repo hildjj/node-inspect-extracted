@@ -52,9 +52,15 @@ declare module 'node-inspect-extracted' {
         sorted?: boolean | ((a: string, b: string) => number) | undefined;
         numericSeparator?: boolean | undefined;
     }
+
+    export const inspectDefaultOptions: Required<InspectOptions>;
+
     export type Style = 'special' | 'number' | 'bigint' | 'boolean' | 'undefined' | 'null' | 'string' | 'symbol' | 'date' | 'regexp' | 'module';
     export type CustomInspectFunction = (depth: number, options: InspectOptionsStylized) => string;
     export interface InspectOptionsStylized extends InspectOptions {
+      /**
+       * Write your own function for adding color to the output, or use one of the built-in stylize* functions.
+       */
         stylize(text: string, styleType: Style): string;
     }
     /**
@@ -296,4 +302,29 @@ declare module 'node-inspect-extracted' {
      * @since v16.11.0
      */
     export function stripVTControlCharacters(str: string): string;
+
+    /**
+     * Colorize `text` with ANSI escapes according to the styleType. Mostly used in inspect() options.
+     *
+     * ```typescript
+     * inspect({ a: 'b' }, { stylize: stylizeWithColor });
+     * ```
+     */
+    export function stylizeWithColor(text: string, styleType: Style): string;
+
+    /**
+     * Colorize `text` using HTML span tags and style. Mostly used in inspect() options.
+     *
+     * ```typescript
+     * inspect({ a: 'b' }, { stylize: stylizeWithHTML });
+     * ```
+     */
+    export function stylizeWithHTML(text: string, styleType: Style): string;
+
+    /**
+     * A wrapper around the built-in Proxy constructor that allows the `showProxy` option of inspect to work.
+     *
+     * **Do not use in production code! Only use during testing.**
+     */
+    export const Proxy: new <T>(target: T, handler: ProxyHandler<T>) => T;
 }
