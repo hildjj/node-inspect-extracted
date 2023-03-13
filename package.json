@@ -37,6 +37,7 @@
     "url": "http://github.com/hildjj/node-inspect-extracted.git"
   },
   "author": "Joe Hildebrand <joe-github@cursive.net>",
+  "contributors": ["Noah May <noahmouse2011@gmail.com>"],
   "license": "MIT",
   "devDependencies": {
     "@babel/core": "^7.19.3",
