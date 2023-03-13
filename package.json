@@ -17,10 +17,8 @@
     "pretest": "npm run build",
     "test": "node tools/runtests",
     "pretest:all": "npm run build",
-    "test:all": "nve --arch x64 -p 10,12,14,16,17 node tools/runtests",
-    "coverage": "c8 -r lcov -n src node tools/runtests",
-    "prestart": "npm run coverage || true",
-    "start": "light-server -q -s. -w 'src/**/*.js,test/**/*.js,dist/**,example/** # npm run coverage' -o /coverage/lcov-report/index.html"
+    "test:all": "nve --arch x64 -p 14,16,18,19 node tools/runtests",
+    "coverage": "c8 -r lcov -n src node tools/runtests"
   },
   "keywords": [
     "inspect",
@@ -40,14 +38,13 @@
   "contributors": ["Noah May <noahmouse2011@gmail.com>"],
   "license": "MIT",
   "devDependencies": {
-    "@babel/core": "^7.19.3",
-    "@babel/preset-env": "^7.19.4",
-    "babel-loader": "^8.2.5",
-    "c8": "^7.12.0",
-    "eslint": "^8.25.0",
-    "light-server": "^2.9.1",
-    "webpack": "^5.74.0",
-    "webpack-cli": "^4.10.0"
+    "@babel/core": "^7.21.0",
+    "@babel/preset-env": "^7.20.2",
+    "babel-loader": "^9.1.2",
+    "c8": "^7.13.0",
+    "eslint": "^8.36.0",
+    "webpack": "^5.76.1",
+    "webpack-cli": "^5.0.1"
   },
   "engines": {
     "node": ">=14"
