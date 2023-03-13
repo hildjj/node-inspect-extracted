@@ -29,12 +29,16 @@ function getOwnNonIndexProperties(a, filter = ONLY_ENUMERABLE) {
 }
 
 module.exports = {
+  constants: {
+    kPending,
+    kRejected,
+    ALL_PROPERTIES,
+    ONLY_ENUMERABLE,
+  },
   getOwnNonIndexProperties,
   getPromiseDetails() { return [kPending, undefined]; },
   getProxyDetails: prxy.getProxyDetails,
   Proxy: prxy.Proxy,
-  kPending,
-  kRejected,
   previewEntries(val) {
     return [[], false];
   },
@@ -54,8 +58,4 @@ module.exports = {
     return 'Object';
   },
   getExternalValue() { return BigInt(0); },
-  propertyFilter: {
-    ALL_PROPERTIES,
-    ONLY_ENUMERABLE
-  }
 };

@@ -3,7 +3,7 @@
 const {
   getOwnNonIndexProperties,
   getConstructorName,
-  propertyFilter: {
+  constants: {
     ALL_PROPERTIES,
     ONLY_ENUMERABLE
   }

@@ -45,7 +45,6 @@ const {
   NumberPrototypeValueOf,
   Object,
   ObjectAssign,
-  ObjectCreate,
   ObjectDefineProperty,
   ObjectGetOwnPropertyDescriptor,
   ObjectGetOwnPropertyNames,
@@ -99,18 +98,18 @@ const {
 } = primordials;
 
 const {
+  constants: {
+    ALL_PROPERTIES,
+    ONLY_ENUMERABLE,
+    kPending,
+    kRejected,
+  },
   getOwnNonIndexProperties,
   getPromiseDetails,
   getProxyDetails,
-  kPending,
-  kRejected,
   previewEntries,
   getConstructorName: internalGetConstructorName,
   getExternalValue,
-  propertyFilter: {
-    ALL_PROPERTIES,
-    ONLY_ENUMERABLE
-  },
   Proxy
 } = require('./util');
 
@@ -173,8 +172,8 @@ function pathToFileUrlHref(filepath) {
 const builtInObjects = new SafeSet(
   ArrayPrototypeFilter(
     ObjectGetOwnPropertyNames(globalThis),
-    (e) => RegExpPrototypeExec(/^[A-Z][a-zA-Z0-9]+$/, e) !== null
-  )
+    (e) => RegExpPrototypeExec(/^[A-Z][a-zA-Z0-9]+$/, e) !== null,
+  ),
 );
 
 // https://tc39.es/ecma262/#sec-IsHTMLDDA-internal-slot
@@ -465,7 +464,7 @@ defineColorAlias('doubleunderline', 'doubleUnderline');
 
 // TODO(BridgeAR): Add function style support for more complex styles.
 // Don't use 'blue' not visible on cmd.exe
-inspect.styles = ObjectAssign(ObjectCreate(null), {
+inspect.styles = ObjectAssign({ __proto__: null }, {
   special: 'cyan',
   number: 'yellow',
   bigint: 'yellow',
@@ -813,7 +812,7 @@ function formatValue(ctx, value, recurseTimes, typedArray) {
         context,
         depth,
         getUserOptions(ctx, isCrossContext),
-        inspect
+        inspect,
       );
       // If the custom inspection method returned `this`, don't go into
       // infinite recursion.
@@ -867,7 +866,7 @@ function formatRaw(ctx, value, recurseTimes, typedArray) {
       (ctx.showHidden ?
         ObjectPrototypeHasOwnProperty :
         ObjectPrototypePropertyIsEnumerable)(
-        value, SymbolToStringTag
+        value, SymbolToStringTag,
       ))) {
     tag = '';
   }
@@ -967,7 +966,7 @@ function formatRaw(ctx, value, recurseTimes, typedArray) {
     } else if (isRegExp(value)) {
       // Make RegExps say that they are RegExps
       base = RegExpPrototypeToString(
-        constructor !== null ? value : new RegExp(value)
+        constructor !== null ? value : new RegExp(value),
       );
       const prefix = getPrefix(constructor, tag, 'RegExp');
       if (prefix !== 'RegExp ')
@@ -1022,7 +1021,7 @@ function formatRaw(ctx, value, recurseTimes, typedArray) {
     } else if (isModuleNamespaceObject(value)) {
       braces[0] = `${getPrefix(constructor, tag, 'Module')}{`;
       // Special handle keys for namespace objects.
-      formatter = FunctionPrototypeBind(formatNamespaceObject, null, keys);
+      formatter = formatNamespaceObject.bind(null, keys);
     } else if (isBoxedPrimitive(value)) {
       base = getBoxedBase(value, ctx, keys, constructor, tag);
       if (keys.length === 0 && protoProps === undefined) {
@@ -1048,7 +1047,7 @@ function formatRaw(ctx, value, recurseTimes, typedArray) {
   }
   recurseTimes += 1;
 
-  ArrayPrototypePush(ctx.seen, value);
+  ctx.seen.push(value);
   ctx.currentDepth = recurseTimes;
   let output;
   const indentationLvl = ctx.indentationLvl;
@@ -1079,7 +1078,7 @@ function formatRaw(ctx, value, recurseTimes, typedArray) {
       }
     }
   }
-  ArrayPrototypePop(ctx.seen);
+  ctx.seen.pop();
 
   if (ctx.sorted) {
     const comparator = ctx.sorted === true ? undefined : ctx.sorted;
@@ -1478,7 +1477,7 @@ function groupArrayElements(ctx, output, value) {
       MathRound(
         MathSqrt(
           approxCharHeights * biasedMax * outputLength
-        ) / biasedMax
+        ) / biasedMax,
       ),
       // Do not exceed the breakLength.
       MathFloor((ctx.breakLength - ctx.indentationLvl) / actualMax),
@@ -1486,7 +1485,7 @@ function groupArrayElements(ctx, output, value) {
       // minimal grouping.
       ctx.compact * 4,
       // Limit the columns to a maximum of fifteen.
-      15
+      15,
     );
     // Return with the original output if no grouping should happen.
     if (columns <= 1) {
@@ -1546,12 +1545,12 @@ function groupArrayElements(ctx, output, value) {
 
 function handleMaxCallStackSize(ctx, err, constructorName, indentationLvl) {
   if (isStackOverflowError(err)) {
-    ArrayPrototypePop(ctx.seen);
+    ctx.seen.pop();
     ctx.indentationLvl = indentationLvl;
     return ctx.stylize(
       `[${constructorName}: Inspection interrupted ` +
         'prematurely. Maximum call stack size exceeded.]',
-      'special'
+      'special',
     );
   }
   assert.fail(err.stack);
@@ -1580,6 +1579,8 @@ function addNumericSeparatorEnd(integerString) {
     `${result}${StringPrototypeSlice(integerString, i)}`;
 }
 
+const remainingText = (remaining) => `... ${remaining} more item${remaining > 1 ? 's' : ''}`;
+
 function formatNumber(fn, number, numericSeparator) {
   if (!numericSeparator) {
     // Format -0 as '-0'. Checking `number === -0` won't distinguish 0 from -0.
@@ -1603,7 +1604,7 @@ function formatNumber(fn, number, numericSeparator) {
     addNumericSeparator(string)
   }.${
     addNumericSeparatorEnd(
-      StringPrototypeSlice(String(number), string.length + 1)
+      StringPrototypeSlice(String(number), string.length + 1),
     )
   }`, 'number');
 }
@@ -1712,7 +1713,7 @@ function formatSpecialArray(ctx, value, recurseTimes, maxLength, output, i) {
       ArrayPrototypePush(output, ctx.stylize(message, 'undefined'));
     }
   } else if (remaining > 0) {
-    ArrayPrototypePush(output, `... ${remaining} more item${remaining > 1 ? 's' : ''}`);
+    ArrayPrototypePush(output, remainingText(remaining));
   }
   return output;
 }
@@ -1751,7 +1752,7 @@ function formatArray(ctx, value, recurseTimes) {
     ArrayPrototypePush(output, formatProperty(ctx, value, recurseTimes, i, kArrayType));
   }
   if (remaining > 0) {
-    ArrayPrototypePush(output, `... ${remaining} more item${remaining > 1 ? 's' : ''}`);
+    ArrayPrototypePush(output, remainingText(remaining));
   }
   return output;
 }
@@ -1767,7 +1768,7 @@ function formatTypedArray(value, length, ctx, ignored, recurseTimes) {
     output[i] = elementFormatter(ctx.stylize, value[i], ctx.numericSeparator);
   }
   if (remaining > 0) {
-    output[maxLength] = `... ${remaining} more item${remaining > 1 ? 's' : ''}`;
+    output[maxLength] = remainingText(remaining);
   }
   if (ctx.showHidden) {
     // .buffer goes last, it's not a primitive like the others.
@@ -1789,23 +1790,41 @@ function formatTypedArray(value, length, ctx, ignored, recurseTimes) {
 }
 
 function formatSet(value, ctx, ignored, recurseTimes) {
+  const length = value.size;
+  const maxLength = MathMin(MathMax(0, ctx.maxArrayLength), length);
+  const remaining = length - maxLength;
   const output = [];
   ctx.indentationLvl += 2;
+  let i = 0;
   for (const v of value) {
+    if (i >= maxLength) break;
     ArrayPrototypePush(output, formatValue(ctx, v, recurseTimes));
+    i++;
+  }
+  if (remaining > 0) {
+    ArrayPrototypePush(output, remainingText(remaining));
   }
   ctx.indentationLvl -= 2;
   return output;
 }
 
 function formatMap(value, ctx, ignored, recurseTimes) {
+  const length = value.size;
+  const maxLength = MathMin(MathMax(0, ctx.maxArrayLength), length);
+  const remaining = length - maxLength;
   const output = [];
   ctx.indentationLvl += 2;
+  let i = 0;
   for (const { 0: k, 1: v } of value) {
+    if (i >= maxLength) break;
     ArrayPrototypePush(
       output,
-      `${formatValue(ctx, k, recurseTimes)} => ${formatValue(ctx, v, recurseTimes)}`
+      `${formatValue(ctx, k, recurseTimes)} => ${formatValue(ctx, v, recurseTimes)}`,
     );
+    i++;
+  }
+  if (remaining > 0) {
+    ArrayPrototypePush(output, remainingText(remaining));
   }
   ctx.indentationLvl -= 2;
   return output;
@@ -1828,8 +1847,7 @@ function formatSetIterInner(ctx, recurseTimes, entries, state) {
   }
   const remaining = entries.length - maxLength;
   if (remaining > 0) {
-    ArrayPrototypePush(output,
-                       `... ${remaining} more item${remaining > 1 ? 's' : ''}`);
+    ArrayPrototypePush(output, remainingText(remaining));
   }
   return output;
 }
@@ -1867,7 +1885,7 @@ function formatMapIterInner(ctx, recurseTimes, entries, state) {
   }
   ctx.indentationLvl -= 2;
   if (remaining > 0) {
-    ArrayPrototypePush(output, `... ${remaining} more item${remaining > 1 ? 's' : ''}`);
+    ArrayPrototypePush(output, remainingText(remaining));
   }
   return output;
 }
@@ -1967,7 +1985,7 @@ function formatProperty(ctx, value, recurseTimes, key, type, desc,
     const tmp = RegExpPrototypeSymbolReplace(
       strEscapeSequencesReplacer,
       SymbolPrototypeToString(key),
-      escapeFn
+      escapeFn,
     );
     name = `[${ctx.stylize(tmp, 'symbol')}]`;
   } else if (key === '__proto__') {
@@ -2146,10 +2164,7 @@ function formatNumberNoColor(number, options) {
   return formatNumber(
     stylizeNoColor,
     number,
-    // Maintain node 14 compat
-    // options?.numericSeparator ?? inspectDefaultOptions.numericSeparator
-    (options != null) && (options.numericSeparator != null) ?
-      options.numericSeparator : inspectDefaultOptions.numericSeparator
+    options?.numericSeparator ?? inspectDefaultOptions.numericSeparator,
   );
 }
 
@@ -2160,7 +2175,7 @@ function formatBigIntNoColor(bigint, options) {
     // Maintain node 14 compat
     // options?.numericSeparator ?? inspectDefaultOptions.numericSeparator
     (options != null) && (options.numericSeparator != null) ?
-      options.numericSeparator : inspectDefaultOptions.numericSeparator
+      options.numericSeparator : inspectDefaultOptions.numericSeparator,
   );
 }
 
@@ -2290,6 +2305,18 @@ function formatWithOptionsInternal(inspectOptions, args) {
   return str;
 }
 
+function isZeroWidthCodePoint(code) {
+  return code <= 0x1F || // C0 control codes
+    (code >= 0x7F && code <= 0x9F) || // C1 control codes
+    (code >= 0x300 && code <= 0x36F) || // Combining Diacritical Marks
+    (code >= 0x200B && code <= 0x200F) || // Modifying Invisible Characters
+    // Combining Diacritical Marks for Symbols
+    (code >= 0x20D0 && code <= 0x20FF) ||
+    (code >= 0xFE00 && code <= 0xFE0F) || // Variation Selectors
+    (code >= 0xFE20 && code <= 0xFE2F) || // Combining Half Marks
+    (code >= 0xE0100 && code <= 0xE01EF); // Variation Selectors
+}
+
 if (internalBinding('config').hasIntl) {
   const icu = internalBinding('icu');
   // icu.getStringWidth(string, ambiguousAsFullWidth, expandEmojiSequence)
@@ -2306,7 +2333,7 @@ if (internalBinding('config').hasIntl) {
     for (let i = 0; i < str.length; i++) {
       // Try to avoid calling into C++ by first handling the ASCII portion of
       // the string. If it is fully ASCII, we skip the C++ part.
-      const code = StringPrototypeCharCodeAt(str, i);
+      const code = str.charCodeAt(i);
       if (code >= 127) {
         width += icu.getStringWidth(StringPrototypeNormalize(StringPrototypeSlice(str, i), 'NFC'));
         break;
@@ -2379,17 +2406,6 @@ if (internalBinding('config').hasIntl) {
     );
   };
 
-  const isZeroWidthCodePoint = (code) => {
-    return code <= 0x1F || // C0 control codes
-      (code >= 0x7F && code <= 0x9F) || // C1 control codes
-      (code >= 0x300 && code <= 0x36F) || // Combining Diacritical Marks
-      (code >= 0x200B && code <= 0x200F) || // Modifying Invisible Characters
-      // Combining Diacritical Marks for Symbols
-      (code >= 0x20D0 && code <= 0x20FF) ||
-      (code >= 0xFE00 && code <= 0xFE0F) || // Variation Selectors
-      (code >= 0xFE20 && code <= 0xFE2F) || // Combining Half Marks
-      (code >= 0xE0100 && code <= 0xE01EF); // Variation Selectors
-  };
 }
 
 /**
@@ -2408,6 +2424,7 @@ module.exports = {
   formatWithOptions,
   getStringWidth,
   stripVTControlCharacters,
+  isZeroWidthCodePoint,
   stylizeWithColor,
   stylizeWithHTML(str, styleType) {
     const style = inspect.styles[styleType];
