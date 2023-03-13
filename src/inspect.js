@@ -1476,7 +1476,7 @@ function groupArrayElements(ctx, output, value) {
       // The added bias increases the columns for short entries.
       MathRound(
         MathSqrt(
-          approxCharHeights * biasedMax * outputLength
+          approxCharHeights * biasedMax * outputLength,
         ) / biasedMax,
       ),
       // Do not exceed the breakLength.
@@ -1626,10 +1626,10 @@ function formatPrimitive(fn, value, ctx) {
       trailer = `... ${remaining} more character${remaining > 1 ? 's' : ''}`;
     }
     if (ctx.compact !== true &&
-      // We do not support handling unicode characters width with
-      // the readline getStringWidth function as there are
-      // performance implications.
-      value.length > kMinLineLength &&
+        // We do not support handling unicode characters width with
+        // the readline getStringWidth function as there are
+        // performance implications.
+        value.length > kMinLineLength &&
         value.length > ctx.breakLength - ctx.indentationLvl - 4) {
       return ArrayPrototypeJoin(
         ArrayPrototypeMap(
@@ -2172,10 +2172,7 @@ function formatBigIntNoColor(bigint, options) {
   return formatBigInt(
     stylizeNoColor,
     bigint,
-    // Maintain node 14 compat
-    // options?.numericSeparator ?? inspectDefaultOptions.numericSeparator
-    (options != null) && (options.numericSeparator != null) ?
-      options.numericSeparator : inspectDefaultOptions.numericSeparator,
+    options?.numericSeparator ?? inspectDefaultOptions.numericSeparator,
   );
 }
 
