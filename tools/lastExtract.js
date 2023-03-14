@@ -4,12 +4,12 @@
 // This file is generated from `node tools/check.js -u`
 // DO NOT MODIFY BY HAND
 module.exports = {
-  time: '2023-03-14T07:20:23.085Z',
+  time: '2023-03-14T07:44:08.103Z',
   files: [
     {
       name: 'test/common/tmpdir.js',
       local: 'test/common/tmpdir.js',
-      mtime: '2023-02-28T15:38:51.229Z',
+      mtime: '2023-02-28T15:38:51.228Z',
       sha256: '25593c4c3e7b0deda89b70c65dbbfda20f41bdfbf2b2170e07c7da3dad81d6ca',
       commit: 'd6c68ce34639139d1a510845a37f62038b818123'
     },
@@ -51,8 +51,8 @@ module.exports = {
     {
       name: 'test/parallel/test-util-inspect.js',
       local: 'test/parallel/test-util-inspect.js',
-      sha256: '8ed4a64b3064ce9785efa50fd4f6d105a769c5b4ac13ba278e3df2b98f995a3a',
-      mtime: '2023-02-28T15:39:15.276Z',
+      sha256: '8585ebc59f0045a1af2270f089e8a0eb2aa3c0ea8d437074e8e70c84d8299591',
+      mtime: '2023-03-14T07:37:07.278Z',
       commit: 'ed69a3af9209e3a6f9ceb43152924398cf431d04'
     },
     {
@@ -68,6 +68,20 @@ module.exports = {
       sha256: '7e8f55a19321e2dfeca5868d4ad498371894debed6d8bcf5b2a3af9c3126ce8f',
       mtime: '2021-05-03T22:16:13.727Z',
       commit: 'ec5b06eae385700391ea1e6e56e751978f097212'
+    },
+    {
+      name: 'test/parallel/test-util-inspect-namespace.js',
+      local: 'test/parallel/test-util-inspect-namespace.js',
+      sha256: 'd52207cf84432e47ce7264d12537dd856be8a71579169df21c84464448d1d932',
+      mtime: '2021-02-05T17:22:35.532Z',
+      commit: 'f78da00ab7dd1341d8a2e7b4447fdc1c7b75913d'
+    },
+    {
+      name: 'test/parallel/test-util-inspect-long-running.js',
+      local: 'test/parallel/test-util-inspect-long-running.js',
+      sha256: '40992d84e063d8a40e966a69ca5cb8357a39728344ae125f6eb337e82386881d',
+      mtime: '2020-12-03T20:22:01.782Z',
+      commit: 'eb61127c48ba59e52d7cea293ad80fa54000939c'
     }
   ]
 };

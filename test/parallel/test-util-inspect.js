@@ -2085,6 +2085,8 @@ assert.strictEqual(util.inspect('"\'${a}'), "'\"\\'${a}'");
 ].forEach(([Class, message], i) => {
   console.log('Test %i', i);
   const foo = new Class(message);
+  // TODO: null prototypes
+  // const name = foo.name;
   const extra = Class.name.includes('Error') ? '' : ` [${foo.name}]`;
   assert(
     util.inspect(foo).startsWith(
@@ -2398,6 +2400,9 @@ assert.strictEqual(
 // Check for special colors.
 {
   const special = inspect.colors[inspect.styles.special];
+  // TODO: promise internals
+  // const string = inspect.colors[inspect.styles.string];
+
   assert.strictEqual(
     inspect(new WeakSet(), { colors: true }),
     `WeakSet { \u001b[${special[0]}m<items unknown>\u001b[${special[1]}m }`
@@ -2993,7 +2998,7 @@ assert.strictEqual(
         expected = `\u001b[90m${expected}\u001b[39m`;
       }
     } else if (process.platform === 'win32') {
-      expected = expected.replaceAll(/\//g, '\\'); // Node 14 compat
+      expected = expected.replace(/\//g, '\\'); // Node 14 compat
     }
     assert.strictEqual(line, expected);
   });
@@ -3024,7 +3029,7 @@ assert.strictEqual(
     '/home/user/repository/node');
   let expectedCwd = process.cwd();
   if (process.platform === 'win32') {
-    expectedCwd = `/${expectedCwd.replaceAll(/\\/g, '/')}`; // node 14 compat
+    expectedCwd = `/${expectedCwd.replace(/\\/g, '/')}`; // node 14 compat
   }
   // Use a fake stack to verify the expected colored outcome.
   err.stack = 'Error: ESM without need for encoding!\n' +
