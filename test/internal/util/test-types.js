@@ -2,7 +2,7 @@
 
 const {
   isNativeError,
-  isSet
+  isSet,
 } = require('../../../src/internal/util/types');
 const assert = require('assert');
 

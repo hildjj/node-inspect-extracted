@@ -40,7 +40,7 @@ function walk(dir) {
         args = flags[1].split(/\s+/).concat(args);
       }
       const res = child_process.spawnSync('node', args, {
-        stdio: 'inherit'
+        stdio: 'inherit',
       });
       if (res.error) {
         console.log(c(res.error, 'red'));

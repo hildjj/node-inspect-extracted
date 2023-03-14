@@ -127,7 +127,7 @@ function getMessage(key, args, self) {
   assert(
     msg.length <= args.length, // Default options do not count.
     `Code: ${key}; The provided arguments length (${args.length}) does not ` +
-      `match the required ones (${msg.length}).`
+      `match the required ones (${msg.length}).`,
   );
   return ReflectApply(msg, self, args);
 }

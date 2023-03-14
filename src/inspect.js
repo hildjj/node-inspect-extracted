@@ -110,18 +110,18 @@ const {
   previewEntries,
   getConstructorName: internalGetConstructorName,
   getExternalValue,
-  Proxy
+  Proxy,
 } = require('./util');
 
 const {
   customInspectSymbol,
   isError,
   join,
-  removeColors
+  removeColors,
 } = require('./internal/util');
 
 const {
-  isStackOverflowError
+  isStackOverflowError,
 } = require('./internal/errors');
 
 const {
@@ -270,7 +270,7 @@ function getUserOptions(ctx, isCrossContext) {
     sorted: ctx.sorted,
     getters: ctx.getters,
     numericSeparator: ctx.numericSeparator,
-    ...ctx.userOptions
+    ...ctx.userOptions,
   };
 
   // Typically, the target value will be an instance of `Object`. If that is
@@ -378,7 +378,7 @@ ObjectDefineProperty(inspect, 'defaultOptions', {
   set(options) {
     validateObject(options, 'options');
     return ObjectAssign(inspectDefaultOptions, options);
-  }
+  },
 });
 
 // Set Graphics Rendition https://en.wikipedia.org/wiki/ANSI_escape_code#graphics
@@ -445,7 +445,7 @@ function defineColorAlias(target, alias) {
       this[target] = value;
     },
     configurable: true,
-    enumerable: false
+    enumerable: false,
   });
 }
 
@@ -477,7 +477,7 @@ inspect.styles = ObjectAssign({ __proto__: null }, {
   // "name": intentionally not styling
   // TODO(BridgeAR): Highlight regular expressions properly.
   regexp: 'red',
-  module: 'underline'
+  module: 'underline',
 });
 
 function addQuotes(str, quotes) {
@@ -630,7 +630,7 @@ function getConstructorName(obj, ctx, recurseTimes, protoProps) {
     return `${res} <${inspect(firstProto, {
       ...ctx,
       customInspect: false,
-      depth: -1
+      depth: -1,
     })}>`;
   }
 
@@ -2209,7 +2209,7 @@ function formatWithOptionsInternal(inspectOptions, args) {
                   ...inspectOptions,
                   compact: 3,
                   colors: false,
-                  depth: 0
+                  depth: 0,
                 });
               }
               break;
@@ -2236,7 +2236,7 @@ function formatWithOptionsInternal(inspectOptions, args) {
                 ...inspectOptions,
                 showHidden: true,
                 showProxy: true,
-                depth: 4
+                depth: 4,
               });
               break;
             case 105: { // 'i'
@@ -2430,5 +2430,5 @@ module.exports = {
     }
     return str;
   },
-  Proxy
+  Proxy,
 };

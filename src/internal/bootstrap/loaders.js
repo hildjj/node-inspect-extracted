@@ -75,5 +75,5 @@ const builtinModules = [
 exports.BuiltinModule = {
   exists(s) {
     return s.startsWith('internal/') || builtinModules.indexOf(s) !== -1;
-  }
+  },
 };

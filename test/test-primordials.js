@@ -3,7 +3,7 @@
 const {
   makeSafe,
   internalBinding,
-  SafeMap
+  SafeMap,
 } = require('../src/primordials');
 const assert = require('assert');
 
@@ -30,7 +30,7 @@ const FooSafe = makeSafe(Foo, class SafeFoo extends Foo {
 
 const f = new FooSafe();
 assert(f);
-assert.deepStrictEqual(f.bar(), 'bar');
-assert.deepStrictEqual(f.baz(), 'baz');
+assert.strictEqual(f.bar(), 'bar');
+assert.strictEqual(f.baz(), 'baz');
 
-assert.throws(() => internalBinding('foo'));
+assert.throws(() => internalBinding('foo'), { message: 'unknown module: "foo"' });

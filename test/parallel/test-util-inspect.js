@@ -1262,6 +1262,7 @@ if (typeof Symbol !== 'undefined') {
   const pending = new Promise(() => {});
   assert.strictEqual(util.inspect(pending), 'Promise { <pending> }');
 
+  //
   // const promiseWithProperty = Promise.resolve('foo');
   // promiseWithProperty.bar = 42;
   // assert.strictEqual(util.inspect(promiseWithProperty),
@@ -2002,6 +2003,7 @@ util.inspect(process);
   // TODO:
   // expect = 'WeakMap { [ [length]: 0 ] => {}, ... 1 more item, extra: true }';
   expect = 'WeakMap { [ [length]: 0 ] => false, extra: true }';
+  //
   // let expectAlt = 'WeakMap { {} => [ [length]: 0 ], ... 1 more item, ' +
   //                 'extra: true }';
   let expectAlt = 'WeakMap { {} => [ [length]: 0 ], extra: true }';
@@ -2083,7 +2085,6 @@ assert.strictEqual(util.inspect('"\'${a}'), "'\"\\'${a}'");
 ].forEach(([Class, message], i) => {
   console.log('Test %i', i);
   const foo = new Class(message);
-  // const name = foo.name;
   const extra = Class.name.includes('Error') ? '' : ` [${foo.name}]`;
   assert(
     util.inspect(foo).startsWith(
@@ -2397,8 +2398,6 @@ assert.strictEqual(
 // Check for special colors.
 {
   const special = inspect.colors[inspect.styles.special];
-  // const string = inspect.colors[inspect.styles.string];
-
   assert.strictEqual(
     inspect(new WeakSet(), { colors: true }),
     `WeakSet { \u001b[${special[0]}m<items unknown>\u001b[${special[1]}m }`
