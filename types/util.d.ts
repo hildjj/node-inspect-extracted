@@ -53,7 +53,8 @@ declare module 'node-inspect-extracted' {
         numericSeparator?: boolean | undefined;
     }
 
-    export const inspectDefaultOptions: Required<InspectOptions>;
+    // Not exposed from node's `util` package.
+    // export const inspectDefaultOptions: Required<InspectOptions>;
 
     export type Style = 'special' | 'number' | 'bigint' | 'boolean' | 'undefined' | 'null' | 'string' | 'symbol' | 'date' | 'regexp' | 'module';
     export type CustomInspectFunction = (depth: number, options: InspectOptionsStylized) => string;
