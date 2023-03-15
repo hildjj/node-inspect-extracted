@@ -33,6 +33,7 @@ const { previewEntries } = internalBinding('util');
 const { inspect } = util;
 const { MessageChannel } = require('worker_threads');
 const url = require('url');
+const semver = require('semver');
 
 assert.strictEqual(util.inspect(1), '1');
 assert.strictEqual(util.inspect(false), 'false');
@@ -672,7 +673,7 @@ assert.strictEqual(util.inspect(-5e-324), '-5e-324');
   undefinedCause.stack = '';
 
   // Error cause added in Node v16.
-  if (parseFloat(process.version.slice(1)) >= 16) {
+  if (semver.satisfies(process.version, '>=16')) {
     assert.strictEqual(util.inspect(falsyCause1), '[Error] { [cause]: false }');
     assert.strictEqual(util.inspect(falsyCause2), '[Error] { [cause]: null }');
     assert.strictEqual(
@@ -3044,7 +3045,7 @@ assert.strictEqual(
 }
 
 // This starts to work in node 15
-if (parseFloat(process.version.slice(1)) >= 15) {
+if (semver.satisfies(process.version, '>=15')) {
   // Cross platform checks.
   const err = new Error('foo');
   util.inspect(err, { colors: true }).split('\n').forEach((line, i) => {
@@ -3161,7 +3162,7 @@ if (parseFloat(process.version.slice(1)) >= 15) {
     '    [constructor]: [class Bar extends Foo] {\n' +
     '      [length]: 0,\n' +
     // Different order starting in node 16
-    ((parseFloat(process.version.slice(1)) >= 16) ?
+    (semver.satisfies(process.version, '>=16') ?
       "      [name]: 'Bar',\n" +
       '      [prototype]: [Circular *1],\n' :
       '      [prototype]: [Circular *1],\n' +

@@ -2315,30 +2315,34 @@ function isZeroWidthCodePoint(code) {
 }
 
 if (internalBinding('config').hasIntl) {
-  const icu = internalBinding('icu');
-  // icu.getStringWidth(string, ambiguousAsFullWidth, expandEmojiSequence)
-  // Defaults: ambiguousAsFullWidth = false; expandEmojiSequence = true;
-  // TODO(BridgeAR): Expose the options to the user. That is probably the
-  // best thing possible at the moment, since it's difficult to know what
-  // the receiving end supports.
-  getStringWidth = function getStringWidth(str, removeControlChars = true) {
-    let width = 0;
+  /* c8 ignore start */
+  assert(false);
+  // Can't use node internals
+  // const icu = internalBinding('icu');
+  // // icu.getStringWidth(string, ambiguousAsFullWidth, expandEmojiSequence)
+  // // Defaults: ambiguousAsFullWidth = false; expandEmojiSequence = true;
+  // // TODO(BridgeAR): Expose the options to the user. That is probably the
+  // // best thing possible at the moment, since it's difficult to know what
+  // // the receiving end supports.
+  // getStringWidth = function getStringWidth(str, removeControlChars = true) {
+  //   let width = 0;
 
-    if (removeControlChars) {
-      str = stripVTControlCharacters(str);
-    }
-    for (let i = 0; i < str.length; i++) {
-      // Try to avoid calling into C++ by first handling the ASCII portion of
-      // the string. If it is fully ASCII, we skip the C++ part.
-      const code = str.charCodeAt(i);
-      if (code >= 127) {
-        width += icu.getStringWidth(StringPrototypeNormalize(StringPrototypeSlice(str, i), 'NFC'));
-        break;
-      }
-      width += code >= 32 ? 1 : 0;
-    }
-    return width;
-  };
+  //   if (removeControlChars) {
+  //     str = stripVTControlCharacters(str);
+  //   }
+  //   for (let i = 0; i < str.length; i++) {
+  //     // Try to avoid calling into C++ by first handling the ASCII portion of
+  //     // the string. If it is fully ASCII, we skip the C++ part.
+  //     const code = str.charCodeAt(i);
+  //     if (code >= 127) {
+  //       width += icu.getStringWidth(StringPrototypeNormalize(StringPrototypeSlice(str, i), 'NFC'));
+  //       break;
+  //     }
+  //     width += code >= 32 ? 1 : 0;
+  //   }
+  //   return width;
+  // };
+  /* c8 ignore stop */
 } else {
   /**
    * Returns the number of columns required to display the given string.
