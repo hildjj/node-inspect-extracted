@@ -4,7 +4,7 @@
 // This file is generated from `node tools/check.js -u`
 // DO NOT MODIFY BY HAND
 module.exports = {
-  time: '2023-03-14T18:03:15.441Z',
+  time: '2023-03-16T19:19:31.429Z',
   files: [
     {
       name: 'test/common/tmpdir.js',
@@ -16,9 +16,9 @@ module.exports = {
     {
       name: 'test/common/index.js',
       local: 'test/common/index.js',
-      mtime: '2023-02-28T15:39:15.207Z',
-      sha256: '46447c8ee6e34f165f7d587003471903d940b2e90349e0d6a2c0f0cebf69efd6',
-      commit: '367dc412992bc6835043100066d2545c15832439'
+      mtime: '2023-03-16T19:02:29.415Z',
+      sha256: '6192d71e9b0c1b5613bf976fd6939693bda8041495959fc7ac06859849034da6',
+      commit: '4e9915e383e48f00d98a52ed1a21aa9a5f2c4528'
     },
     {
       name: 'test/common/.eslintrc.yaml',
@@ -44,15 +44,15 @@ module.exports = {
     {
       name: 'lib/internal/util/inspect.js',
       local: 'src/inspect.js',
-      mtime: '2023-02-28T15:39:15.183Z',
-      sha256: 'c0bbb288f5ef7f66405be96fca65aaf38843d14599036ad184c3e4f83e6314b9',
-      commit: 'ddf5002782cf8cf8d1460a18c3de6705a3a5eef0'
+      mtime: '2023-03-16T19:02:29.385Z',
+      sha256: '21e9595dbd5119cbe68d3692c3b2f4d9bd15556afd9894d75fe1c7984bf081a6',
+      commit: '05614f8cf6fb8fe34fd8e42c2e8e3abbaca0c547'
     },
     {
       name: 'test/parallel/test-util-inspect.js',
       local: 'test/parallel/test-util-inspect.js',
-      sha256: '8585ebc59f0045a1af2270f089e8a0eb2aa3c0ea8d437074e8e70c84d8299591',
-      mtime: '2023-03-14T07:37:07.278Z',
+      sha256: '8ed4a64b3064ce9785efa50fd4f6d105a769c5b4ac13ba278e3df2b98f995a3a',
+      mtime: '2023-03-16T19:02:25.912Z',
       commit: 'ed69a3af9209e3a6f9ceb43152924398cf431d04'
     },
     {
