@@ -5,9 +5,11 @@ const path = require('path');
 const fs = require('fs');
 const child_process = require('child_process');
 const { inspect } = require('../src/inspect');
-const nodeVersion = parseFloat(process.version.slice(1));
+const semver = require('semver');
 
-const TEST_RE = (nodeVersion > 12) ? /^test-(.*)(\.m?js)$/ : /^test-(.*)(\.js)$/;
+const TEST_RE = semver.satisfies(process.version, '>=12') ?
+  /^test-(.*)(\.m?js)$/ :
+  /^test-(.*)(\.js)$/;
 
 const root = path.resolve(__dirname, '..');
 const buf = Buffer.alloc(200);
@@ -40,7 +42,7 @@ function walk(dir) {
         args = flags[1].split(/\s+/).concat(args);
       }
       const res = child_process.spawnSync('node', args, {
-        stdio: 'inherit'
+        stdio: 'inherit',
       });
       if (res.error) {
         console.log(c(res.error, 'red'));

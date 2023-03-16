@@ -13,7 +13,7 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [14.x, 16.x, 18.x]
+        node-version: [14.x, 16.x, 18.x, 19.x]
 
     steps:
       - uses: actions/checkout@v3
@@ -23,8 +23,8 @@ jobs:
         uses: actions/setup-node@v3
         with:
           node-version: ${{ matrix.node-version }}
-      - name: Install c8
-        run: npm install c8
+      - name: Install test run dependencies
+        run: npm install c8 semver
       - name: Test ${{ matrix.node-version }}
         run: npm run coverage
       - name: Coveralls Parallel

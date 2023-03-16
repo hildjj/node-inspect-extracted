@@ -10,7 +10,7 @@ module.exports = {
     filename: 'inspect.js',
     library: {
       type: 'umd',
-      name: 'util'
+      name: 'util',
     },
     globalObject: 'this',
   },
@@ -22,11 +22,11 @@ module.exports = {
         use: {
           loader: 'babel-loader',
           options: {
-            presets: ['@babel/preset-env']
-          }
-        }
+            presets: ['@babel/preset-env'],
+          },
+        },
       },
-    ]
-  }
+    ],
+  },
   // devtool: 'source-map'
 };

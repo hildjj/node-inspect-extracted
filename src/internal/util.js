@@ -11,5 +11,5 @@ module.exports = {
   join: Array.prototype.join.call.bind(Array.prototype.join),
   removeColors(str) {
     return String.prototype.replace.call(str, colorRegExp, '');
-  }
+  },
 };

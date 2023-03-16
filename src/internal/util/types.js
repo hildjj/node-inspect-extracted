@@ -10,7 +10,7 @@ const { getConstructorName } = require('../../util');
     get: function() {
       return this;
     },
-    configurable: true
+    configurable: true,
   });
   // eslint-disable-next-line no-undef
   __magic__.globalThis = __magic__;
@@ -190,7 +190,7 @@ module.exports = {
       'Float32Array',
       'Float64Array',
       'BigInt64Array',
-      'BigUint64Array'
+      'BigUint64Array',
     );
   },
   isStringObject,

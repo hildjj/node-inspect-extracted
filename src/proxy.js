@@ -34,5 +34,5 @@ class Prxy {
 
 module.exports = {
   getProxyDetails: Prxy.getProxyDetails.bind(Prxy),
-  Proxy: Prxy
+  Proxy: Prxy,
 };

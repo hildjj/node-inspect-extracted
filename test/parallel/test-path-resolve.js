@@ -1,8 +1,6 @@
 'use strict';
 const common = require('../common');
-// const fixtures = require('../common/fixtures');
 const assert = require('assert');
-// const child = require('child_process');
 const path = require('../../src/path');
 
 const failures = [];

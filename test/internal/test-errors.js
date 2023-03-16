@@ -2,8 +2,8 @@
 
 const {
   codes: {
-    ERR_INVALID_ARG_TYPE
-  }
+    ERR_INVALID_ARG_TYPE,
+  },
 } = require('../../src/internal/errors');
 const assert = require('assert');
 
@@ -11,7 +11,7 @@ assert.throws(() => {
   throw new ERR_INVALID_ARG_TYPE('first argument', 'Object', 4);
 }, {
   code: 'ERR_INVALID_ARG_TYPE',
-  message: 'The first argument must be of type object. Received type number (4)'
+  message: 'The first argument must be of type object. Received type number (4)',
 });
 
 let e = new ERR_INVALID_ARG_TYPE('foo.bar', 'Object', 4);
@@ -21,7 +21,7 @@ assert.strictEqual(
 assert.strictEqual(
   e.toString(),
   'TypeError [ERR_INVALID_ARG_TYPE]: The "foo.bar" property must be of ' +
-  'type object. Received type number (4)'
+  'type object. Received type number (4)',
 );
 
 e = new ERR_INVALID_ARG_TYPE('foo', 'Foo', 4);

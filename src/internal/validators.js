@@ -7,7 +7,7 @@ const {
 const {
   hideStackFrames,
   codes: {
-    ERR_INVALID_ARG_TYPE
+    ERR_INVALID_ARG_TYPE,
   },
 } = require('./errors');
 

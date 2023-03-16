@@ -1,7 +1,7 @@
 'use strict';
 
 const {
-  inspect
+  inspect,
 } = require('../src/inspect');
 const assert = require('assert');
 
@@ -11,7 +11,7 @@ import('./fixture.mjs').then((m) => {
 
   const o = {
     default: 4,
-    [Symbol.stringTag]: 'Module'
+    [Symbol.stringTag]: 'Module',
   };
   assert.notStrictEqual(inspect(o), '[Module: null prototype] { default: 4 }');
 }, (e) => {

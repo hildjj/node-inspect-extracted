@@ -25,19 +25,19 @@ function exec(bin, opts = {}) {
     args: [],
     encoding: 'utf8',
     env: {},
-    ...opts
+    ...opts,
   };
   return new Promise((resolve, reject) => {
     opts.env = {
       ...process.env,
-      ...opts.env
+      ...opts.env,
     };
     // console.log(`SPAWN: (${opts.cwd || process.cwd()})`, bin, ...opts.args)
     const args = opts.args || [];
     delete opts.args;
     const c = spawn(bin, args, {
       stdio: 'pipe',
-      ...opts
+      ...opts,
     });
     const bufs = [];
     c.on('error', reject);
@@ -77,7 +77,6 @@ function checkFileHash(filename) {
 }
 
 async function checkAll() {
-  // const lastTime = new Date(lastExtract.time);
   lastExtract.time = new Date().toISOString();
 
   let fail = false;
@@ -89,7 +88,7 @@ async function checkAll() {
           await exec('git', {
             args: ['--no-pager', 'diff', f.commit, '--', f.name],
             cwd: nodeRoot,
-            stdio: 'inherit'
+            stdio: 'inherit',
           });
         } catch (err) {
           if (!err.code) {
@@ -109,7 +108,7 @@ async function checkAll() {
             args: [
               'log', '-n1', '--pretty=format:%H', '--', f.name,
             ],
-            cwd: nodeRoot
+            cwd: nodeRoot,
           });
         } else {
           fail = true;
@@ -135,7 +134,7 @@ checkAll().then(async (fail) => {
 // DO NOT MODIFY BY HAND
 module.exports = ${util.inspect(lastExtract, {
     depth: Infinity,
-    compact: false
+    compact: false,
   })};
 `);
   }

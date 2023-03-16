@@ -98,7 +98,7 @@ module.exports = {
   internalBinding(mod) {
     if (mod === 'config') {
       return {
-        hasIntl: false
+        hasIntl: false,
       };
     }
     throw new Error(`unknown module: "${mod}"`);
@@ -181,7 +181,7 @@ module.exports = {
     Function.prototype.call.bind(RegExp.prototype.toString),
   SafeStringIterator: createSafeIterator(
     StringIterator,
-    Function.prototype.call.bind(StringIteratorPrototype.next)
+    Function.prototype.call.bind(StringIteratorPrototype.next),
   ),
   SafeMap: makeSafe(
     Map,
@@ -236,7 +236,7 @@ module.exports = {
   SymbolToStringTag: Symbol.toStringTag,
   TypedArrayPrototypeGetLength: getterCaller('length'),
   Uint8Array,
-  uncurryThis
+  uncurryThis,
 };
 
 // Node 14
@@ -251,15 +251,15 @@ if (!String.prototype.replaceAll) {
   }
 
   function getSubstitution(matched, str, position, captures, namedCaptures, replacement) {
-    var tailPos = position + matched.length;
-    var m = captures.length;
-    var symbols = /\$([$&'`]|\d{1,2})/;
+    const tailPos = position + matched.length;
+    const m = captures.length;
+    let symbols = /\$([$&'`]|\d{1,2})/;
     if (namedCaptures !== undefined) {
       namedCaptures = Object(requireObjectCoercible(namedCaptures));
       symbols = /\$([$&'`]|\d{1,2}|<[^>]*>)/g;
     }
     return replacement.replace(symbols, (match, ch) => {
-      var capture;
+      let capture;
       switch (ch.charAt(0)) {
         case '$': return '$';
         case '&': return matched;
@@ -268,27 +268,28 @@ if (!String.prototype.replaceAll) {
         case '<':
           capture = namedCaptures[ch.slice(1, -1)];
           break;
-        default: // \d\d?
-          var n = +ch;
+        default: { // \d\d?
+          const n = +ch;
           if (n === 0) return match;
           if (n > m) {
-            var f = Math.floor(n / 10);
+            const f = Math.floor(n / 10);
             if (f === 0) return match;
             if (f <= m) return captures[f - 1] === undefined ? ch.charAt(1) : captures[f - 1] + ch.charAt(1);
             return match;
           }
           capture = captures[n - 1];
+        }
       }
       return capture === undefined ? '' : capture;
     });
   }
 
   module.exports.StringPrototypeReplaceAll = (str, searchValue, replaceValue) => {
-    var O = requireObjectCoercible(str);
-    var IS_REG_EXP, flags, replacer, string, searchString, functionalReplace, searchLength, advanceBy, replacement;
-    var position = 0;
-    var endOfLastMatch = 0;
-    var result = '';
+    const O = requireObjectCoercible(str);
+    let IS_REG_EXP, flags, replacer, replacement;
+    let position = 0;
+    let endOfLastMatch = 0;
+    let result = '';
     if (searchValue != null) {
       IS_REG_EXP = searchValue instanceof RegExp;
       if (IS_REG_EXP) {
@@ -302,12 +303,12 @@ if (!String.prototype.replaceAll) {
         return replacer.call(searchValue, O, replaceValue);
       }
     }
-    string = String(O);
-    searchString = String(searchValue);
-    functionalReplace = (typeof replaceValue === 'function');
+    const string = String(O);
+    const searchString = String(searchValue);
+    const functionalReplace = (typeof replaceValue === 'function');
     if (!functionalReplace) replaceValue = String(replaceValue);
-    searchLength = searchString.length;
-    advanceBy = Math.max(1, searchLength);
+    const searchLength = searchString.length;
+    const advanceBy = Math.max(1, searchLength);
     position = string.indexOf(searchString, 0);
     while (position !== -1) {
       replacement = functionalReplace ?
