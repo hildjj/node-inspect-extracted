@@ -201,10 +201,54 @@ const kArrayType = 1;
 const kArrayExtrasType = 2;
 
 /* eslint-disable no-control-regex */
-const strEscapeSequencesRegExp = /[\x00-\x1f\x27\x5c\x7f-\x9f]|[\ud800-\udbff](?![\udc00-\udfff])|(?<![\ud800-\udbff])[\udc00-\udfff]/;
-const strEscapeSequencesReplacer = /[\x00-\x1f\x27\x5c\x7f-\x9f]|[\ud800-\udbff](?![\udc00-\udfff])|(?<![\ud800-\udbff])[\udc00-\udfff]/g;
-const strEscapeSequencesRegExpSingle = /[\x00-\x1f\x5c\x7f-\x9f]|[\ud800-\udbff](?![\udc00-\udfff])|(?<![\ud800-\udbff])[\udc00-\udfff]/;
-const strEscapeSequencesReplacerSingle = /[\x00-\x1f\x5c\x7f-\x9f]|[\ud800-\udbff](?![\udc00-\udfff])|(?<![\ud800-\udbff])[\udc00-\udfff]/g;
+// Work-arounds for Safari not implementing negative look-behinds.
+// Remove all of this once Safari 16.4 is rolled out "enough".
+let strEscapeSequencesRegExp,
+  strEscapeSequencesReplacer,
+  strEscapeSequencesRegExpSingle,
+  strEscapeSequencesReplacerSingle,
+  extractedSplitNewLines;
+try {
+  // Change from regex literals to RegExp constructors to avoid unrecoverable
+  // syntax error at load time.
+  strEscapeSequencesRegExp =
+    // eslint-disable-next-line max-len
+    new RegExp('[\\x00-\\x1f\\x27\\x5c\\x7f-\\x9f]|[\\ud800-\\udbff](?![\\udc00-\\udfff])|(?<![\\ud800-\\udbff])[\\udc00-\\udfff]');
+  strEscapeSequencesReplacer =
+    new RegExp(
+      // eslint-disable-next-line max-len
+      '[\x00-\\x1f\\x27\\x5c\\x7f-\\x9f]|[\\ud800-\\udbff](?![\\udc00-\\udfff])|(?<![\\ud800-\\udbff])[\\udc00-\\udfff]',
+      'g',
+    );
+  strEscapeSequencesRegExpSingle =
+    // eslint-disable-next-line max-len
+    new RegExp('[\\x00-\\x1f\\x5c\\x7f-\\x9f]|[\\ud800-\\udbff](?![\\udc00-\\udfff])|(?<![\\ud800-\\udbff])[\\udc00-\\udfff]');
+  strEscapeSequencesReplacerSingle =
+    // eslint-disable-next-line max-len
+    new RegExp('[\\x00-\\x1f\\x5c\\x7f-\\x9f]|[\\ud800-\\udbff](?![\\udc00-\\udfff])|(?<![\\ud800-\\udbff])[\\udc00-\\udfff]', 'g');
+  const extractedNewLineRe = new RegExp('(?<=\\n)');
+  extractedSplitNewLines = (value) => RegExpPrototypeSymbolSplit(extractedNewLineRe, value);
+  /* c8 ignore start */
+  // CI doesn't run in an elderly runtime
+} catch {
+  // These are from a previous version of node,
+  // see commit 76372607a6743cc75eae50ca58657c9e8a654428
+  // dated 2021-12-06
+  strEscapeSequencesRegExp = /[\x00-\x1f\x27\x5c\x7f-\x9f]/;
+  strEscapeSequencesReplacer = /[\x00-\x1f\x27\x5c\x7f-\x9f]/g;
+  strEscapeSequencesRegExpSingle = /[\x00-\x1f\x5c\x7f-\x9f]/;
+  strEscapeSequencesReplacerSingle = /[\x00-\x1f\x5c\x7f-\x9f]/g;
+  extractedSplitNewLines = (value) => {
+    const lines = RegExpPrototypeSymbolSplit(/\n/, value);
+    const last = ArrayPrototypePop(lines);
+    const nlLines = ArrayPrototypeMap(lines, (line) => line + '\n');
+    if (last !== '') {
+      nlLines.push(last);
+    }
+    return nlLines;
+  };
+}
+/* c8 ignore stop */
 /* eslint-enable no-control-regex */
 
 const keyStrRegExp = /^[a-zA-Z_][a-zA-Z_0-9]*$/;
@@ -1633,7 +1677,7 @@ function formatPrimitive(fn, value, ctx) {
         value.length > ctx.breakLength - ctx.indentationLvl - 4) {
       return ArrayPrototypeJoin(
         ArrayPrototypeMap(
-          RegExpPrototypeSymbolSplit(/(?<=\n)/, value),
+          extractedSplitNewLines(value),
           (line) => fn(strEscape(line), 'string'),
         ),
         ` +\n${StringPrototypeRepeat(' ', ctx.indentationLvl + 2)}`,
