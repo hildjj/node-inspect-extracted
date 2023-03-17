@@ -20,7 +20,9 @@ pre {
   const pre = document.createElement('pre');
   pre.innerHTML = util.inspect({
     a: 1,
-    [Symbol('b')]: false,
+    b: '<p>',
+    '&lt;': NaN,
+    [Symbol('<br>')]: false,
     buf: new Uint8Array([1, 2, 3, 4])
   }, {
     compact: false,

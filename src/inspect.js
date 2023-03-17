@@ -2358,8 +2358,8 @@ function isZeroWidthCodePoint(code) {
     (code >= 0xE0100 && code <= 0xE01EF); // Variation Selectors
 }
 
+/* c8 ignore start */
 if (internalBinding('config').hasIntl) {
-  /* c8 ignore start */
   assert(false);
   // Can't use node internals
   // const icu = internalBinding('icu');
@@ -2461,6 +2461,27 @@ function stripVTControlCharacters(str) {
   return RegExpPrototypeSymbolReplace(ansi, str, '');
 }
 
+const entities = {
+  34: '&quot;',
+  38: '&amp;',
+  39: '&apos;',
+  60: '&lt;',
+  62: '&gt;',
+  160: '&nbsp;',
+};
+
+function escapeHTML(str) {
+  return str.replace(
+    // eslint-disable-next-line no-control-regex
+    /[\u0000-\u002F\u003A-\u0040\u005B-\u0060\u007B-\u00FF]/g,
+    (c) => {
+      const code = String(c.charCodeAt(0));
+      const ent = entities[code];
+      return ent || ('&#' + code + ';');
+    },
+  );
+}
+
 module.exports = {
   identicalSequenceRange,
   inspect,
@@ -2474,9 +2495,9 @@ module.exports = {
   stylizeWithHTML(str, styleType) {
     const style = inspect.styles[styleType];
     if (style !== undefined) {
-      return `<span style="color:${style};">${str}</span>`;
+      return `<span style="color:${style};">${escapeHTML(str)}</span>`;
     }
-    return str;
+    return escapeHTML(str);
   },
   Proxy,
 };
