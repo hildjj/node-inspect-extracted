@@ -2358,8 +2358,8 @@ function isZeroWidthCodePoint(code) {
     (code >= 0xE0100 && code <= 0xE01EF); // Variation Selectors
 }
 
+/* c8 ignore start */
 if (internalBinding('config').hasIntl) {
-  /* c8 ignore start */
   assert(false);
   // Can't use node internals
   // const icu = internalBinding('icu');
