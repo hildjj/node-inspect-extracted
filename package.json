@@ -56,7 +56,7 @@
     }
   },
   "overrides": {
-    "semver": ">=7.5.3",
+    "semver": "$semver",
     "word-wrap": "npm:@aashutoshrathi/word-wrap"
   },
   "engines": {
