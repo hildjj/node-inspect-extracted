@@ -149,7 +149,6 @@ let maxStack_ErrorMessage;
  * Returns true if `err.name` and `err.message` are equal to engine-specific
  * values indicating max call stack size has been exceeded.
  * "Maximum call stack size exceeded" in V8.
- *
  * @param {Error} err
  * @returns {boolean}
  */
