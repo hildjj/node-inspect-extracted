@@ -6,6 +6,7 @@
   "module": "./index.mjs",
   "browser": "./dist/inspect.js",
   "exports": {
+    "types": "./types/util.d.ts",
     "import": "./index.mjs",
     "require": "./dist/inspect.js"
   },
