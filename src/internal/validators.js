@@ -11,27 +11,48 @@ const {
   },
 } = require('./errors');
 
+const kValidateObjectNone = 0;
+const kValidateObjectAllowNullable = 1 << 0;
+const kValidateObjectAllowArray = 1 << 1;
+const kValidateObjectAllowFunction = 1 << 2;
+
 /**
- * @param {unknown} value
+ * @callback validateObject
+ * @param {*} value
  * @param {string} name
- * @param {{
- *   allowArray?: boolean,
- *   allowFunction?: boolean,
- *   nullable?: boolean
- * }} [options]
+ * @param {number} [options]
  */
+
+/** @type {validateObject} */
 const validateObject = hideStackFrames(
-  (value, name, options) => {
-    const useDefaultOptions = options == null;
-    const allowArray = useDefaultOptions ? false : options.allowArray;
-    const allowFunction = useDefaultOptions ? false : options.allowFunction;
-    const nullable = useDefaultOptions ? false : options.nullable;
-    if ((!nullable && value === null) ||
-        (!allowArray && ArrayIsArray(value)) ||
-        (typeof value !== 'object' && (
-          !allowFunction || typeof value !== 'function'
-        ))) {
-      throw new ERR_INVALID_ARG_TYPE(name, 'Object', value);
+  (value, name, options = kValidateObjectNone) => {
+    if (options === kValidateObjectNone) {
+      if (value === null || ArrayIsArray(value)) {
+        throw new ERR_INVALID_ARG_TYPE(name, 'Object', value);
+      }
+
+      if (typeof value !== 'object') {
+        throw new ERR_INVALID_ARG_TYPE(name, 'Object', value);
+      }
+    } else {
+      const throwOnNullable = (kValidateObjectAllowNullable & options) === 0;
+
+      if (throwOnNullable && value === null) {
+        throw new ERR_INVALID_ARG_TYPE(name, 'Object', value);
+      }
+
+      const throwOnArray = (kValidateObjectAllowArray & options) === 0;
+
+      if (throwOnArray && ArrayIsArray(value)) {
+        throw new ERR_INVALID_ARG_TYPE(name, 'Object', value);
+      }
+
+      const throwOnFunction = (kValidateObjectAllowFunction & options) === 0;
+      const typeofValue = typeof value;
+
+      if (typeofValue !== 'object' && (throwOnFunction || typeofValue !== 'function')) {
+        throw new ERR_INVALID_ARG_TYPE(name, 'Object', value);
+      }
     }
   });
 
@@ -41,6 +62,10 @@ function validateString(value, name) {
 }
 
 module.exports = {
+  kValidateObjectNone,
+  kValidateObjectAllowNullable,
+  kValidateObjectAllowArray,
+  kValidateObjectAllowFunction,
   validateObject,
   validateString,
 };
