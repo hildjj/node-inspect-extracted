@@ -50,16 +50,6 @@
     "webpack": "^5.90.0",
     "webpack-cli": "^5.1.4"
   },
-  "pnpm": {
-    "overrides": {
-      "semver": ">=7.5.3",
-      "word-wrap": "npm:@aashutoshrathi/word-wrap"
-    }
-  },
-  "overrides": {
-    "semver": "$semver",
-    "word-wrap": "npm:@aashutoshrathi/word-wrap"
-  },
   "engines": {
     "node": ">=16"
   }
