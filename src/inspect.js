@@ -157,6 +157,7 @@ const { BuiltinModule } = require('./internal/bootstrap/realm');
 const {
   validateObject,
   validateString,
+  kValidateObjectAllowArray,
 } = require('./internal/validators');
 
 let hexSlice;
@@ -1264,7 +1265,7 @@ function getFunctionBase(value, constructor, tag) {
 function identicalSequenceRange(a, b) {
   for (let i = 0; i < a.length - 3; i++) {
     // Find the first entry of b that matches the current entry of a.
-    const pos = b.indexOf(a[i]);
+    const pos = ArrayPrototypeIndexOf(b, a[i]);
     if (pos !== -1) {
       const rest = b.length - pos;
       if (rest > 3) {
@@ -2206,7 +2207,7 @@ function format(...args) {
 }
 
 function formatWithOptions(inspectOptions, ...args) {
-  validateObject(inspectOptions, 'inspectOptions', { allowArray: true });
+  validateObject(inspectOptions, 'inspectOptions', kValidateObjectAllowArray);
   return formatWithOptionsInternal(inspectOptions, args);
 }
 

@@ -19,7 +19,7 @@ const hacks = [
   'eslint-plugin-jsdoc',
   'eslint-plugin-markdown',
   '@babel/eslint-parser',
-  '@babel/plugin-syntax-import-assertions',
+  '@babel/plugin-syntax-import-attributes',
 ];
 Module._findPath = (request, paths, isMain) => {
   const r = ModuleFindPath(request, paths, isMain);
@@ -46,7 +46,7 @@ module.exports = {
   parserOptions: {
     babelOptions: {
       plugins: [
-        Module._findPath('@babel/plugin-syntax-import-assertions'),
+        Module._findPath('@babel/plugin-syntax-import-attributes'),
       ],
     },
     requireConfigFile: false,
@@ -55,10 +55,10 @@ module.exports = {
   overrides: [
     {
       files: [
-        'test/es-module/test-esm-type-flag.js',
-        'test/es-module/test-esm-type-flag-alias.js',
         '*.mjs',
         'test/es-module/test-esm-example-loader.js',
+        'test/es-module/test-esm-type-flag.js',
+        'test/es-module/test-esm-type-flag-alias.js',
       ],
       parserOptions: { sourceType: 'module' },
     },
@@ -112,6 +112,22 @@ module.exports = {
           message: 'Import process instead of using the global',
         },
       ] },
+    },
+    {
+      files: [
+        'lib/internal/modules/**/*.js',
+      ],
+      rules: {
+        'curly': 'error',
+      },
+    },
+    {
+      files: [
+        'lib/internal/test_runner/**/*.js',
+      ],
+      rules: {
+        'node-core/set-proto-to-null-in-object': 'error',
+      },
     },
   ],
   rules: {
@@ -242,7 +258,6 @@ module.exports = {
         message: 'Use `globalThis.crypto`.',
       },
     ],
-    'no-return-await': 'error',
     'no-self-compare': 'error',
     'no-tabs': 'error',
     'no-template-curly-in-string': 'error',
@@ -308,6 +323,7 @@ module.exports = {
     'jsdoc/newline-after-description': 'off',
     'jsdoc/require-returns-description': 'off',
     'jsdoc/valid-types': 'off',
+    'jsdoc/no-defaults': 'off',
     'jsdoc/no-undefined-types': 'off',
     'jsdoc/require-param': 'off',
     'jsdoc/check-tag-names': 'off',
@@ -329,6 +345,7 @@ module.exports = {
     DecompressionStream: 'readable',
     fetch: 'readable',
     FormData: 'readable',
+    navigator: 'readable',
     ReadableStream: 'readable',
     ReadableStreamDefaultReader: 'readable',
     ReadableStreamBYOBReader: 'readable',
@@ -345,5 +362,6 @@ module.exports = {
     WritableStream: 'readable',
     WritableStreamDefaultWriter: 'readable',
     WritableStreamDefaultController: 'readable',
+    WebSocket: 'readable',
   },
 };
