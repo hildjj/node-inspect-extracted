@@ -46,6 +46,6 @@ const invalidArgTypeError = {
     1, Infinity, -Infinity, NaN,
     undefined, null, 1.1,
   ].forEach((i) => assert.throws(() => validateString(i, 'name'), {
-    code: 'ERR_INVALID_ARG_TYPE'
+    code: 'ERR_INVALID_ARG_TYPE',
   }));
 }
