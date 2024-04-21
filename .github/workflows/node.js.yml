@@ -13,18 +13,20 @@ jobs:
 
     strategy:
       matrix:
-        node-version: [16.x, 18.x, 20.x, 21.x]
+        node-version: [18.x, 20.x, 21.x]
 
     steps:
       - uses: actions/checkout@v4
         with:
           submodules: true
+      - run: corepack enable
       - name: Use Node.js ${{ matrix.node-version }}
         uses: actions/setup-node@v4
         with:
           node-version: ${{ matrix.node-version }}
-      - name: Install test run dependencies
-        run: npm install c8 semver
+          cache: pnpm
+      - name: Install dependencies
+        run: pnpm install
       - name: Test ${{ matrix.node-version }}
         run: npm run coverage
       - name: Coveralls Parallel
