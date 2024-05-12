@@ -15,8 +15,8 @@ const {
   ArrayPrototypePush,
   ArrayPrototypePushApply,
   ArrayPrototypeSlice,
-  ArrayPrototypeSplice,
   ArrayPrototypeSort,
+  ArrayPrototypeSplice,
   ArrayPrototypeUnshift,
   BigIntPrototypeValueOf,
   BooleanPrototypeValueOf,
@@ -28,8 +28,8 @@ const {
   FunctionPrototypeCall,
   FunctionPrototypeToString,
   JSONStringify,
-  MapPrototypeGetSize,
   MapPrototypeEntries,
+  MapPrototypeGetSize,
   MathFloor,
   MathMax,
   MathMin,
@@ -63,14 +63,15 @@ const {
   RegExpPrototypeSymbolReplace,
   RegExpPrototypeSymbolSplit,
   RegExpPrototypeToString,
-  SafeStringIterator,
   SafeMap,
   SafeSet,
+  SafeStringIterator,
   SetPrototypeGetSize,
   SetPrototypeValues,
   String,
   StringPrototypeCharCodeAt,
   StringPrototypeCodePointAt,
+  StringPrototypeEndsWith,
   StringPrototypeIncludes,
   StringPrototypeIndexOf,
   StringPrototypeLastIndexOf,
@@ -81,7 +82,6 @@ const {
   StringPrototypeReplaceAll,
   StringPrototypeSlice,
   StringPrototypeSplit,
-  StringPrototypeEndsWith,
   StringPrototypeStartsWith,
   StringPrototypeToLowerCase,
   StringPrototypeTrim,
@@ -213,19 +213,19 @@ try {
   // Change from regex literals to RegExp constructors to avoid unrecoverable
   // syntax error at load time.
   strEscapeSequencesRegExp =
-    // eslint-disable-next-line max-len
+    // eslint-disable-next-line @stylistic/js/max-len
     new RegExp('[\\x00-\\x1f\\x27\\x5c\\x7f-\\x9f]|[\\ud800-\\udbff](?![\\udc00-\\udfff])|(?<![\\ud800-\\udbff])[\\udc00-\\udfff]');
   strEscapeSequencesReplacer =
     new RegExp(
-      // eslint-disable-next-line max-len
+      // eslint-disable-next-line @stylistic/js/max-len
       '[\x00-\\x1f\\x27\\x5c\\x7f-\\x9f]|[\\ud800-\\udbff](?![\\udc00-\\udfff])|(?<![\\ud800-\\udbff])[\\udc00-\\udfff]',
       'g',
     );
   strEscapeSequencesRegExpSingle =
-    // eslint-disable-next-line max-len
+    // eslint-disable-next-line @stylistic/js/max-len
     new RegExp('[\\x00-\\x1f\\x5c\\x7f-\\x9f]|[\\ud800-\\udbff](?![\\udc00-\\udfff])|(?<![\\ud800-\\udbff])[\\udc00-\\udfff]');
   strEscapeSequencesReplacerSingle =
-    // eslint-disable-next-line max-len
+    // eslint-disable-next-line @stylistic/js/max-len
     new RegExp('[\\x00-\\x1f\\x5c\\x7f-\\x9f]|[\\ud800-\\udbff](?![\\udc00-\\udfff])|(?<![\\ud800-\\udbff])[\\udc00-\\udfff]', 'g');
   const extractedNewLineRe = new RegExp('(?<=\\n)');
   extractedSplitNewLines = (value) => RegExpPrototypeSymbolSplit(extractedNewLineRe, value);
