@@ -14,3 +14,4 @@ webpack.config.js
 dist/*.js.map
 .github/
 .eslintignore
+.ncurc
