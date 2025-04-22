@@ -5,7 +5,7 @@ const {
   makeSafe,
   internalBinding,
   SafeMap,
-  _stringPrototypeReplaceAll
+  _stringPrototypeReplaceAll,
 } = require('../src/primordials');
 const assert = require('assert');
 

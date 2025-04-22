@@ -6,7 +6,6 @@ require('../common');
 const assert = require('assert');
 const util = require('../../src/inspect.js');
 const semver = require('semver');
-const { customInspectSymbol } = require('../../src/internal/util.js');
 
 // Errors thrown in accessors are re-thrown
 {
@@ -66,11 +65,9 @@ if (semver.satisfies(process.version, '>=16')) {
 
 const u = new URL('http://user:pass@localhost:8080/?foo=bar#baz');
 assert.strictEqual(
-  util.inspect(u, {customInspect: false}),
-  'http://user:pass@localhost:8080/?foo=bar#baz'
-);
+  util.inspect(u, { }),
+  'http://user:pass@localhost:8080/?foo=bar#baz');
 
 assert.strictEqual(
-  util.inspect({u}, {customInspect: false, depth: 0}),
-  '{ u: URL {} }'
-);
+  util.inspect({ u }, { customInspect: false, depth: 0 }),
+  '{ u: URL {} }');

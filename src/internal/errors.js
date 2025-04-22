@@ -21,7 +21,7 @@ const {
   ArrayPrototypePush,
   ArrayPrototypeSlice,
   ArrayPrototypeSplice,
-  ArrayPrototypeUnshift,
+  // ArrayPrototypeUnshift,
   Error,
   ErrorCaptureStackTrace,
   // ErrorPrototypeToString,
@@ -215,9 +215,8 @@ const overrideStackTrace = new SafeWeakMap();
 const assert = require('./assert');
 
 // Lazily loaded
-let util;
+// let util;
 
-//
 // let internalUtil = null;
 // function lazyInternalUtil() {
 //   internalUtil ??= require('./util');
@@ -438,102 +437,103 @@ class HideStackFramesError extends Error {
 // }
 
 function makeNodeErrorWithCode(Base, key) {
-  const msg = messages.get(key);
+  //
+  // const msg = messages.get(key);
   // const expectedLength = typeof msg !== 'string' ? -1 :
   // getExpectedArgumentLength(msg);
 
   // switch (expectedLength) {
-    // case 0: {
-    //   class NodeError extends Base {
-    //     code = key;
+  //   case 0: {
+  //     class NodeError extends Base {
+  //       code = key;
 
-    //     constructor(...args) {
-    //       assert(
-    //         args.length === 0,
-    //         `Code: ${key}; The provided arguments length (${args.length}) does not ` +
-    //           `match the required ones (${expectedLength}).`,
-    //       );
-    //       super(msg);
-    //     }
+  //       constructor(...args) {
+  //         assert(
+  //           args.length === 0,
+  //           `Code: ${key}; The provided arguments length (${args.length}) does not ` +
+  //             `match the required ones (${expectedLength}).`,
+  //         );
+  //         super(msg);
+  //       }
 
-    //     // This is a workaround for wpt tests that expect that the error
-    //     // constructor has a `name` property of the base class.
-    //     get ['constructor']() {
-    //       return Base;
-    //     }
+  //       // This is a workaround for wpt tests that expect that the error
+  //       // constructor has a `name` property of the base class.
+  //       get ['constructor']() {
+  //         return Base;
+  //       }
 
-    //     get [kIsNodeError]() {
-    //       return true;
-    //     }
+  //       get [kIsNodeError]() {
+  //         return true;
+  //       }
 
-    //     toString() {
-    //       return `${this.name} [${key}]: ${this.message}`;
-    //     }
-    //   }
-    //   return NodeError;
+  //       toString() {
+  //         return `${this.name} [${key}]: ${this.message}`;
+  //       }
+  //     }
+  //     return NodeError;
+  //   }
+  //   case -1: {
+  class NodeError extends Base {
+    code = key;
+
+    constructor(...args) {
+      super();
+      ObjectDefineProperty(this, 'message', {
+        __proto__: null,
+        value: getMessage(key, args, this),
+        enumerable: false,
+        writable: true,
+        configurable: true,
+      });
+    }
+
+    // This is a workaround for wpt tests that expect that the error
+    // constructor has a `name` property of the base class.
+    // get ['constructor']() {
+    //   return Base;
     // }
-    // case -1: {
-      class NodeError extends Base {
-        code = key;
 
-        constructor(...args) {
-          super();
-          ObjectDefineProperty(this, 'message', {
-            __proto__: null,
-            value: getMessage(key, args, this),
-            enumerable: false,
-            writable: true,
-            configurable: true,
-          });
-        }
-
-        // This is a workaround for wpt tests that expect that the error
-        // constructor has a `name` property of the base class.
-        // get ['constructor']() {
-        //   return Base;
-        // }
-
-        // get [kIsNodeError]() {
-        //   return true;
-        // }
-
-        toString() {
-          return `${this.name} [${key}]: ${this.message}`;
-        }
-      }
-      return NodeError;
+    // get [kIsNodeError]() {
+    //   return true;
     // }
-    // default: {
-    //   class NodeError extends Base {
-    //     code = key;
 
-    //     constructor(...args) {
-    //       assert(
-    //         args.length === expectedLength,
-    //         `Code: ${key}; The provided arguments length (${args.length}) does not ` +
-    //           `match the required ones (${expectedLength}).`,
-    //       );
+    toString() {
+      return `${this.name} [${key}]: ${this.message}`;
+    }
+  }
+  return NodeError;
+  //   }
+  //   default: {
+  //     class NodeError extends Base {
+  //       code = key;
 
-    //       ArrayPrototypeUnshift(args, msg);
-    //       super(ReflectApply(lazyInternalUtilInspect().format, null, args));
-    //     }
+  //       constructor(...args) {
+  //         assert(
+  //           args.length === expectedLength,
+  //           `Code: ${key}; The provided arguments length (${args.length}) does not ` +
+  //             `match the required ones (${expectedLength}).`,
+  //         );
 
-    //     // This is a workaround for wpt tests that expect that the error
-    //     // constructor has a `name` property of the base class.
-    //     get ['constructor']() {
-    //       return Base;
-    //     }
+  //         ArrayPrototypeUnshift(args, msg);
+  //         super(ReflectApply(lazyInternalUtilInspect().format, null, args));
+  //       }
 
-    //     get [kIsNodeError]() {
-    //       return true;
-    //     }
+  //       // This is a workaround for wpt tests that expect that the error
+  //       // constructor has a `name` property of the base class.
+  //       get ['constructor']() {
+  //         return Base;
+  //       }
 
-    //     toString() {
-    //       return `${this.name} [${key}]: ${this.message}`;
-    //     }
-    //   }
-    //   return NodeError;
-    // }
+  //       get [kIsNodeError]() {
+  //         return true;
+  //       }
+
+  //       toString() {
+  //         return `${this.name} [${key}]: ${this.message}`;
+  //       }
+  //     }
+  //     return NodeError;
+  //   }
   // }
 }
 
@@ -558,7 +558,7 @@ function hideStackFrames(fn) {
 
 // Utility function for registering the error codes. Only used here. Exported
 // *only* to allow for testing.
-function E(sym, val, def, /*...otherClasses */) {
+function E(sym, val, def) { // , ...otherClasses ) {
   // Special case for SystemError that formats the error message differently
   // The SystemErrors only have SystemError as their base classes.
   messages.set(sym, val);
@@ -591,6 +591,7 @@ function E(sym, val, def, /*...otherClasses */) {
   codes[sym] = ErrClass;
 }
 
+//
 // function getExpectedArgumentLength(msg) {
 //   let expectedLength = 0;
 //   const regex = /%[dfijoOs]/g;
@@ -610,6 +611,7 @@ function getMessage(key, args, self) {
     return ReflectApply(msg, self, args);
   }
 
+  //
   // const expectedLength = getExpectedArgumentLength(msg);
   // assert(
   //   expectedLength === args.length,

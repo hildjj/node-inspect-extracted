@@ -122,7 +122,9 @@ assert.strictEqual(determineSpecificType(undefined), 'undefined');
 assert.strictEqual(determineSpecificType(Infinity), 'type number (Infinity)');
 assert.strictEqual(determineSpecificType(-Infinity), 'type number (-Infinity)');
 assert.strictEqual(determineSpecificType(-0), 'type number (-0)');
-assert.strictEqual(determineSpecificType('012345678901234567890123456789'), 'type string (\'0123456789012345678901234...\')');
+assert.strictEqual(
+  determineSpecificType('012345678901234567890123456789'),
+  'type string (\'0123456789012345678901234...\')');
 
 assert(formatList);
 assert.strictEqual(formatList([]), '');
