@@ -65,9 +65,11 @@ if (semver.satisfies(process.version, '>=16')) {
 
 const u = new URL('http://user:pass@localhost:8080/?foo=bar#baz');
 assert.strictEqual(
-  util.inspect(u, { }),
+  util.inspect(u, { customInspect: false }),
   'http://user:pass@localhost:8080/?foo=bar#baz');
 
-assert.strictEqual(
-  util.inspect({ u }, { customInspect: false, depth: 0 }),
-  '{ u: URL {} }');
+if (semver.satisfies(process.version, '>=20')) {
+  assert.strictEqual(
+    util.inspect({ u }, { customInspect: false, depth: 0 }),
+    '{ u: URL {} }');
+}
