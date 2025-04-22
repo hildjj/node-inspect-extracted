@@ -141,5 +141,7 @@ function resolve(...args) {
 }
 
 module.exports = {
+  isPosixPathSeparator,
+  normalizeString,
   resolve,
 };

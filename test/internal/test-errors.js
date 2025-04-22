@@ -1,9 +1,12 @@
 'use strict';
 
+require('../common');
 const {
   codes: {
     ERR_INVALID_ARG_TYPE,
   },
+  determineSpecificType,
+  formatList,
 } = require('../../src/internal/errors');
 const assert = require('assert');
 
@@ -103,4 +106,24 @@ e = new ERR_INVALID_ARG_TYPE(
 assert.strictEqual(
   e.message,
   'The "foo" argument must be of type number. ' +
-  'Received type bigint (1234567890123456789012345...)');
+  'Received type bigint (123456789012345678901234567890n)');
+
+e = new ERR_INVALID_ARG_TYPE(
+  'foo',
+  ['RegExp', 'string'],
+  0);
+assert.strictEqual(
+  e.message,
+  'The "foo" argument must be of type string or an instance of RegExp. Received type number (0)');
+
+assert(determineSpecificType);
+assert.strictEqual(determineSpecificType("'"), 'type string ("\'")');
+assert.strictEqual(determineSpecificType(undefined), 'undefined');
+assert.strictEqual(determineSpecificType(Infinity), 'type number (Infinity)');
+assert.strictEqual(determineSpecificType(-Infinity), 'type number (-Infinity)');
+assert.strictEqual(determineSpecificType(-0), 'type number (-0)');
+assert.strictEqual(determineSpecificType('012345678901234567890123456789'), 'type string (\'0123456789012345678901234...\')');
+
+assert(formatList);
+assert.strictEqual(formatList([]), '');
+assert.strictEqual(formatList([1, 2, 3, 4]), '1, 2, 3, and 4');

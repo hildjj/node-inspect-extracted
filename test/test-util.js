@@ -1,5 +1,6 @@
 'use strict';
 
+require('./common');
 const {
   getOwnNonIndexProperties,
   getConstructorName,

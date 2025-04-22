@@ -1,3 +1,5 @@
+/* eslint-disable node-core/require-common-first */
+import './common/index.js';
 import util from '../dist/inspect.js';
 import assert from 'assert';
 

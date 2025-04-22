@@ -72,7 +72,7 @@ const builtinModules = [
   'zlib',
 ];
 
-exports.BuiltinModule = {
+module.exports.BuiltinModule = {
   exists(s) {
     return s.startsWith('internal/') || builtinModules.indexOf(s) !== -1;
   },

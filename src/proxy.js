@@ -1,6 +1,12 @@
 'use strict';
 
-const ALL_PROXIES = new WeakMap();
+const primordials = require('./primordials');
+const {
+  Proxy,
+  ProxyRevocable,
+  SafeWeakMap,
+} = primordials;
+const ALL_PROXIES = new SafeWeakMap();
 
 // Wrap Proxy's to remember their details.
 class Prxy {
@@ -21,7 +27,7 @@ class Prxy {
     return deets[0];
   }
   static revocable(target, handler) {
-    const p = Proxy.revocable(target, handler);
+    const p = ProxyRevocable(target, handler);
     ALL_PROXIES.set(p.proxy, [target, handler]);
     const revoke = p.revoke;
     p.revoke = () => {
