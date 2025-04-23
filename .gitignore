@@ -1,5 +1,5 @@
+.vscode/
 coverage/
-.nyc_output/
+dist/
 node_modules/
 t.js
-.vscode/

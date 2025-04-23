@@ -2,9 +2,11 @@
 
 const primordials = require('./primordials');
 const {
-  internalBinding,
   Array,
+  ArrayBuffer,
+  ArrayBufferPrototype,
   ArrayIsArray,
+  ArrayPrototype,
   ArrayPrototypeFilter,
   ArrayPrototypeForEach,
   ArrayPrototypeIncludes,
@@ -24,10 +26,15 @@ const {
   DatePrototypeToISOString,
   DatePrototypeToString,
   ErrorPrototypeToString,
+  Function,
+  FunctionPrototype,
   FunctionPrototypeBind,
   FunctionPrototypeCall,
+  FunctionPrototypeSymbolHasInstance,
   FunctionPrototypeToString,
   JSONStringify,
+  Map,
+  MapPrototype,
   MapPrototypeEntries,
   MapPrototypeGetSize,
   MathFloor,
@@ -52,6 +59,7 @@ const {
   ObjectGetPrototypeOf,
   ObjectIs,
   ObjectKeys,
+  ObjectPrototype,
   ObjectPrototypeHasOwnProperty,
   ObjectPrototypePropertyIsEnumerable,
   ObjectSeal,
@@ -66,6 +74,8 @@ const {
   SafeMap,
   SafeSet,
   SafeStringIterator,
+  Set,
+  SetPrototype,
   SetPrototypeGetSize,
   SetPrototypeValues,
   String,
@@ -79,6 +89,7 @@ const {
   StringPrototypePadEnd,
   StringPrototypePadStart,
   StringPrototypeRepeat,
+  StringPrototypeReplace,
   StringPrototypeReplaceAll,
   StringPrototypeSlice,
   StringPrototypeSplit,
@@ -86,14 +97,18 @@ const {
   StringPrototypeToLowerCase,
   StringPrototypeTrim,
   StringPrototypeValueOf,
+  SymbolIterator,
   SymbolPrototypeToString,
   SymbolPrototypeValueOf,
-  SymbolIterator,
+  SymbolToPrimitive,
   SymbolToStringTag,
+  TypedArray,
+  TypedArrayPrototype,
   TypedArrayPrototypeGetLength,
   TypedArrayPrototypeGetSymbolToStringTag,
   Uint8Array,
   globalThis,
+  internalBinding,
   uncurryThis,
 } = primordials;
 
@@ -110,6 +125,7 @@ const {
   previewEntries,
   getConstructorName: internalGetConstructorName,
   getExternalValue,
+  // eslint-disable-next-line node-core/prefer-primordials
   Proxy,
 } = require('./util');
 
@@ -162,12 +178,26 @@ const {
 
 let hexSlice;
 let internalUrl;
+let internalUrlContextSymbols;
 
 function pathToFileUrlHref(filepath) {
   // Maintain node 14 compat
   // internalUrl ??= require('./internal/url');
   internalUrl = (internalUrl == null) ? require('./internal/url') : internalUrl;
   return internalUrl.pathToFileURL(filepath).href;
+}
+
+function isURL(value) {
+  // Maintain node 14 compat
+  // internalUrl ??= require('./internal/url');
+  internalUrl = (internalUrl == null) ? require('./internal/url') : internalUrl;
+  return typeof value.href === 'string' && value instanceof internalUrl.URL;
+}
+
+function removeInternalUrlContextSymbol(keys) {
+  internalUrlContextSymbols = internalUrlContextSymbols ||
+    ObjectGetOwnPropertySymbols(new internalUrl.URL('http://user:pass@localhost:8080/?foo=bar#baz'));
+  return keys.filter((v) => internalUrlContextSymbols[v] === -1);
 }
 
 const builtInObjects = new SafeSet(
@@ -289,15 +319,17 @@ const meta = [
 ];
 
 // Regex used for ansi escape code splitting
-// Adopted from https://github.com/chalk/ansi-regex/blob/HEAD/index.js
-// License: MIT, authors: @sindresorhus, Qix-, arjunmehta and LitoMore
+// Ref: https://github.com/chalk/ansi-regex/blob/f338e1814144efb950276aac84135ff86b72dc8e/index.js
+// License: MIT by Sindre Sorhus <sindresorhus@gmail.com>
 // Matches all ansi escape code sequences in a string
-const ansiPattern = '[\\u001B\\u009B][[\\]()#;?]*' +
-  '(?:(?:(?:(?:;[-a-zA-Z\\d\\/#&.:=?%@~_]+)*' +
-  '|[a-zA-Z\\d]+(?:;[-a-zA-Z\\d\\/#&.:=?%@~_]*)*)?\\u0007)' +
-  '|(?:(?:\\d{1,4}(?:;\\d{0,4})*)?[\\dA-PR-TZcf-ntqry=><~]))';
-const ansi = new RegExp(ansiPattern, 'g');
-
+const ansi = new RegExp(
+  '[\\u001B\\u009B][[\\]()#;?]*' +
+  '(?:(?:(?:(?:;[-a-zA-Z\\d\\/\\#&.:=?%@~_]+)*' +
+  '|[a-zA-Z\\d]+(?:;[-a-zA-Z\\d\\/\\#&.:=?%@~_]*)*)?' +
+  '(?:\\u0007|\\u001B\\u005C|\\u009C))' +
+  '|(?:(?:\\d{1,4}(?:;\\d{0,4})*)?' +
+  '[\\dA-PR-TZcf-nq-uy=><~]))', 'g',
+);
 let getStringWidth;
 
 function getUserOptions(ctx, isCrossContext) {
@@ -633,10 +665,31 @@ function isInstanceof(object, proto) {
   }
 }
 
+// Special-case for some builtin prototypes in case their `constructor` property has been tampered.
+const wellKnownPrototypes = new SafeMap();
+wellKnownPrototypes.set(ArrayPrototype, { name: 'Array', constructor: Array });
+wellKnownPrototypes.set(ArrayBufferPrototype, { name: 'ArrayBuffer', constructor: ArrayBuffer });
+wellKnownPrototypes.set(FunctionPrototype, { name: 'Function', constructor: Function });
+wellKnownPrototypes.set(MapPrototype, { name: 'Map', constructor: Map });
+wellKnownPrototypes.set(ObjectPrototype, { name: 'Object', constructor: Object });
+wellKnownPrototypes.set(SetPrototype, { name: 'Set', constructor: Set });
+wellKnownPrototypes.set(TypedArrayPrototype, { name: 'TypedArray', constructor: TypedArray });
+
 function getConstructorName(obj, ctx, recurseTimes, protoProps) {
   let firstProto;
   const tmp = obj;
   while (obj || isUndetectableObject(obj)) {
+    const wellKnownPrototypeNameAndConstructor = wellKnownPrototypes.get(obj);
+    if (wellKnownPrototypeNameAndConstructor != null) {
+      const { name, constructor } = wellKnownPrototypeNameAndConstructor;
+      if (FunctionPrototypeSymbolHasInstance(constructor, tmp)) {
+        if (protoProps !== undefined && firstProto !== obj) {
+          addPrototypeProperties(
+            ctx, tmp, firstProto || tmp, recurseTimes, protoProps);
+        }
+        return name;
+      }
+    }
     const descriptor = ObjectGetOwnPropertyDescriptor(obj, 'constructor');
     if (descriptor !== undefined &&
         typeof descriptor.value === 'function' &&
@@ -739,6 +792,7 @@ function addPrototypeProperties(ctx, main, obj, recurseTimes, output) {
   } while (++depth !== 3);
 }
 
+/** @type {(constructor: string, tag: string, fallback: string, size?: string) => string} */
 function getPrefix(constructor, tag, fallback, size = '') {
   if (constructor === null) {
     if (tag !== '' && fallback !== tag) {
@@ -845,12 +899,12 @@ function formatValue(ctx, value, recurseTimes, typedArray) {
         // Filter out the util module, its inspect function is special.
         maybeCustom !== inspect &&
         // Also filter out any prototype objects using the circular check.
-        !(value.constructor && value.constructor.prototype === value)) {
+        ObjectGetOwnPropertyDescriptor(value, 'constructor')?.value?.prototype !== value) {
       // This makes sure the recurseTimes are reported as before while using
       // a counter internally.
       const depth = ctx.depth === null ? null : ctx.depth - recurseTimes;
       const isCrossContext =
-        proxy !== undefined || !(context instanceof Object);
+        proxy !== undefined || !FunctionPrototypeSymbolHasInstance(Object, context);
       const ret = FunctionPrototypeCall(
         maybeCustom,
         context,
@@ -994,7 +1048,11 @@ function formatRaw(ctx, value, recurseTimes, typedArray) {
   if (noIterator) {
     keys = getKeys(value, ctx.showHidden);
     braces = ['{', '}'];
-    if (constructor === 'Object') {
+    if (typeof value === 'function') {
+      base = getFunctionBase(ctx, value, constructor, tag);
+      if (keys.length === 0 && protoProps === undefined)
+        return ctx.stylize(base, 'special');
+    } else if (constructor === 'Object') {
       if (isArgumentsObject(value)) {
         braces[0] = '[Arguments] {';
       } else if (tag !== '') {
@@ -1003,10 +1061,6 @@ function formatRaw(ctx, value, recurseTimes, typedArray) {
       if (keys.length === 0 && protoProps === undefined) {
         return `${braces[0]}}`;
       }
-    } else if (typeof value === 'function') {
-      base = getFunctionBase(value, constructor, tag);
-      if (keys.length === 0 && protoProps === undefined)
-        return ctx.stylize(base, 'special');
     } else if (isRegExp(value)) {
       // Make RegExps say that they are RegExps
       base = RegExpPrototypeToString(
@@ -1071,6 +1125,14 @@ function formatRaw(ctx, value, recurseTimes, typedArray) {
       if (keys.length === 0 && protoProps === undefined) {
         return base;
       }
+    } else if (isURL(value) && !(recurseTimes > ctx.depth && ctx.depth !== null)) {
+      // @hildjj: In node <=20, there are a few symbol keys that mess up
+      // this algorithm.  Ignore them.
+      keys = removeInternalUrlContextSymbol(keys);
+      base = value.href;
+      if (keys.length === 0 && protoProps === undefined) {
+        return base;
+      }
     } else {
       if (keys.length === 0 && protoProps === undefined) {
         if (isExternal(value)) {
@@ -1107,6 +1169,7 @@ function formatRaw(ctx, value, recurseTimes, typedArray) {
       ArrayPrototypePushApply(output, protoProps);
     }
   } catch (err) {
+    if (!isStackOverflowError(err)) throw err;
     const constructorName = StringPrototypeSlice(getCtxStyle(value, constructor, tag), 0, -1);
     return handleMaxCallStackSize(ctx, err, constructorName, indentationLvl);
   }
@@ -1223,9 +1286,9 @@ function getClassBase(value, constructor, tag) {
   return `[${base}]`;
 }
 
-function getFunctionBase(value, constructor, tag) {
+function getFunctionBase(ctx, value, constructor, tag) {
   const stringified = FunctionPrototypeToString(value);
-  if (StringPrototypeStartsWith(stringified, 'class') && StringPrototypeEndsWith(stringified, '}')) {
+  if (StringPrototypeStartsWith(stringified, 'class') && stringified[stringified.length - 1] === '}') {
     const slice = StringPrototypeSlice(stringified, 5, -1);
     const bracketIndex = StringPrototypeIndexOf(slice, '{');
     if (bracketIndex !== -1 &&
@@ -1250,7 +1313,7 @@ function getFunctionBase(value, constructor, tag) {
   if (value.name === '') {
     base += ' (anonymous)';
   } else {
-    base += `: ${value.name}`;
+    base += `: ${typeof value.name === 'string' ? value.name : formatValue(ctx, value.name)}`;
   }
   base += ']';
   if (constructor !== type && constructor !== null) {
@@ -1285,8 +1348,14 @@ function identicalSequenceRange(a, b) {
   return { len: 0, offset: 0 };
 }
 
-function getStackString(error) {
-  return error.stack ? String(error.stack) : ErrorPrototypeToString(error);
+function getStackString(ctx, error) {
+  if (error.stack) {
+    if (typeof error.stack === 'string') {
+      return error.stack;
+    }
+    return formatValue(ctx, error.stack);
+  }
+  return ErrorPrototypeToString(error);
 }
 
 function getStackFrames(ctx, err, stack) {
@@ -1301,7 +1370,7 @@ function getStackFrames(ctx, err, stack) {
 
   // Remove stack frames identical to frames in cause.
   if (cause != null && isError(cause)) {
-    const causeStack = getStackString(cause);
+    const causeStack = getStackString(ctx, cause);
     const causeStackStart = StringPrototypeIndexOf(causeStack, '\n    at');
     if (causeStackStart !== -1) {
       const causeFrames = StringPrototypeSplit(StringPrototypeSlice(causeStack, causeStackStart + 1), '\n');
@@ -1316,10 +1385,19 @@ function getStackFrames(ctx, err, stack) {
   return frames;
 }
 
+/** @type {(stack: string, constructor: string | null, name: unknown, tag: string) => string} */
 function improveStack(stack, constructor, name, tag) {
   // A stack trace may contain arbitrary data. Only manipulate the output
   // for "regular errors" (errors that "look normal") for now.
   let len = name.length;
+
+  if (typeof name !== 'string') {
+    stack = StringPrototypeReplace(
+      stack,
+      `${name}`,
+      `${name} [${StringPrototypeSlice(getPrefix(constructor, tag, 'Error'), 0, -1)}]`,
+    );
+  }
 
   if (constructor === null ||
       (StringPrototypeEndsWith(name, 'Error') &&
@@ -1329,7 +1407,7 @@ function improveStack(stack, constructor, name, tag) {
     if (constructor === null) {
       const start = RegExpPrototypeExec(/^([A-Z][a-z_ A-Z0-9[\]()-]+)(?::|\n {4}at)/, stack) ||
       RegExpPrototypeExec(/^([a-z_A-Z0-9-]*Error)$/, stack);
-      fallback = (start && start[1]) || '';
+      fallback = (start?.[1]) || '';
       len = fallback.length;
       fallback = fallback || 'Error';
     }
@@ -1353,8 +1431,8 @@ function removeDuplicateErrorKeys(ctx, keys, err, stack) {
   if (!ctx.showHidden && keys.length !== 0) {
     for (const name of ['name', 'message', 'stack']) {
       const index = ArrayPrototypeIndexOf(keys, name);
-      // Only hide the property in case it's part of the original stack
-      if (index !== -1 && StringPrototypeIncludes(stack, err[name])) {
+      // Only hide the property if it's a string and if it's part of the original stack
+      if (index !== -1 && (typeof err[name] !== 'string' || StringPrototypeIncludes(stack, err[name]))) {
         ArrayPrototypeSplice(keys, index, 1);
       }
     }
@@ -1414,8 +1492,8 @@ function safeGetCWD() {
 }
 
 function formatError(err, constructor, tag, ctx, keys) {
-  const name = err.name != null ? String(err.name) : 'Error';
-  let stack = getStackString(err);
+  const name = err.name != null ? err.name : 'Error';
+  let stack = getStackString(ctx, err);
 
   removeDuplicateErrorKeys(ctx, keys, err, stack);
 
@@ -1595,22 +1673,20 @@ function groupArrayElements(ctx, output, value) {
 }
 
 function handleMaxCallStackSize(ctx, err, constructorName, indentationLvl) {
-  if (isStackOverflowError(err)) {
-    ctx.seen.pop();
-    ctx.indentationLvl = indentationLvl;
-    return ctx.stylize(
-      `[${constructorName}: Inspection interrupted ` +
-        'prematurely. Maximum call stack size exceeded.]',
-      'special',
-    );
-  }
-  assert.fail(err.stack);
+  ctx.seen.pop();
+  ctx.indentationLvl = indentationLvl;
+  return ctx.stylize(
+    `[${constructorName}: Inspection interrupted ` +
+      'prematurely. Maximum call stack size exceeded.]',
+    'special',
+  );
 }
 
 function addNumericSeparator(integerString) {
   let result = '';
   let i = integerString.length;
-  const start = StringPrototypeStartsWith(integerString, '-') ? 1 : 0;
+  assert(i !== 0);
+  const start = integerString[0] === '-' ? 1 : 0;
   for (; i >= start + 4; i -= 3) {
     result = `_${StringPrototypeSlice(integerString, i - 3, i)}${result}`;
   }
@@ -2038,20 +2114,15 @@ function formatProperty(ctx, value, recurseTimes, key, type, desc,
       SymbolPrototypeToString(key),
       escapeFn,
     );
-    name = `[${ctx.stylize(tmp, 'symbol')}]`;
-  } else if (key === '__proto__') {
-    name = "['__proto__']";
-  } else if (desc.enumerable === false) {
-    const tmp = RegExpPrototypeSymbolReplace(
-      strEscapeSequencesReplacer,
-      key,
-      escapeFn,
-    );
-    name = `[${tmp}]`;
+    name = ctx.stylize(tmp, 'symbol');
   } else if (RegExpPrototypeExec(keyStrRegExp, key) !== null) {
-    name = ctx.stylize(key, 'name');
+    name = key === '__proto__' ? "['__proto__']" : ctx.stylize(key, 'name');
   } else {
     name = ctx.stylize(strEscape(key), 'string');
+  }
+
+  if (desc.enumerable === false) {
+    name = `[${name}]`;
   }
   return `${name}:${extra}${str}`;
 }
@@ -2152,6 +2223,11 @@ function hasBuiltInToString(value) {
       return true;
     }
     value = proxyTarget;
+  }
+
+  // Check if value has a custom Symbol.toPrimitive transformation.
+  if (typeof value[SymbolToPrimitive] === 'function') {
+    return false;
   }
 
   // Count objects that have no `toString` function as built-in.
@@ -2506,5 +2582,6 @@ module.exports = {
     }
     return escapeHTML(str);
   },
+  // eslint-disable-next-line node-core/prefer-primordials
   Proxy,
 };

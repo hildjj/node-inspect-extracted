@@ -64,7 +64,7 @@ on the Web, so you might want `stylizeWithHTML`, which is also exported from the
 ```js
 inspect({ a: 1 }, {
   compact: false,
-  stylize: stylizeWithHTML
+  stylize: stylizeWithHTML,
 });
 ```
 

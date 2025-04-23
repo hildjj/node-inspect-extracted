@@ -1,5 +1,6 @@
 'use strict';
 
+require('./common');
 const {
   inspect,
 } = require('../src/inspect');

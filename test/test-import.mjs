@@ -1,3 +1,5 @@
+/* eslint-disable node-core/require-common-first */
+import './common/index.js';
 import {
   default as util,
   inspect,

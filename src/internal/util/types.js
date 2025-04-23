@@ -1,12 +1,32 @@
 'use strict';
 
+const primordials = require('../../primordials');
+const {
+  ArrayIsArray,
+  BigInt,
+  Boolean,
+  DatePrototype,
+  Error,
+  FunctionPrototype,
+  Number,
+  ObjectDefineProperty,
+  ObjectGetOwnPropertyDescriptor,
+  ObjectGetPrototypeOf,
+  ObjectIsFrozen,
+  ObjectPrototype,
+  String,
+  Symbol,
+  SymbolToStringTag,
+  globalThis,
+} = primordials;
 const { getConstructorName } = require('../../util');
 
 // From https://mathiasbynens.be/notes/globalthis
 /* c8 ignore start */ // only needed for node 10
 (function() {
   if (typeof globalThis === 'object') return;
-  Object.defineProperty(Object.prototype, '__magic__', {
+  // eslint-disable-next-line node-core/avoid-prototype-pollution
+  ObjectDefineProperty(ObjectPrototype, '__magic__', {
     get: function() {
       return this;
     },
@@ -14,7 +34,7 @@ const { getConstructorName } = require('../../util');
   });
   // eslint-disable-next-line no-undef
   __magic__.globalThis = __magic__;
-  delete Object.prototype.__magic__;
+  delete ObjectPrototype.__magic__;
 }());
 /* c8 ignore stop */
 
@@ -38,7 +58,7 @@ function constructorNamed(val, ...name) {
     if (name.indexOf(getConstructorName(val)) >= 0) {
       return true;
     }
-    val = Object.getPrototypeOf(val);
+    val = ObjectGetPrototypeOf(val);
   }
   return false;
 }
@@ -66,11 +86,11 @@ const isSymbolObject = checkBox(Symbol);
 module.exports = {
   isAsyncFunction(val) {
     return (typeof val === 'function') &&
-      Function.prototype.toString.call(val).startsWith('async');
+      FunctionPrototype.toString.call(val).startsWith('async');
   },
   isGeneratorFunction(val) {
     return (typeof val === 'function') &&
-      Function.prototype.toString.call(val).match(/^(async\s+)?function *\*/);
+    FunctionPrototype.toString.call(val).match(/^(async\s+)?function *\*/);
   },
   isAnyArrayBuffer(val) {
     return constructorNamed(val, 'ArrayBuffer', 'SharedArrayBuffer');
@@ -81,12 +101,12 @@ module.exports = {
   isArgumentsObject(val) {
     const cond = (val !== null) &&
       (typeof val === 'object') &&
-      !Array.isArray(val) &&
+      !ArrayIsArray(val) &&
       (typeof val.length === 'number') &&
       (val.length === (val.length | 0)) &&
       (val.length >= 0);
     if (cond) {
-      const prop = Object.getOwnPropertyDescriptor(val, 'callee');
+      const prop = ObjectGetOwnPropertyDescriptor(val, 'callee');
       return prop && !prop.enumerable;
     }
     return false;
@@ -103,8 +123,8 @@ module.exports = {
   },
   isExternal(val) {
     return (typeof val === 'object') &&
-      (Object.isFrozen(val)) &&
-      (Object.getPrototypeOf(val) == null);
+      (ObjectIsFrozen(val)) &&
+      (ObjectGetPrototypeOf(val) == null);
   },
   isMap(val) {
     if (!constructorNamed(val, 'Map')) {
@@ -118,14 +138,14 @@ module.exports = {
     return true;
   },
   isMapIterator(val) {
-    return Object.prototype.toString.call(Object.getPrototypeOf(val)) ===
+    return ObjectPrototype.toString.call(ObjectGetPrototypeOf(val)) ===
       '[object Map Iterator]';
   },
   isModuleNamespaceObject(val) {
     // TODO: this is weak and easily faked
     return val &&
       (typeof val === 'object') &&
-      (val[Symbol.toStringTag] === 'Module');
+      (val[SymbolToStringTag] === 'Module');
   },
   isNativeError(val) {
     return (val instanceof Error) && constructorNamed(
@@ -154,7 +174,7 @@ module.exports = {
     return true;
   },
   isSetIterator(val) {
-    return Object.prototype.toString.call(Object.getPrototypeOf(val)) ===
+    return ObjectPrototype.toString.call(ObjectGetPrototypeOf(val)) ===
       '[object Set Iterator]';
   },
   isWeakMap(val) {
@@ -169,7 +189,7 @@ module.exports = {
   isDate(val) {
     if (constructorNamed(val, 'Date')) {
       try {
-        Date.prototype.getTime.call(val); // Throws for pseudo-dates
+        DatePrototype.getTime.call(val); // Throws for pseudo-dates
         return true;
       } catch {
         // Ignored

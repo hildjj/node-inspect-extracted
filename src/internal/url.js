@@ -8,7 +8,7 @@ const {
   StringPrototypeIncludes,
   StringPrototypeReplace,
 } = require('../primordials');
-
+const URL = require('../url');
 const {
   CHAR_FORWARD_SLASH,
 } = require('./constants');
@@ -52,4 +52,5 @@ function pathToFileURL(filepath) {
 
 module.exports = {
   pathToFileURL,
+  URL,
 };

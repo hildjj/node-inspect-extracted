@@ -15,6 +15,8 @@ const resolveTests = [
      [['abc'], '/abc'],
      [['/some/dir', '.', '/absolute/'], '/absolute'],
      [['/foo/tmp.3/', '../tmp.3/cycles/root.js'], '/foo/tmp.3/cycles/root.js'],
+     [['a/b/c/', '../../..'], '/'],
+     [['.'], '/'],
     ],
   ],
 ];
@@ -35,3 +37,8 @@ assert.strictEqual(failures.length, 0, failures.join('\n'));
 
 assert.strictEqual(path.resolve(), '/');
 assert.strictEqual(path.resolve(''), '/');
+
+assert.strictEqual(
+  path.normalizeString('foo', false, '/', path.isPosixPathSeparator),
+  'foo'
+);

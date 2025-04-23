@@ -1,5 +1,17 @@
 'use strict';
 
+const primordials = require('./primordials');
+const {
+  BigInt,
+  Error,
+  NumberParseInt,
+  ObjectEntries,
+  ObjectGetOwnPropertyDescriptor,
+  ObjectGetOwnPropertyDescriptors,
+  ObjectGetOwnPropertySymbols,
+  ObjectPrototypeToString,
+  Symbol,
+} = primordials;
 const prxy = require('./proxy');
 const ALL_PROPERTIES = 0;
 const ONLY_ENUMERABLE = 2;
@@ -7,19 +19,20 @@ const kPending = Symbol('kPending');
 const kRejected = Symbol('kRejected');
 
 function getOwnNonIndexProperties(a, filter = ONLY_ENUMERABLE) {
-  const desc = Object.getOwnPropertyDescriptors(a);
+  const desc = ObjectGetOwnPropertyDescriptors(a);
   const ret = [];
-  for (const [k, v] of Object.entries(desc)) {
+  // eslint-disable-next-line node-core/no-array-destructuring
+  for (const [k, v] of ObjectEntries(desc)) {
     if (!/^(0|[1-9][0-9]*)$/.test(k) ||
-        (parseInt(k, 10) >= (2 ** 32 - 1))) { // Arrays are limited in size
+        (NumberParseInt(k, 10) >= (2 ** 32 - 1))) { // Arrays are limited in size
       if ((filter === ONLY_ENUMERABLE) && !v.enumerable) {
         continue;
       }
       ret.push(k);
     }
   }
-  for (const s of Object.getOwnPropertySymbols(a)) {
-    const v = Object.getOwnPropertyDescriptor(a, s);
+  for (const s of ObjectGetOwnPropertySymbols(a)) {
+    const v = ObjectGetOwnPropertyDescriptor(a, s);
     if ((filter === ONLY_ENUMERABLE) && !v.enumerable) {
       continue;
     }
@@ -44,12 +57,13 @@ module.exports = {
   },
   getConstructorName(val) {
     if (!val || typeof val !== 'object') {
+      // eslint-disable-next-line no-restricted-syntax
       throw new Error('Invalid object');
     }
     if (val.constructor && val.constructor.name) {
       return val.constructor.name;
     }
-    const str = Object.prototype.toString.call(val);
+    const str = ObjectPrototypeToString(val);
     // e.g. [object Boolean]
     const m = str.match(/^\[object ([^\]]+)\]/);
     if (m) {

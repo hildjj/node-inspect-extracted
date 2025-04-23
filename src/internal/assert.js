@@ -1,13 +1,22 @@
 'use strict';
 
-function assert(p) {
-  if (!p) {
-    throw new Error('Assertion failed');
+let error;
+function lazyError() {
+  return error = (error != null) ? error : require('./errors').codes.ERR_INTERNAL_ASSERTION;
+}
+
+function assert(value, message) {
+  if (!value) {
+    const ERR_INTERNAL_ASSERTION = lazyError();
+    throw new ERR_INTERNAL_ASSERTION(message);
   }
 }
 
-assert.fail = function fail(message) {
-  throw new Error(message);
-};
+function fail(message) {
+  const ERR_INTERNAL_ASSERTION = lazyError();
+  throw new ERR_INTERNAL_ASSERTION(message);
+}
+
+assert.fail = fail;
 
 module.exports = assert;

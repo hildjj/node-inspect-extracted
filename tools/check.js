@@ -80,7 +80,7 @@ async function checkAll() {
   lastExtract.time = new Date().toISOString();
 
   let fail = false;
-  const nodeRoot = path.resolve(__dirname, '..', '..', 'node');
+  const nodeRoot = path.resolve(__dirname, '..', '..', '..', 'track', 'node');
   for (const f of lastExtract.files) {
     if (diff) {
       if (f.local) {
@@ -124,18 +124,18 @@ checkAll().then(async (fail) => {
   if (fail) {
     process.exit(1);
   } else if (update) {
+    lastExtract.files.sort((a, b) => a.name.localeCompare(b));
     await fsp.writeFile(
       LAST_EXTRACT_FILE,
       `\
-/* eslint-disable max-len */
 'use strict';
 
 // This file is generated from \`node tools/check.js -u\`
 // DO NOT MODIFY BY HAND
 module.exports = ${util.inspect(lastExtract, {
-    depth: Infinity,
-    compact: false,
-  })};
+  depth: Infinity,
+  compact: false,
+})};
 `);
   }
 }, (e) => {

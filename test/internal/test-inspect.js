@@ -2,6 +2,7 @@
 
 // Local tests.  Some of these should go back into node.js
 
+require('../common');
 const assert = require('assert');
 const util = require('../../src/inspect.js');
 const semver = require('semver');
@@ -48,7 +49,7 @@ assert.strictEqual(util.inspect({
   '    <span style="color:yellow;">3</span>,\n' +
   '    <span style="color:yellow;">4</span>\n' +
   '  ],\n' +
-  '  [<span style="color:green;">Symbol&#40;&lt;br&gt;&#41;</span>]: <span style="color:yellow;">false</span>\n' +
+  '  <span style="color:green;">Symbol&#40;&lt;br&gt;&#41;</span>: <span style="color:yellow;">false</span>\n' +
   '}');
 
 const a = {};
@@ -60,4 +61,15 @@ if (semver.satisfies(process.version, '>=16')) {
   const cause = new Error('cause');
   const e2 = new Error('wrapper', { cause });
   assert.match(util.inspect(e2), /\[cause\]: Error: cause\n/);
+}
+
+const u = new URL('http://user:pass@localhost:8080/?foo=bar#baz');
+assert.strictEqual(
+  util.inspect(u, { customInspect: false }),
+  'http://user:pass@localhost:8080/?foo=bar#baz');
+
+if (semver.satisfies(process.version, '>=20')) {
+  assert.strictEqual(
+    util.inspect({ u }, { customInspect: false, depth: 0 }),
+    '{ u: URL {} }');
 }

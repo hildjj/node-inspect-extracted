@@ -1,9 +1,11 @@
 'use strict';
 
+require('./common');
 const {
   makeSafe,
   internalBinding,
   SafeMap,
+  _stringPrototypeReplaceAll,
 } = require('../src/primordials');
 const assert = require('assert');
 
@@ -34,3 +36,6 @@ assert.strictEqual(f.bar(), 'bar');
 assert.strictEqual(f.baz(), 'baz');
 
 assert.throws(() => internalBinding('foo'), { message: 'unknown module: "foo"' });
+
+assert.strictEqual(_stringPrototypeReplaceAll('foo', 'o', 'a'), 'faa');
+assert.strictEqual(_stringPrototypeReplaceAll('foo', /o/g, 'a'), 'faa');

@@ -1,7 +1,325 @@
 'use strict';
+/* eslint-disable node-core/prefer-primordials, no-restricted-globals */
 
-// back-patch in primordials in user-land
+const primordials = { __proto__: null };
 
+// This file subclasses and stores the JS builtins that come from the VM
+// so that Node.js's builtin modules do not need to later look these up from
+// the global proxy, which can be mutated by users.
+
+// Use of primordials have sometimes a dramatic impact on performance, please
+// benchmark all changes made in performance-sensitive areas of the codebase.
+// See: https://github.com/nodejs/node/pull/38248
+
+const {
+  defineProperty: ReflectDefineProperty,
+  getOwnPropertyDescriptor: ReflectGetOwnPropertyDescriptor,
+  ownKeys: ReflectOwnKeys,
+} = Reflect;
+
+// `uncurryThis` is equivalent to `func => Function.prototype.call.bind(func)`.
+// It is using `bind.bind(call)` to avoid using `Function.prototype.bind`
+// and `Function.prototype.call` after it may have been mutated by users.
+const { apply, bind, call } = Function.prototype;
+const uncurryThis = bind.bind(call);
+primordials.uncurryThis = uncurryThis;
+
+// `applyBind` is equivalent to `func => Function.prototype.apply.bind(func)`.
+// It is using `bind.bind(apply)` to avoid using `Function.prototype.bind`
+// and `Function.prototype.apply` after it may have been mutated by users.
+const applyBind = bind.bind(apply);
+primordials.applyBind = applyBind;
+
+// Methods that accept a variable number of arguments, and thus it's useful to
+// also create `${prefix}${key}Apply`, which uses `Function.prototype.apply`,
+// instead of `Function.prototype.call`, and thus doesn't require iterator
+// destructuring.
+const varargsMethods = [
+  // 'ArrayPrototypeConcat' is omitted, because it performs the spread
+  // on its own for arrays and array-likes with a truthy
+  // @@isConcatSpreadable symbol property.
+  'ArrayOf',
+  'ArrayPrototypePush',
+  'ArrayPrototypeUnshift',
+  // 'FunctionPrototypeCall' is omitted, since there's 'ReflectApply'
+  // and 'FunctionPrototypeApply'.
+  'MathHypot',
+  'MathMax',
+  'MathMin',
+  'StringFromCharCode',
+  'StringFromCodePoint',
+  'StringPrototypeConcat',
+  'TypedArrayOf',
+];
+
+function getNewKey(key) {
+  return typeof key === 'symbol' ?
+    `Symbol${key.description[7].toUpperCase()}${key.description.slice(8)}` :
+    `${key[0].toUpperCase()}${key.slice(1)}`;
+}
+
+function copyAccessor(dest, prefix, key, { enumerable, get, set }) {
+  ReflectDefineProperty(dest, `${prefix}Get${key}`, {
+    __proto__: null,
+    value: uncurryThis(get),
+    enumerable,
+  });
+  if (set !== undefined) {
+    ReflectDefineProperty(dest, `${prefix}Set${key}`, {
+      __proto__: null,
+      value: uncurryThis(set),
+      enumerable,
+    });
+  }
+}
+
+function copyPropsRenamed(src, dest, prefix) {
+  for (const key of ReflectOwnKeys(src)) {
+    const newKey = getNewKey(key);
+    const desc = ReflectGetOwnPropertyDescriptor(src, key);
+    if ('get' in desc) {
+      copyAccessor(dest, prefix, newKey, desc);
+    } else {
+      const name = `${prefix}${newKey}`;
+      ReflectDefineProperty(dest, name, { __proto__: null, ...desc });
+      if (varargsMethods.includes(name)) {
+        ReflectDefineProperty(dest, `${name}Apply`, {
+          __proto__: null,
+          // `src` is bound as the `this` so that the static `this` points
+          // to the object it was defined on,
+          // e.g.: `ArrayOfApply` gets a `this` of `Array`:
+          value: applyBind(desc.value, src),
+        });
+      }
+    }
+  }
+}
+
+function copyPropsRenamedBound(src, dest, prefix) {
+  for (const key of ReflectOwnKeys(src)) {
+    const newKey = getNewKey(key);
+    const desc = ReflectGetOwnPropertyDescriptor(src, key);
+    if ('get' in desc) {
+      copyAccessor(dest, prefix, newKey, desc);
+    } else {
+      const { value } = desc;
+      if (typeof value === 'function') {
+        desc.value = value.bind(src);
+      }
+
+      const name = `${prefix}${newKey}`;
+      ReflectDefineProperty(dest, name, { __proto__: null, ...desc });
+      // if (varargsMethods.includes(name)) {
+      //   ReflectDefineProperty(dest, `${name}Apply`, {
+      //     __proto__: null,
+      //     value: applyBind(value, src),
+      //   });
+      // }
+    }
+  }
+}
+
+function copyPrototype(src, dest, prefix) {
+  for (const key of ReflectOwnKeys(src)) {
+    const newKey = getNewKey(key);
+    const desc = ReflectGetOwnPropertyDescriptor(src, key);
+    if ('get' in desc) {
+      copyAccessor(dest, prefix, newKey, desc);
+    } else {
+      const { value } = desc;
+      if (typeof value === 'function') {
+        desc.value = uncurryThis(value);
+      }
+
+      const name = `${prefix}${newKey}`;
+      ReflectDefineProperty(dest, name, { __proto__: null, ...desc });
+      if (varargsMethods.includes(name)) {
+        ReflectDefineProperty(dest, `${name}Apply`, {
+          __proto__: null,
+          value: applyBind(value),
+        });
+      }
+    }
+  }
+}
+
+// Create copies of configurable value properties of the global object
+[
+  'Proxy',
+  'globalThis',
+].forEach((name) => {
+  primordials[name] = globalThis[name];
+});
+
+// Create copies of URI handling functions
+[
+  decodeURI,
+  decodeURIComponent,
+  encodeURI,
+  encodeURIComponent,
+].forEach((fn) => {
+  primordials[fn.name] = fn;
+});
+
+// Create copies of legacy functions
+[
+  escape,
+  eval,
+  unescape,
+].forEach((fn) => {
+  primordials[fn.name] = fn;
+});
+
+// Create copies of the namespace objects
+[
+  'Atomics',
+  'JSON',
+  'Math',
+  'Proxy',
+  'Reflect',
+].forEach((name) => {
+  copyPropsRenamed(globalThis[name], primordials, name);
+});
+
+// Create copies of intrinsic objects
+[
+  'AggregateError',
+  'Array',
+  'ArrayBuffer',
+  'BigInt',
+  'BigInt64Array',
+  'BigUint64Array',
+  'Boolean',
+  'DataView',
+  'Date',
+  'Error',
+  'EvalError',
+  'FinalizationRegistry',
+  'Float32Array',
+  'Float64Array',
+  'Function',
+  'Int16Array',
+  'Int32Array',
+  'Int8Array',
+  'Map',
+  'Number',
+  'Object',
+  'RangeError',
+  'ReferenceError',
+  'RegExp',
+  'Set',
+  'String',
+  'Symbol',
+  'SyntaxError',
+  'TypeError',
+  'URIError',
+  'Uint16Array',
+  'Uint32Array',
+  'Uint8Array',
+  'Uint8ClampedArray',
+  'WeakMap',
+  'WeakRef',
+  'WeakSet',
+].forEach((name) => {
+  const original = globalThis[name];
+  if (original) {
+    primordials[name] = original;
+    copyPropsRenamed(original, primordials, name);
+    copyPrototype(original.prototype, primordials, `${name}Prototype`);
+  }
+});
+
+
+// Create copies of intrinsic objects that require a valid `this` to call
+// static methods.
+// Refs: https://www.ecma-international.org/ecma-262/#sec-promise.all
+[
+  'Promise',
+].forEach((name) => {
+  const original = globalThis[name];
+  primordials[name] = original;
+  copyPropsRenamedBound(original, primordials, name);
+  copyPrototype(original.prototype, primordials, `${name}Prototype`);
+});
+
+// Create copies of abstract intrinsic objects that are not directly exposed
+// on the global object.
+// Refs: https://tc39.es/ecma262/#sec-%typedarray%-intrinsic-object
+[
+  { name: 'TypedArray', original: Reflect.getPrototypeOf(Uint8Array) },
+  { name: 'ArrayIterator', original: {
+    prototype: Reflect.getPrototypeOf(Array.prototype[Symbol.iterator]()),
+  } },
+  { name: 'StringIterator', original: {
+    prototype: Reflect.getPrototypeOf(String.prototype[Symbol.iterator]()),
+  } },
+].forEach(({ name, original }) => {
+  primordials[name] = original;
+  // The static %TypedArray% methods require a valid `this`, but can't be bound,
+  // as they need a subclass constructor as the receiver:
+  copyPrototype(original, primordials, name);
+  copyPrototype(original.prototype, primordials, `${name}Prototype`);
+});
+
+primordials.IteratorPrototype = Reflect.getPrototypeOf(primordials.ArrayIteratorPrototype);
+
+const {
+  // Array: ArrayConstructor,
+  ArrayPrototypeForEach,
+  // ArrayPrototypeMap,
+  FinalizationRegistry,
+  FunctionPrototypeCall,
+  Map,
+  // ObjectDefineProperties,
+  // ObjectDefineProperty,
+  ObjectFreeze,
+  ObjectSetPrototypeOf,
+  // Promise,
+  // PromisePrototypeThen,
+  // PromiseResolve,
+  // ReflectApply,
+  // ReflectConstruct,
+  // ReflectGet,
+  // ReflectSet,
+  RegExp,
+  // RegExpPrototype,
+  // RegExpPrototypeExec,
+  // RegExpPrototypeGetDotAll,
+  // RegExpPrototypeGetFlags,
+  // RegExpPrototypeGetGlobal,
+  // RegExpPrototypeGetHasIndices,
+  // RegExpPrototypeGetIgnoreCase,
+  // RegExpPrototypeGetMultiline,
+  // RegExpPrototypeGetSource,
+  // RegExpPrototypeGetSticky,
+  // RegExpPrototypeGetUnicode,
+  Set,
+  SymbolIterator,
+  // SymbolMatch,
+  // SymbolMatchAll,
+  // SymbolReplace,
+  // SymbolSearch,
+  // SymbolSpecies,
+  // SymbolSplit,
+  WeakMap,
+  WeakRef,
+  WeakSet,
+} = primordials;
+
+
+/**
+ * Creates a class that can be safely iterated over.
+ *
+ * Because these functions are used by `makeSafe`, which is exposed on the
+ * `primordials` object, it's important to use const references to the
+ * primordials that they use.
+ * @template {Iterable} T
+ * @template {*} TReturn
+ * @template {*} TNext
+ * @param {(self: T) => IterableIterator<T>} factory
+ * @param {(...args: [] | [TNext]) => IteratorResult<T, TReturn>} next
+ * @returns {Iterator<T, TReturn, TNext>}
+ */
 const createSafeIterator = (factory, next) => {
   class SafeIterator {
     constructor(iterable) {
@@ -10,66 +328,60 @@ const createSafeIterator = (factory, next) => {
     next() {
       return next(this._iterator);
     }
-    [Symbol.iterator]() {
+    [SymbolIterator]() {
       return this;
     }
   }
-  Object.setPrototypeOf(SafeIterator.prototype, null);
-  Object.freeze(SafeIterator.prototype);
-  Object.freeze(SafeIterator);
+  ObjectSetPrototypeOf(SafeIterator.prototype, null);
+  ObjectFreeze(SafeIterator.prototype);
+  ObjectFreeze(SafeIterator);
   return SafeIterator;
 };
 
-function getGetter(cls, getter) {
-  // TODO: __lookupGetter__ is deprecated, but Object.getOwnPropertyDescriptor
-  // doesn't work on built-ins like Typed Arrays.
-  return Function.prototype.call.bind(cls.prototype.__lookupGetter__(getter));
-}
-
-function getterCaller(getter) {
-  return (val) => {
-    return val.constructor.prototype.__lookupGetter__(getter).call(val);
-  };
-}
-
-function uncurryThis(func) {
-  return Function.prototype.call.bind(func);
-}
+primordials.SafeArrayIterator = createSafeIterator(
+  primordials.ArrayPrototypeSymbolIterator,
+  primordials.ArrayIteratorPrototypeNext,
+);
+primordials.SafeStringIterator = createSafeIterator(
+  primordials.StringPrototypeSymbolIterator,
+  primordials.StringIteratorPrototypeNext,
+);
 
 const copyProps = (src, dest) => {
-  Array.prototype.forEach.call(Reflect.ownKeys(src), (key) => {
-    if (!Reflect.getOwnPropertyDescriptor(dest, key)) {
-      Reflect.defineProperty(
+  ArrayPrototypeForEach(ReflectOwnKeys(src), (key) => {
+    if (!ReflectGetOwnPropertyDescriptor(dest, key)) {
+      ReflectDefineProperty(
         dest,
         key,
-        Reflect.getOwnPropertyDescriptor(src, key));
+        { __proto__: null, ...ReflectGetOwnPropertyDescriptor(src, key) });
     }
   });
 };
 
+/**
+ * @type {typeof primordials.makeSafe}
+ */
 const makeSafe = (unsafe, safe) => {
-  if (Symbol.iterator in unsafe.prototype) {
+  if (SymbolIterator in unsafe.prototype) {
     const dummy = new unsafe();
     let next; // We can reuse the same `next` method.
 
-    Array.prototype.forEach.call(Reflect.ownKeys(unsafe.prototype), (key) => {
-      if (!Reflect.getOwnPropertyDescriptor(safe.prototype, key)) {
-        const desc = Reflect.getOwnPropertyDescriptor(unsafe.prototype, key);
+    ArrayPrototypeForEach(ReflectOwnKeys(unsafe.prototype), (key) => {
+      if (!ReflectGetOwnPropertyDescriptor(safe.prototype, key)) {
+        const desc = ReflectGetOwnPropertyDescriptor(unsafe.prototype, key);
         if (
           typeof desc.value === 'function' &&
           desc.value.length === 0 &&
-          Symbol.iterator in (
-            Function.prototype.call.call(desc.value, dummy) || {})) {
+          SymbolIterator in (FunctionPrototypeCall(desc.value, dummy) ?? {})
+        ) {
           const createIterator = uncurryThis(desc.value);
-          if (next == null) {
-            next = uncurryThis(createIterator(dummy).next);
-          }
+          next = next || uncurryThis(createIterator(dummy).next);
           const SafeIterator = createSafeIterator(createIterator, next);
           desc.value = function() {
             return new SafeIterator(this);
           };
         }
-        Reflect.defineProperty(safe.prototype, key, desc);
+        ReflectDefineProperty(safe.prototype, key, { __proto__: null, ...desc });
       }
     });
   } else {
@@ -77,251 +389,383 @@ const makeSafe = (unsafe, safe) => {
   }
   copyProps(unsafe, safe);
 
-  Object.setPrototypeOf(safe.prototype, null);
-  Object.freeze(safe.prototype);
-  Object.freeze(safe);
+  ObjectSetPrototypeOf(safe.prototype, null);
+  ObjectFreeze(safe.prototype);
+  ObjectFreeze(safe);
   return safe;
 };
+primordials.makeSafe = makeSafe;
 
-const StringIterator =
-  Function.prototype.call.bind(String.prototype[Symbol.iterator]);
-const StringIteratorPrototype = Reflect.getPrototypeOf(StringIterator(''));
-
-function ErrorCaptureStackTrace(targetObject) {
-  const stack = new Error().stack;
-  // Remove the second line, which is this function
-  targetObject.stack = stack.replace(/.*\n.*/, '$1');
-}
-
-module.exports = {
-  makeSafe, // exported for testing
-  internalBinding(mod) {
-    if (mod === 'config') {
-      return {
-        hasIntl: false,
-      };
-    }
-    throw new Error(`unknown module: "${mod}"`);
+// Subclass the constructors because we need to use their prototype
+// methods later.
+// Defining the `constructor` is necessary here to avoid the default
+// constructor which uses the user-mutable `%ArrayIteratorPrototype%.next`.
+primordials.SafeMap = makeSafe(
+  Map,
+  class SafeMap extends Map {
+    constructor(i) { super(i); } // eslint-disable-line no-useless-constructor
   },
-  Array,
-  ArrayIsArray: Array.isArray,
-  ArrayPrototypeFilter: Function.prototype.call.bind(Array.prototype.filter),
-  ArrayPrototypeForEach: Function.prototype.call.bind(Array.prototype.forEach),
-  ArrayPrototypeIncludes:
-    Function.prototype.call.bind(Array.prototype.includes),
-  ArrayPrototypeIndexOf: Function.prototype.call.bind(Array.prototype.indexOf),
-  ArrayPrototypeJoin: Function.prototype.call.bind(Array.prototype.join),
-  ArrayPrototypeMap: Function.prototype.call.bind(Array.prototype.map),
-  ArrayPrototypePop: Function.prototype.call.bind(Array.prototype.pop),
-  ArrayPrototypePush: Function.prototype.call.bind(Array.prototype.push),
-  ArrayPrototypePushApply: Function.apply.bind(Array.prototype.push),
-  ArrayPrototypeSlice: Function.prototype.call.bind(Array.prototype.slice),
-  ArrayPrototypeSort: Function.prototype.call.bind(Array.prototype.sort),
-  ArrayPrototypeSplice: Function.prototype.call.bind(Array.prototype.splice),
-  ArrayPrototypeUnshift: Function.prototype.call.bind(Array.prototype.unshift),
-  BigIntPrototypeValueOf:
-    Function.prototype.call.bind(BigInt.prototype.valueOf),
-  BooleanPrototypeValueOf:
-    Function.prototype.call.bind(Boolean.prototype.valueOf),
-  DatePrototypeGetTime: Function.prototype.call.bind(Date.prototype.getTime),
-  DatePrototypeToISOString:
-    Function.prototype.call.bind(Date.prototype.toISOString),
-  DatePrototypeToString:
-    Function.prototype.call.bind(Date.prototype.toString),
-  ErrorCaptureStackTrace,
-  ErrorPrototypeToString:
-    Function.prototype.call.bind(Error.prototype.toString),
-  FunctionPrototypeBind: Function.prototype.call.bind(Function.prototype.bind),
-  FunctionPrototypeCall:
-    Function.prototype.call.bind(Function.prototype.call),
-  FunctionPrototypeToString:
-    Function.prototype.call.bind(Function.prototype.toString),
-  globalThis: (typeof globalThis === 'undefined') ? global : globalThis,
-  JSONStringify: JSON.stringify,
-  MapPrototypeGetSize: getGetter(Map, 'size'),
-  MapPrototypeEntries: Function.prototype.call.bind(Map.prototype.entries),
-  MathFloor: Math.floor,
-  MathMax: Math.max,
-  MathMin: Math.min,
-  MathRound: Math.round,
-  MathSqrt: Math.sqrt,
-  MathTrunc: Math.trunc,
-  Number,
-  NumberIsFinite: Number.isFinite,
-  NumberIsNaN: Number.isNaN,
-  NumberParseFloat: Number.parseFloat,
-  NumberParseInt: Number.parseInt,
-  NumberPrototypeToString: Function.prototype.call.bind(Number.prototype.toString),
-  NumberPrototypeValueOf:
-    Function.prototype.call.bind(Number.prototype.valueOf),
-  Object,
-  ObjectAssign: Object.assign,
-  ObjectCreate: Object.create,
-  ObjectDefineProperty: Object.defineProperty,
-  ObjectGetOwnPropertyDescriptor: Object.getOwnPropertyDescriptor,
-  ObjectGetOwnPropertyNames: Object.getOwnPropertyNames,
-  ObjectGetOwnPropertySymbols: Object.getOwnPropertySymbols,
-  ObjectGetPrototypeOf: Object.getPrototypeOf,
-  ObjectIs: Object.is,
-  ObjectKeys: Object.keys,
-  ObjectPrototypeHasOwnProperty:
-    Function.prototype.call.bind(Object.prototype.hasOwnProperty),
-  ObjectPrototypePropertyIsEnumerable:
-    Function.prototype.call.bind(Object.prototype.propertyIsEnumerable),
-  ObjectSeal: Object.seal,
-  ObjectSetPrototypeOf: Object.setPrototypeOf,
-  ReflectApply: Reflect.apply,
-  ReflectOwnKeys: Reflect.ownKeys,
-  RegExp,
-  RegExpPrototypeExec: Function.prototype.call.bind(RegExp.prototype.exec),
-  RegExpPrototypeSymbolReplace: Function.prototype.call.bind(RegExp.prototype[Symbol.replace]),
-  RegExpPrototypeSymbolSplit: Function.prototype.call.bind(RegExp.prototype[Symbol.split]),
-  RegExpPrototypeTest: Function.prototype.call.bind(RegExp.prototype.test),
-  RegExpPrototypeToString:
-    Function.prototype.call.bind(RegExp.prototype.toString),
-  SafeStringIterator: createSafeIterator(
-    StringIterator,
-    Function.prototype.call.bind(StringIteratorPrototype.next),
-  ),
-  SafeMap: makeSafe(
-    Map,
-    class SafeMap extends Map {
-      constructor(i) { super(i); } // eslint-disable-line no-useless-constructor
-    }),
-  SafeSet: makeSafe(
-    Set,
-    class SafeSet extends Set {
-      constructor(i) { super(i); } // eslint-disable-line no-useless-constructor
-    }),
-  SetPrototypeGetSize: getGetter(Set, 'size'),
-  SetPrototypeValues: Function.prototype.call.bind(Set.prototype.values),
-  String,
-  StringPrototypeCharCodeAt:
-    Function.prototype.call.bind(String.prototype.charCodeAt),
-  StringPrototypeCodePointAt:
-    Function.prototype.call.bind(String.prototype.codePointAt),
-  StringPrototypeEndsWith:
-    Function.prototype.call.bind(String.prototype.endsWith),
-  StringPrototypeIncludes:
-    Function.prototype.call.bind(String.prototype.includes),
-  StringPrototypeIndexOf:
-    Function.prototype.call.bind(String.prototype.indexOf),
-  StringPrototypeLastIndexOf:
-    Function.prototype.call.bind(String.prototype.lastIndexOf),
-  StringPrototypeNormalize:
-    Function.prototype.call.bind(String.prototype.normalize),
-  StringPrototypePadEnd:
-    Function.prototype.call.bind(String.prototype.padEnd),
-  StringPrototypePadStart:
-    Function.prototype.call.bind(String.prototype.padStart),
-  StringPrototypeRepeat: Function.prototype.call.bind(String.prototype.repeat),
-  StringPrototypeReplace:
-    Function.prototype.call.bind(String.prototype.replace),
-  StringPrototypeReplaceAll:
-    Function.prototype.call.bind(String.prototype.replaceAll),
-  StringPrototypeSlice: Function.prototype.call.bind(String.prototype.slice),
-  StringPrototypeSplit: Function.prototype.call.bind(String.prototype.split),
-  StringPrototypeStartsWith: Function.prototype.call.bind(String.prototype.startsWith),
-  StringPrototypeToLowerCase:
-    Function.prototype.call.bind(String.prototype.toLowerCase),
-  StringPrototypeTrim: Function.prototype.call.bind(String.prototype.trim),
-  StringPrototypeValueOf:
-    Function.prototype.call.bind(String.prototype.valueOf),
-  SymbolPrototypeToString:
-    Function.prototype.call.bind(Symbol.prototype.toString),
-  SymbolPrototypeValueOf:
-    Function.prototype.call.bind(Symbol.prototype.valueOf),
-  SymbolIterator: Symbol.iterator,
-  SymbolFor: Symbol.for,
-  SymbolToStringTag: Symbol.toStringTag,
-  TypedArrayPrototypeGetLength: getterCaller('length'),
-  Uint8Array,
-  uncurryThis,
+);
+primordials.SafeWeakMap = makeSafe(
+  WeakMap,
+  class SafeWeakMap extends WeakMap {
+    constructor(i) { super(i); } // eslint-disable-line no-useless-constructor
+  },
+);
+
+primordials.SafeSet = makeSafe(
+  Set,
+  class SafeSet extends Set {
+    constructor(i) { super(i); } // eslint-disable-line no-useless-constructor
+  },
+);
+primordials.SafeWeakSet = makeSafe(
+  WeakSet,
+  class SafeWeakSet extends WeakSet {
+    constructor(i) { super(i); } // eslint-disable-line no-useless-constructor
+  },
+);
+
+primordials.SafeFinalizationRegistry = makeSafe(
+  FinalizationRegistry,
+  class SafeFinalizationRegistry extends FinalizationRegistry {
+    // eslint-disable-next-line no-useless-constructor
+    constructor(cleanupCallback) { super(cleanupCallback); }
+  },
+);
+primordials.SafeWeakRef = makeSafe(
+  WeakRef,
+  class SafeWeakRef extends WeakRef {
+    // eslint-disable-next-line no-useless-constructor
+    constructor(target) { super(target); }
+  },
+);
+
+// const SafePromise = makeSafe(
+//   Promise,
+//   class SafePromise extends Promise {
+//     // eslint-disable-next-line no-useless-constructor
+//     constructor(executor) { super(executor); }
+//   },
+// );
+
+/**
+ * Attaches a callback that is invoked when the Promise is settled (fulfilled or
+ * rejected). The resolved value cannot be modified from the callback.
+ * Prefer using async functions when possible.
+ * @param {Promise<any>} thisPromise
+ * @param {(() => void) | undefined | null} onFinally The callback to execute
+ *        when the Promise is settled (fulfilled or rejected).
+ * @returns {Promise} A Promise for the completion of the callback.
+ */
+// primordials.SafePromisePrototypeFinally = (thisPromise, onFinally) =>
+//   // Wrapping on a new Promise is necessary to not expose the SafePromise
+//   // prototype to user-land.
+//   new Promise((a, b) =>
+//     new SafePromise((a, b) => PromisePrototypeThen(thisPromise, a, b))
+//       .finally(onFinally)
+//       .then(a, b),
+//   );
+
+primordials.AsyncIteratorPrototype =
+  // TODO(@hildjj): understand why node's primordials is wrong here.
+  // primordials.ReflectGetPrototypeOf(
+  primordials.ReflectGetPrototypeOf(
+    async function* () {}).prototype;
+// );
+
+// const arrayToSafePromiseIterable = (promises, mapFn) =>
+//   new primordials.SafeArrayIterator(
+//     ArrayPrototypeMap(
+//       promises,
+//       (promise, i) =>
+//         new SafePromise((a, b) => PromisePrototypeThen(mapFn == null ? promise : mapFn(promise, i), a, b)),
+//     ),
+//   );
+
+/**
+ * @template T,U
+ * @param {Array<T | PromiseLike<T>>} promises
+ * @param {(v: T|PromiseLike<T>, k: number) => U|PromiseLike<U>} [mapFn]
+ * @returns {Promise<Awaited<U>[]>}
+ */
+// primordials.SafePromiseAll = (promises, mapFn) =>
+//   // Wrapping on a new Promise is necessary to not expose the SafePromise
+//   // prototype to user-land.
+//   new Promise((a, b) =>
+//     SafePromise.all(arrayToSafePromiseIterable(promises, mapFn)).then(a, b),
+//   );
+
+/**
+ * Should only be used for internal functions, this would produce similar
+ * results as `Promise.all` but without prototype pollution, and the return
+ * value is not a genuine Array but an array-like object.
+ * @template T,U
+ * @param {ArrayLike<T | PromiseLike<T>>} promises
+ * @param {(v: T|PromiseLike<T>, k: number) => U|PromiseLike<U>} [mapFn]
+ * @returns {Promise<ArrayLike<Awaited<U>>>}
+ */
+// primordials.SafePromiseAllReturnArrayLike = (promises, mapFn) =>
+//   new Promise((resolve, reject) => {
+//     const { length } = promises;
+
+//     const returnVal = ArrayConstructor(length);
+//     ObjectSetPrototypeOf(returnVal, null);
+//     if (length === 0) resolve(returnVal);
+
+//     let pendingPromises = length;
+//     for (let i = 0; i < length; i++) {
+//       const promise = mapFn != null ? mapFn(promises[i], i) : promises[i];
+//       PromisePrototypeThen(PromiseResolve(promise), (result) => {
+//         returnVal[i] = result;
+//         if (--pendingPromises === 0) resolve(returnVal);
+//       }, reject);
+//     }
+//   });
+
+/**
+ * Should only be used when we only care about waiting for all the promises to
+ * resolve, not what value they resolve to.
+ * @template T,U
+ * @param {ArrayLike<T | PromiseLike<T>>} promises
+ * @param {(v: T|PromiseLike<T>, k: number) => U|PromiseLike<U>} [mapFn]
+ * @returns {Promise<void>}
+ */
+// primordials.SafePromiseAllReturnVoid = (promises, mapFn) =>
+//   new Promise((resolve, reject) => {
+//     let pendingPromises = promises.length;
+//     if (pendingPromises === 0) resolve();
+//     const onFulfilled = () => {
+//       if (--pendingPromises === 0) {
+//         resolve();
+//       }
+//     };
+//     for (let i = 0; i < promises.length; i++) {
+//       const promise = mapFn != null ? mapFn(promises[i], i) : promises[i];
+//       PromisePrototypeThen(PromiseResolve(promise), onFulfilled, reject);
+//     }
+//   });
+
+/**
+ * @template T,U
+ * @param {Array<T|PromiseLike<T>>} promises
+ * @param {(v: T|PromiseLike<T>, k: number) => U|PromiseLike<U>} [mapFn]
+ * @returns {Promise<PromiseSettledResult<any>[]>}
+ */
+// primordials.SafePromiseAllSettled = (promises, mapFn) =>
+//   // Wrapping on a new Promise is necessary to not expose the SafePromise
+//   // prototype to user-land.
+//   new Promise((a, b) =>
+//     SafePromise.allSettled(arrayToSafePromiseIterable(promises, mapFn)).then(a, b),
+//   );
+
+/**
+ * Should only be used when we only care about waiting for all the promises to
+ * settle, not what value they resolve or reject to.
+ * @template T,U
+ * @param {ArrayLike<T|PromiseLike<T>>} promises
+ * @param {(v: T|PromiseLike<T>, k: number) => U|PromiseLike<U>} [mapFn]
+ * @returns {Promise<void>}
+ */
+// primordials.SafePromiseAllSettledReturnVoid = (promises, mapFn) => new Promise((resolve) => {
+//   let pendingPromises = promises.length;
+//   if (pendingPromises === 0) resolve();
+//   const onSettle = () => {
+//     if (--pendingPromises === 0) resolve();
+//   };
+//   for (let i = 0; i < promises.length; i++) {
+//     const promise = mapFn != null ? mapFn(promises[i], i) : promises[i];
+//     PromisePrototypeThen(PromiseResolve(promise), onSettle, onSettle);
+//   }
+// });
+
+/**
+ * @template T,U
+ * @param {Array<T|PromiseLike<T>>} promises
+ * @param {(v: T|PromiseLike<T>, k: number) => U|PromiseLike<U>} [mapFn]
+ * @returns {Promise<Awaited<U>>}
+ */
+// primordials.SafePromiseAny = (promises, mapFn) =>
+//   // Wrapping on a new Promise is necessary to not expose the SafePromise
+//   // prototype to user-land.
+//   new Promise((a, b) =>
+//     SafePromise.any(arrayToSafePromiseIterable(promises, mapFn)).then(a, b),
+//   );
+
+/**
+ * @template T,U
+ * @param {Array<T|PromiseLike<T>>} promises
+ * @param {(v: T|PromiseLike<T>, k: number) => U|PromiseLike<U>} [mapFn]
+ * @returns {Promise<Awaited<U>>}
+ */
+// primordials.SafePromiseRace = (promises, mapFn) =>
+//   // Wrapping on a new Promise is necessary to not expose the SafePromise
+//   // prototype to user-land.
+//   new Promise((a, b) =>
+//     SafePromise.race(arrayToSafePromiseIterable(promises, mapFn)).then(a, b),
+//   );
+
+
+// const {
+//   exec: OriginalRegExpPrototypeExec,
+//   [SymbolMatch]: OriginalRegExpPrototypeSymbolMatch,
+//   [SymbolMatchAll]: OriginalRegExpPrototypeSymbolMatchAll,
+//   [SymbolReplace]: OriginalRegExpPrototypeSymbolReplace,
+//   [SymbolSearch]: OriginalRegExpPrototypeSymbolSearch,
+//   [SymbolSplit]: OriginalRegExpPrototypeSymbolSplit,
+// } = RegExpPrototype;
+
+// class RegExpLikeForStringSplitting {
+//   #regex;
+//   constructor() {
+//     this.#regex = ReflectConstruct(RegExp, arguments);
+//   }
+
+//   get lastIndex() {
+//     return ReflectGet(this.#regex, 'lastIndex');
+//   }
+//   set lastIndex(value) {
+//     ReflectSet(this.#regex, 'lastIndex', value);
+//   }
+
+//   exec() {
+//     return ReflectApply(OriginalRegExpPrototypeExec, this.#regex, arguments);
+//   }
+// }
+// ObjectSetPrototypeOf(RegExpLikeForStringSplitting.prototype, null);
+
+/**
+ * @param {RegExp} pattern
+ * @returns {RegExp}
+ */
+// primordials.hardenRegExp = function hardenRegExp(pattern) {
+//   ObjectDefineProperties(pattern, {
+//     [SymbolMatch]: {
+//       __proto__: null,
+//       configurable: true,
+//       value: OriginalRegExpPrototypeSymbolMatch,
+//     },
+//     [SymbolMatchAll]: {
+//       __proto__: null,
+//       configurable: true,
+//       value: OriginalRegExpPrototypeSymbolMatchAll,
+//     },
+//     [SymbolReplace]: {
+//       __proto__: null,
+//       configurable: true,
+//       value: OriginalRegExpPrototypeSymbolReplace,
+//     },
+//     [SymbolSearch]: {
+//       __proto__: null,
+//       configurable: true,
+//       value: OriginalRegExpPrototypeSymbolSearch,
+//     },
+//     [SymbolSplit]: {
+//       __proto__: null,
+//       configurable: true,
+//       value: OriginalRegExpPrototypeSymbolSplit,
+//     },
+//     constructor: {
+//       __proto__: null,
+//       configurable: true,
+//       value: {
+//         [SymbolSpecies]: RegExpLikeForStringSplitting,
+//       },
+//     },
+//     dotAll: {
+//       __proto__: null,
+//       configurable: true,
+//       value: RegExpPrototypeGetDotAll(pattern),
+//     },
+//     exec: {
+//       __proto__: null,
+//       configurable: true,
+//       value: OriginalRegExpPrototypeExec,
+//     },
+//     global: {
+//       __proto__: null,
+//       configurable: true,
+//       value: RegExpPrototypeGetGlobal(pattern),
+//     },
+//     hasIndices: {
+//       __proto__: null,
+//       configurable: true,
+//       value: RegExpPrototypeGetHasIndices(pattern),
+//     },
+//     ignoreCase: {
+//       __proto__: null,
+//       configurable: true,
+//       value: RegExpPrototypeGetIgnoreCase(pattern),
+//     },
+//     multiline: {
+//       __proto__: null,
+//       configurable: true,
+//       value: RegExpPrototypeGetMultiline(pattern),
+//     },
+//     source: {
+//       __proto__: null,
+//       configurable: true,
+//       value: RegExpPrototypeGetSource(pattern),
+//     },
+//     sticky: {
+//       __proto__: null,
+//       configurable: true,
+//       value: RegExpPrototypeGetSticky(pattern),
+//     },
+//     unicode: {
+//       __proto__: null,
+//       configurable: true,
+//       value: RegExpPrototypeGetUnicode(pattern),
+//     },
+//   });
+//   ObjectDefineProperty(pattern, 'flags', {
+//     __proto__: null,
+//     configurable: true,
+//     value: RegExpPrototypeGetFlags(pattern),
+//   });
+//   return pattern;
+// };
+
+/*
+ * @param {string} str
+ * @param {RegExp} regexp
+ * @returns {number}
+ */
+// primordials.SafeStringPrototypeSearch = (str, regexp) => {
+//   regexp.lastIndex = 0;
+//   const match = RegExpPrototypeExec(regexp, str);
+//   return match ? match.index : -1;
+// };
+
+/**
+ * Mock the one part of internalBinding that is needed.
+ * @param {string} mod Module
+ * @returns {{hasIntl: string}}
+ */
+primordials.internalBinding = (mod) => {
+  if (mod === 'config') {
+    return {
+      hasIntl: false,
+    };
+  }
+  // eslint-disable-next-line no-restricted-syntax
+  throw new Error(`unknown module: "${mod}"`);
 };
 
-// Node 14
-/* c8 ignore start */
-if (!String.prototype.replaceAll) {
-  // Lifted and simplified from core-js for the moment.  Will remove when we
-  // drop node 14 support.
-
-  function requireObjectCoercible(it) {
-    if (it == null) throw new TypeError("Can't call method on " + it);
-    return it;
+// Quick hack from
+// https://bassamrubaye.me/javascript-replaceall-is-not-a-function-error-2-fixes/
+// for node 14
+primordials._stringPrototypeReplaceAll = (obj, str, newStr) => {
+  if (Object.prototype.toString.call(str).toLowerCase() === '[object regexp]') {
+    return obj.replace(str, newStr);
   }
+  return obj.replace(new RegExp(str, 'g'), newStr);
+};
 
-  function getSubstitution(matched, str, position, captures, namedCaptures, replacement) {
-    const tailPos = position + matched.length;
-    const m = captures.length;
-    let symbols = /\$([$&'`]|\d{1,2})/;
-    if (namedCaptures !== undefined) {
-      namedCaptures = Object(requireObjectCoercible(namedCaptures));
-      symbols = /\$([$&'`]|\d{1,2}|<[^>]*>)/g;
-    }
-    return replacement.replace(symbols, (match, ch) => {
-      let capture;
-      switch (ch.charAt(0)) {
-        case '$': return '$';
-        case '&': return matched;
-        case '`': return str.slice(0, position);
-        case "'": return str.slice(tailPos);
-        case '<':
-          capture = namedCaptures[ch.slice(1, -1)];
-          break;
-        default: { // \d\d?
-          const n = +ch;
-          if (n === 0) return match;
-          if (n > m) {
-            const f = Math.floor(n / 10);
-            if (f === 0) return match;
-            if (f <= m) return captures[f - 1] === undefined ? ch.charAt(1) : captures[f - 1] + ch.charAt(1);
-            return match;
-          }
-          capture = captures[n - 1];
-        }
-      }
-      return capture === undefined ? '' : capture;
-    });
-  }
+primordials.StringPrototypeReplaceAll =
+  primordials.StringPrototypeReplaceAll || primordials._stringPrototypeReplaceAll;
 
-  module.exports.StringPrototypeReplaceAll = (str, searchValue, replaceValue) => {
-    const O = requireObjectCoercible(str);
-    let IS_REG_EXP, flags, replacer, replacement;
-    let position = 0;
-    let endOfLastMatch = 0;
-    let result = '';
-    if (searchValue != null) {
-      IS_REG_EXP = searchValue instanceof RegExp;
-      if (IS_REG_EXP) {
-        flags = searchValue.flags;
-        if (!~flags.indexOf('g')) {
-          throw new TypeError('`.replaceAll` does not allow non-global regexes');
-        }
-      }
-      replacer = searchValue[Symbol.replace];
-      if (replacer) {
-        return replacer.call(searchValue, O, replaceValue);
-      }
-    }
-    const string = String(O);
-    const searchString = String(searchValue);
-    const functionalReplace = (typeof replaceValue === 'function');
-    if (!functionalReplace) replaceValue = String(replaceValue);
-    const searchLength = searchString.length;
-    const advanceBy = Math.max(1, searchLength);
-    position = string.indexOf(searchString, 0);
-    while (position !== -1) {
-      replacement = functionalReplace ?
-        String(replaceValue(searchString, position, string)) :
-        getSubstitution(searchString, string, position, [], undefined, replaceValue);
-      result += string.slice(endOfLastMatch, position) + replacement;
-      endOfLastMatch = position + searchLength;
-      position = string.indexOf(searchString, position + advanceBy);
-    }
-    if (endOfLastMatch < string.length) {
-      result += string.slice(endOfLastMatch);
-    }
-    return result;
-  };
-}
-/* c8 ignore stop */
+ObjectSetPrototypeOf(primordials, null);
+ObjectFreeze(primordials);
+
+module.exports = primordials;
