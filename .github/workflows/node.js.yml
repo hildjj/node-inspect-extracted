@@ -31,7 +31,7 @@ jobs:
         id: cache-nve
         uses: actions/cache@v4
         with:
-          path: $HOME/.cache/nve
+          path: ~/.cache/nve
           key: ${{ runner.os }}-nve
       - name: Test supported versions
         run: npm run ci
