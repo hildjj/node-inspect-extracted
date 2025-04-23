@@ -2,7 +2,7 @@
 
 let error;
 function lazyError() {
-  return error ??= require('./errors').codes.ERR_INTERNAL_ASSERTION;
+  return error = (error != null) ? error : require('./errors').codes.ERR_INTERNAL_ASSERTION;
 }
 
 function assert(value, message) {

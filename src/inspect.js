@@ -178,6 +178,7 @@ const {
 
 let hexSlice;
 let internalUrl;
+let internalUrlContextSymbols;
 
 function pathToFileUrlHref(filepath) {
   // Maintain node 14 compat
@@ -191,6 +192,12 @@ function isURL(value) {
   // internalUrl ??= require('./internal/url');
   internalUrl = (internalUrl == null) ? require('./internal/url') : internalUrl;
   return typeof value.href === 'string' && value instanceof internalUrl.URL;
+}
+
+function removeInternalUrlContextSymbol(keys) {
+  internalUrlContextSymbols = internalUrlContextSymbols ||
+    ObjectGetOwnPropertySymbols(new internalUrl.URL('http://user:pass@localhost:8080/?foo=bar#baz'));
+  return keys.filter((v) => internalUrlContextSymbols[v] === -1);
 }
 
 const builtInObjects = new SafeSet(
@@ -1119,6 +1126,9 @@ function formatRaw(ctx, value, recurseTimes, typedArray) {
         return base;
       }
     } else if (isURL(value) && !(recurseTimes > ctx.depth && ctx.depth !== null)) {
+      // @hildjj: In node <=20, there are a few symbol keys that mess up
+      // this algorithm.  Ignore them.
+      keys = removeInternalUrlContextSymbol(keys);
       base = value.href;
       if (keys.length === 0 && protoProps === undefined) {
         return base;
