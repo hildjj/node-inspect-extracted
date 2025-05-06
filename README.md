@@ -143,8 +143,8 @@ some spot checks for the webpack output.
 This project only supports versions of Node that the Node team is [currently
 supporting](https://github.com/nodejs/Release#release-schedule).  Ava's
 [support statement](https://github.com/avajs/ava/blob/master/docs/support-statement.md)
-is what we will be using as well.  Currently, that means Node `10`+ is
-required.
+is what we will be using as well.  Currently, that means Node `20`+ is
+required.  Older versions of node may work, but issues will not be fixed for them.
 
 ## LICENSE
 
