@@ -58,6 +58,8 @@ const noop = () => {};
 const hasCrypto = Boolean(process.versions.openssl) &&
                   !process.env.NODE_SKIP_CRYPTO;
 
+const hasSQLite = Boolean(process.versions.sqlite);
+
 const hasQuic = hasCrypto && !!process.config.variables.node_quic;
 
 function parseTestFlags(filename = process.argv[1]) {
@@ -694,6 +696,12 @@ function skipIf32Bits() {
   }
 }
 
+function skipIfSQLiteMissing() {
+  if (!hasSQLite) {
+    skip('missing SQLite');
+  }
+}
+
 function getArrayBufferViews(buf) {
   const { buffer, byteOffset, byteLength } = buf;
 
@@ -713,6 +721,11 @@ function getArrayBufferViews(buf) {
     BigUint64Array,
     DataView,
   ];
+  if ('Float16Array' in global) {
+    // Avoid compilation error
+    // eslint-disable-next-line dot-notation
+    arrayBufferViews.push(global['Float16Array']);
+  }
 
   for (const type of arrayBufferViews) {
     const { BYTES_PER_ELEMENT = 1 } = type;
@@ -895,6 +908,7 @@ const common = {
   hasIntl,
   hasCrypto,
   hasQuic,
+  hasSQLite,
   invalidArgTypeHelper,
   isAlive,
   isASan,
@@ -924,6 +938,7 @@ const common = {
   skipIf32Bits,
   skipIfEslintMissing,
   skipIfInspectorDisabled,
+  skipIfSQLiteMissing,
   spawnPromisified,
 
   get enoughTestMem() {

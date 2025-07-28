@@ -3,7 +3,7 @@
 // This file is generated from `node tools/check.js -u`
 // DO NOT MODIFY BY HAND
 module.exports = {
-  time: '2025-05-06T16:22:28.586Z',
+  time: '2025-07-28T15:34:28.743Z',
   files: [
     {
       name: 'test/eslint.config_partial.mjs',
@@ -36,9 +36,9 @@ module.exports = {
     {
       name: 'tools/eslint/package.json',
       local: 'tools/eslint/package.json',
-      sha256: 'f7757b07e6c62ce27582107fd430261f755c19e26c88412406fa55e3e90845c4',
-      mtime: '2025-05-06T15:28:05.182Z',
-      commit: '74ac98c78ea08a273e5e3bb405e40273d7e55ea1'
+      sha256: '381101f83c01874b89c18274544e2f444785f9aa862266d937f889cef6733bb1',
+      mtime: '2025-07-28T13:04:39.242Z',
+      commit: '191396260c122e341009f4f4be04baf4b10e666f'
     },
     {
       name: 'tools/eslint-rules/alphabetize-errors.js',
@@ -211,9 +211,9 @@ module.exports = {
     {
       name: 'eslint.config.mjs',
       local: 'eslint.config.mjs',
-      sha256: 'b8af629fb08ea3567d6f6912acc29a39e231a5ff3ccc0d4857c4d7ab159061dc',
-      mtime: '2025-05-06T15:27:00.424Z',
-      commit: 'dcba975031e141f2d92e41818062eaa99d105ed6'
+      sha256: '59faccb52f5cfb9fa88ab7394b85922d68657478c16b4ebe9ee5ba9c52697177',
+      mtime: '2025-07-28T13:04:39.217Z',
+      commit: '191396260c122e341009f4f4be04baf4b10e666f'
     },
     {
       name: 'lib/internal/per_context/primordials.js',
@@ -225,37 +225,37 @@ module.exports = {
     {
       name: 'typings/primordials.d.ts',
       local: 'src/primordials.d.ts',
-      sha256: 'c6403d2d402b275859ee646fe569a68904385544c01ac086b1c4cb774b2259cf',
-      mtime: '2025-04-19T14:46:57.387Z',
-      commit: '864ff620dad679f3c698be765c5a4f66e9ecf3d9'
+      sha256: '4514fcbfb3d7ef7d3f7f0385996cffaecbe1ed119526c7da1b93d16d4c388ef0',
+      mtime: '2025-07-28T13:04:35.336Z',
+      commit: '17df800b90df9c0da05c9fe4bb15c754d7eb827b'
     },
     {
       name: 'test/common/tmpdir.js',
       local: 'test/common/tmpdir.js',
-      mtime: '2025-04-19T14:46:57.222Z',
-      sha256: 'e35ff013aa17ee245dcf0fb8943c2855bd2c90fdd52177dbc5a0bb600e17ebf2',
-      commit: '03e9adf876e2039604a038b2eb1476bf4a9e1774'
+      mtime: '2025-06-22T15:05:33.683Z',
+      sha256: '32001ed4697fccbe8d7c4b12312731d2d45d9272157c46b07d09d5ceaaf77727',
+      commit: 'a3af644dda43eb0e26f6404d426a723bb0159605'
     },
     {
       name: 'test/common/index.js',
       local: 'test/common/index.js',
-      mtime: '2025-04-19T14:46:57.221Z',
-      sha256: '7fdd3fb50f07bb0788dfc2faa52eadc58507f42ba31d4d740cbf7b7ff5a73b59',
-      commit: '8d10bc7b09efa49e17df17afabfd75462c231058'
+      mtime: '2025-07-28T13:04:35.288Z',
+      sha256: '61684dff07965c3d9251b6f725c5c4065bad0e49f6de781e84921f4b098db037',
+      commit: '97f80374a6110e5abf1f445a33a5217d7371d39d'
     },
     {
       name: 'lib/internal/util/inspect.js',
       local: 'src/inspect.js',
-      mtime: '2025-05-06T15:27:00.468Z',
-      sha256: '56cddbce12b59c41f2047e46df3a19f1aec771c359edab0c8be1aa38550b6131',
-      commit: 'd9e78c00c191d1340d51143ab4352dc66056485f'
+      mtime: '2025-07-28T13:04:35.256Z',
+      sha256: '5102cab8e5b7ded474d30c0bec372fa24369630aaa9c8923e6add01f1ead4b8f',
+      commit: '6f7b89516f3b32c58a2bf6ba262f1963b5bc06ff'
     },
     {
       name: 'test/parallel/test-util-inspect.js',
       local: 'test/parallel/test-util-inspect.js',
-      sha256: '0cfcee7f4c0f1e22285ed57f9f6891741da1ff4c96c6b4c325dd29ff83eaabdc',
-      mtime: '2025-04-20T18:39:39.533Z',
-      commit: '97a3a8204c7c0eb35fc6c11274a7aee5d2ea3ddc'
+      sha256: '5e1c547b7f0cae4f8b4782369e9b6912f17ae6a46a56ec24088b88e5f5de7150',
+      mtime: '2025-07-07T11:38:54.041Z',
+      commit: '6f7b89516f3b32c58a2bf6ba262f1963b5bc06ff'
     },
     {
       name: 'test/parallel/test-util-inspect-proxy.js',
