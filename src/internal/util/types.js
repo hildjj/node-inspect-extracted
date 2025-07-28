@@ -8,12 +8,14 @@ const {
   DatePrototype,
   Error,
   FunctionPrototype,
+  MapPrototypeHas,
   Number,
   ObjectDefineProperty,
   ObjectGetOwnPropertyDescriptor,
   ObjectGetPrototypeOf,
   ObjectIsFrozen,
   ObjectPrototype,
+  SetPrototypeHas,
   String,
   Symbol,
   SymbolToStringTag,
@@ -131,7 +133,7 @@ module.exports = {
       return false;
     }
     try {
-      val.has();
+      MapPrototypeHas(val);
     } catch {
       return false;
     }
@@ -167,7 +169,7 @@ module.exports = {
       return false;
     }
     try {
-      val.has();
+      SetPrototypeHas(val);
     } catch {
       return false;
     }
