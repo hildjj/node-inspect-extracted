@@ -108,14 +108,24 @@ function normalizeString(path, allowAboveRoot, separator, isPathSeparator) {
   return res;
 }
 
+/**
+ * path.resolve([from ...], to)
+ * @param {...string} args
+ * @returns {string}
+ */
 function resolve(...args) {
+  if (args.length === 0 || (args.length === 1 && (args[0] === '' || args[0] === '.'))) {
+    const cwd = posixCwd();
+    if (StringPrototypeCharCodeAt(cwd, 0) === CHAR_FORWARD_SLASH) {
+      return cwd;
+    }
+  }
   let resolvedPath = '';
   let resolvedAbsolute = false;
 
-  for (let i = args.length - 1; i >= -1 && !resolvedAbsolute; i--) {
-    const path = i >= 0 ? args[i] : posixCwd();
-
-    validateString(path, 'path');
+  for (let i = args.length - 1; i >= 0 && !resolvedAbsolute; i--) {
+    const path = args[i];
+    validateString(path, `paths[${i}]`);
 
     // Skip empty entries
     if (path.length === 0) {
@@ -127,12 +137,18 @@ function resolve(...args) {
       StringPrototypeCharCodeAt(path, 0) === CHAR_FORWARD_SLASH;
   }
 
+  if (!resolvedAbsolute) {
+    const cwd = posixCwd();
+    resolvedPath = `${cwd}/${resolvedPath}`;
+    resolvedAbsolute =
+      StringPrototypeCharCodeAt(cwd, 0) === CHAR_FORWARD_SLASH;
+  }
+
   // At this point the path should be resolved to a full absolute path, but
   // handle relative paths to be safe (might happen when process.cwd() fails)
 
   // Normalize the path
-  resolvedPath = normalizeString(resolvedPath, !resolvedAbsolute, '/',
-                                 isPosixPathSeparator);
+  resolvedPath = normalizeString(resolvedPath, !resolvedAbsolute, '/', isPosixPathSeparator);
 
   if (resolvedAbsolute) {
     return `/${resolvedPath}`;

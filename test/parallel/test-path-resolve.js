@@ -4,6 +4,8 @@ const assert = require('assert');
 const path = require('../../src/path');
 
 const failures = [];
+// Fake one for the web case
+const posixyCwd = '/';
 
 const resolveTests = [
   [ path.resolve,
@@ -17,6 +19,12 @@ const resolveTests = [
      [['/foo/tmp.3/', '../tmp.3/cycles/root.js'], '/foo/tmp.3/cycles/root.js'],
      [['a/b/c/', '../../..'], '/'],
      [['.'], '/'],
+     [[], posixyCwd],
+     [[''], posixyCwd],
+     [['', ''], posixyCwd],
+     [['.'], posixyCwd],
+     [['/some/dir', '.', '/absolute/'], '/absolute'],
+     [['/foo/tmp.3/', '../tmp.3/cycles/root.js'], '/foo/tmp.3/cycles/root.js'],
     ],
   ],
 ];
@@ -35,10 +43,13 @@ resolveTests.forEach(([resolve, tests]) => {
 });
 assert.strictEqual(failures.length, 0, failures.join('\n'));
 
-assert.strictEqual(path.resolve(), '/');
-assert.strictEqual(path.resolve(''), '/');
-
 assert.strictEqual(
   path.normalizeString('foo', false, '/', path.isPosixPathSeparator),
   'foo'
+);
+
+const dots = process.cwd().replace(/[^\\/]+/g, '..') + '/../../../foo';
+assert.strictEqual(
+  path.normalizeString(dots, true, '/', path.isPosixPathSeparator),
+  dots.replace(/^[^/]*\//, ''),
 );
