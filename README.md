@@ -12,7 +12,9 @@ interesting for Web use cases.
 
 ## Installation
 
-    npm install node-inspect-extracted
+```bash
+npm install node-inspect-extracted
+```
 
 ## Use
 
@@ -27,7 +29,7 @@ console.log(util.inspect(1));
 
 With `import`:
 
-```js
+```mjs
 import util from 'node-inspect-extracted';
 console.log(util.inspect(2));
 ```
@@ -45,15 +47,15 @@ From the browser:
 
 The following [`util`](https://nodejs.org/api/util.html) functions:
 
- - [`inspect(object[,showHidden|options[,depth [, colors]]])`](https://nodejs.org/api/util.html#util_util_inspect_object_showhidden_depth_colors)
- - [`format(format[, ...args])`](https://nodejs.org/api/util.html#util_util_format_format_args)
- - [`formatWithOptions(inspectOptions, format[, ...args])`](https://nodejs.org/api/util.html#util_util_formatwithoptions_inspectoptions_format_args)
+- [`inspect(object[,showHidden|options[,depth [, colors]]])`](https://nodejs.org/api/util.html#util_util_inspect_object_showhidden_depth_colors)
+- [`format(format[, ...args])`](https://nodejs.org/api/util.html#util_util_format_format_args)
+- [`formatWithOptions(inspectOptions, format[, ...args])`](https://nodejs.org/api/util.html#util_util_formatwithoptions_inspectoptions_format_args)
 
 And these extras:
 
- - `Proxy(target, handler)`: a wrapper for the normal [`Proxy`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy) class that allows the `showProxy` option of inspect to work.
- - `stylizeWithColor(str, styleType)`: colorize `str` with ANSI escapes according to the styleType
- - `stylizeWithHTML(str, styleType)`: colorize `str` with HTML span tags
+- `Proxy(target, handler)`: a wrapper for the normal [`Proxy`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy) class that allows the `showProxy` option of inspect to work.
+- `stylizeWithColor(str, styleType)`: colorize `str` with ANSI escapes according to the styleType
+- `stylizeWithHTML(str, styleType)`: colorize `str` with HTML span tags
 
 ## Colors
 
@@ -61,7 +63,8 @@ If you specify `{colors: true}` in the inspect options, you will get ANSI
 escape codes, just as you would in Node.  That's unlikely to be helpful to you
 on the Web, so you might want `stylizeWithHTML`, which is also exported from the package:
 
-```js
+```mjs
+import { inspect, stylizeWithHTML } from 'node-inspect-extracted';
 inspect({ a: 1 }, {
   compact: false,
   stylize: stylizeWithHTML,
@@ -69,6 +72,7 @@ inspect({ a: 1 }, {
 ```
 
 which yields this ugly HTML:
+
 ```html
 {
   a: <span style="color:yellow;">1</span>
@@ -79,7 +83,8 @@ If you want better HTML, the [lightly-documented](https://nodejs.org/api/util.ht
 a function that takes two parameters, a string, and a class name.  The mappings
 from class names to colors is in `inspect.styles`, so start with this:
 
-```js
+```mjs
+import { inspect } from 'node-inspect-extracted';
 function stylizeWithHTML(str, styleType) {
   const style = inspect.styles[styleType];
   if (style !== undefined) {
@@ -87,36 +92,40 @@ function stylizeWithHTML(str, styleType) {
   }
   return str;
 }
+inspect({ a: 1 }, {
+  compact: false,
+  stylize: stylizeWithHTML,
+});
 ```
 
 ## Known Limitations
 
- - If you want your
+- If you want your
    [`Proxy`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/Proxy)
    objects to have their internal object inspected, you may use the `Proxy`
    constructor exported by this project.  That was done mostly for test coverage
    purposes. It is not recommended for production code.
- - [`arguments`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/arguments)
+- [`arguments`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Functions/arguments)
    objects are not treated specially.
    [[bug](https://github.com/hildjj/node-inspect-extracted/issues/1)]
- - Several of the existing type checks (corresponding to Node's
+- Several of the existing type checks (corresponding to Node's
    [`util.types`](https://nodejs.org/api/util.html#util_util_types)) are
    weaker than the ones in Node, which has the freedom to use internal
    capabilities of the runtime.  This means you can fake out the type
    detection to get output different than node.
    [[bug](https://github.com/hildjj/node-inspect-extracted/issues/2)]
- - Objects that have been mangled with `Object.setPrototypeOf`
+- Objects that have been mangled with `Object.setPrototypeOf`
    do not retain their original type information.
    [[bug](https://github.com/hildjj/node-inspect-extracted/issues/3)]
- - `Promise` state is not visible.  All Promises will show up as
+- `Promise` state is not visible.  All Promises will show up as
    `Promise< pending >` no matter what state they are in.
- - `Map` and `Set` iterators will not show their internal state because that
+- `Map` and `Set` iterators will not show their internal state because that
    cannot be done from unprivileged code without modifying the iterator.
    Entry iterators are not distinguished from value iterators.
    [[bug](https://github.com/hildjj/node-inspect-extracted/issues/4)]
- - `WeakMap` and `WeakSet` will not show their contents, because those contents
+- `WeakMap` and `WeakSet` will not show their contents, because those contents
    cannot be iterated over in unprivileged code.
- - Colorful stack traces are not completely accurate with respect to what
+- Colorful stack traces are not completely accurate with respect to what
    modules are Node-internal.  This doesn't matter on the Web.
 
 ## Developing
@@ -129,11 +138,11 @@ Check out NodeJS and this package next to one another:
     npm install -g pnpm
     pnpm install
 
- - `npm start` to build, run all tests and start an auto-refreshing web server
+- `npm start` to build, run all tests and start an auto-refreshing web server
    to watch coverage change.
- - `npm run check` to see if there have been any changes to node that need to be integrated.
- - `npm run check -- -d` to see the diffs with node
- - `npm run check -- -u` to indicate that we have merged the current changes
+- `npm run check` to see if there have been any changes to node that need to be integrated.
+- `npm run check -- -d` to see the diffs with node
+- `npm run check -- -u` to indicate that we have merged the current changes
 
 Tests run mostly against the pre-webpack source at the moment, but there are
 some spot checks for the webpack output.

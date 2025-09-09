@@ -225,7 +225,7 @@ const assert = require('./assert');
 
 let internalUtilInspect = null;
 function lazyInternalUtilInspect() {
-  internalUtilInspect = internalUtilInspect || require('../inspect');
+  internalUtilInspect ||= require('../inspect');
   return internalUtilInspect;
 }
 

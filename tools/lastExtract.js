@@ -3,14 +3,14 @@
 // This file is generated from `node tools/check.js -u`
 // DO NOT MODIFY BY HAND
 module.exports = {
-  time: '2025-07-28T15:34:28.743Z',
+  time: '2025-09-09T23:15:37.982Z',
   files: [
     {
       name: 'test/eslint.config_partial.mjs',
       local: 'test/eslint.config_partial.mjs',
-      sha256: '6b783b4618b964dabb627afe1f1ec55bc935837ed68a879f676ea0801b3e1a0d',
-      mtime: '2025-05-06T15:27:00.570Z',
-      commit: '98df74464fa8524f169999641796477a33b57e05'
+      sha256: '4165b357d12f5c3a672eefe677c56b8dca749bb355b573d204f26f6131dcd893',
+      mtime: '2025-08-16T12:56:09.701Z',
+      commit: '7e0a0fccc1e8c3840314a2a73d9cbd343ca358f3'
     },
     {
       name: 'tools/eslint/eslint-plugin-node-core.js',
@@ -71,79 +71,79 @@ module.exports = {
     {
       name: 'tools/eslint-rules/crypto-check.js',
       local: 'tools/eslint-rules/crypto-check.js',
-      sha256: '683e5088b26b3f282d156ac078cd7977864e21c47cd9074ba6db157dcbbcdc50',
-      mtime: '2023-02-28T15:38:51.296Z',
-      commit: '3ce4cef4e6674b8d32d9718de8c2d0a8882e2d59'
+      sha256: 'c0ba7680522f0a9d1cb50e1feb83e9bedb428606d95c0617442e57c53d3fdaa2',
+      mtime: '2025-08-16T12:56:09.738Z',
+      commit: '324d9fc9d4b3d9446fe3fbc48fb85b195fdf685c'
     },
     {
       name: 'tools/eslint-rules/eslint-check.js',
       local: 'tools/eslint-rules/eslint-check.js',
-      sha256: '5028dff2c089c4da84067b8d10214f4fe9d41c29c25ef53ca569777d3088289b',
-      mtime: '2024-08-01T05:30:18.853Z',
-      commit: '2eff28fb7a93d3f672f80b582f664a7c701569fb'
+      sha256: 'de3ed501dc7fdbc2324bc882c5f75c304b3b5698050f9851dca4a4126c43776b',
+      mtime: '2025-08-16T12:56:09.738Z',
+      commit: '324d9fc9d4b3d9446fe3fbc48fb85b195fdf685c'
     },
     {
       name: 'tools/eslint-rules/inspector-check.js',
       local: 'tools/eslint-rules/inspector-check.js',
-      sha256: 'cd2e68d4634b39f6ab66ed73427d81191b60e7125d4c29cbcf4ecf9376910ab0',
-      mtime: '2023-02-28T15:38:51.296Z',
-      commit: '3ce4cef4e6674b8d32d9718de8c2d0a8882e2d59'
+      sha256: 'd1e5af08fbc66d87492bee2968b7016b2608a7b1703bf55b0344e39774322d92',
+      mtime: '2025-08-16T12:56:09.738Z',
+      commit: '324d9fc9d4b3d9446fe3fbc48fb85b195fdf685c'
     },
     {
       name: 'tools/eslint-rules/lowercase-name-for-primitive.js',
       local: 'tools/eslint-rules/lowercase-name-for-primitive.js',
-      sha256: 'f1089f9828e629d9e4739d29d482b5ea45c63d3d2300ee90bc8d3d8e73266541',
-      mtime: '2023-02-28T15:39:15.295Z',
-      commit: '75dca44c60adac4a13427b3e530430fc3dc1a55b'
+      sha256: 'eb4f26fff682f22d0af6326dd1bd4213749a2ed2878756aee3d77e8bec4e5763',
+      mtime: '2025-08-16T12:56:09.738Z',
+      commit: '324d9fc9d4b3d9446fe3fbc48fb85b195fdf685c'
     },
     {
       name: 'tools/eslint-rules/no-array-destructuring.js',
       local: 'tools/eslint-rules/no-array-destructuring.js',
-      sha256: '3b953057e21194d8eb98effdbee9ad34324850213d66a2c1cdc97a8b6620b60d',
-      mtime: '2024-06-27T02:38:57.588Z',
-      commit: '3c1069bb061c6aec46a64c6c7d2c4cc154c6e374'
+      sha256: '0575edbe8995e7d5f7b342d2b28b36fd7d0d6f72ac506643eaab2beca8c03f75',
+      mtime: '2025-08-16T12:56:09.738Z',
+      commit: '324d9fc9d4b3d9446fe3fbc48fb85b195fdf685c'
     },
     {
       name: 'tools/eslint-rules/no-duplicate-requires.js',
       local: 'tools/eslint-rules/no-duplicate-requires.js',
-      sha256: '70dd93c17135240bdebd45e09ed7c69b7d115c43dc076e4c48873f2dab0abb1d',
-      mtime: '2024-10-17T04:41:42.554Z',
-      commit: '5c22d19f4430fcc2db0e4fb6547165e9973a4b56'
+      sha256: '79ac6739cb6e4245b9449cab8bb1967533b9fdd23fbdf899eb2148557b807422',
+      mtime: '2025-08-16T12:56:09.738Z',
+      commit: '324d9fc9d4b3d9446fe3fbc48fb85b195fdf685c'
     },
     {
       name: 'tools/eslint-rules/no-unescaped-regexp-dot.js',
       local: 'tools/eslint-rules/no-unescaped-regexp-dot.js',
-      sha256: '199ece626ee0b8fbe0642f9cc739ea55a3c16755fd253d7a3eb3093fb65247ab',
-      mtime: '2024-10-17T04:42:54.713Z',
-      commit: '71785889c893a82f335e04a7e81c6ba08546a32e'
+      sha256: '9f61312528e895d65f7bb91339f3fd7c925a4cdc5fed792e6ae94044848d0400',
+      mtime: '2025-08-16T12:56:09.738Z',
+      commit: '324d9fc9d4b3d9446fe3fbc48fb85b195fdf685c'
     },
     {
       name: 'tools/eslint-rules/non-ascii-character.js',
       local: 'tools/eslint-rules/non-ascii-character.js',
-      sha256: '49c7ba5aaf40144f89e4e11e23cba35430c885881280de9f018703b755356a06',
-      mtime: '2024-06-27T02:38:57.588Z',
-      commit: '3c1069bb061c6aec46a64c6c7d2c4cc154c6e374'
+      sha256: 'dde8603a5a6c1cd594b986d848db1a1fa6863608bbb2e0e89d935b47dd2f0d43',
+      mtime: '2025-08-16T12:56:09.738Z',
+      commit: '324d9fc9d4b3d9446fe3fbc48fb85b195fdf685c'
     },
     {
       name: 'tools/eslint-rules/prefer-assert-iferror.js',
       local: 'tools/eslint-rules/prefer-assert-iferror.js',
-      sha256: 'df58bbb03cb4e6656a8a9883899bfce65f4737c573b68d44fadae88b4e4688e5',
-      mtime: '2024-06-27T02:38:57.588Z',
-      commit: '3c1069bb061c6aec46a64c6c7d2c4cc154c6e374'
+      sha256: '8e60312a06a3906b571c4bdfd958ea8d213ab4f3dc63f9a6a2f690d49bd76696',
+      mtime: '2025-08-16T12:56:09.738Z',
+      commit: '324d9fc9d4b3d9446fe3fbc48fb85b195fdf685c'
     },
     {
       name: 'tools/eslint-rules/prefer-assert-methods.js',
       local: 'tools/eslint-rules/prefer-assert-methods.js',
-      sha256: 'e45ef563edb3b769e4f4615a4f01266f8c52bd75f7be914192e8ea08a1cc132e',
-      mtime: '2024-06-27T02:38:57.589Z',
-      commit: '3c1069bb061c6aec46a64c6c7d2c4cc154c6e374'
+      sha256: 'f11debe7e9e9038019c66dc9fee31162873d1d646c69a925cf123c4a71234fad',
+      mtime: '2025-08-16T12:56:09.739Z',
+      commit: '324d9fc9d4b3d9446fe3fbc48fb85b195fdf685c'
     },
     {
       name: 'tools/eslint-rules/prefer-common-mustnotcall.js',
       local: 'tools/eslint-rules/prefer-common-mustnotcall.js',
-      sha256: '160f545890af16b2a8a28f439f747e62e7880326eea246acc7da6f96fca030ae',
-      mtime: '2023-02-28T15:39:15.295Z',
-      commit: '75dca44c60adac4a13427b3e530430fc3dc1a55b'
+      sha256: '9beb174cb27193e4ff61822e16847769361f15bbfa444bf2fb1f2dd2d7f13feb',
+      mtime: '2025-08-16T12:56:09.739Z',
+      commit: '324d9fc9d4b3d9446fe3fbc48fb85b195fdf685c'
     },
     {
       name: 'tools/eslint-rules/prefer-common-mustsucceed.js',
@@ -162,16 +162,16 @@ module.exports = {
     {
       name: 'tools/eslint-rules/prefer-primordials.js',
       local: 'tools/eslint-rules/prefer-primordials.js',
-      sha256: '2a9cc95fd8f3d5158f16760e35c93ac8e9b98b6a5ce765ccdfc2d21999440b70',
-      mtime: '2025-04-19T14:46:57.379Z',
-      commit: '5e5af2947f3ddbdde208a19e8a0d16ebdd123d2c'
+      sha256: '5bf610f28615c39c5921907bfa2579d1f830dce41f87be1cd749141b70219998',
+      mtime: '2025-08-16T12:56:09.739Z',
+      commit: '324d9fc9d4b3d9446fe3fbc48fb85b195fdf685c'
     },
     {
       name: 'tools/eslint-rules/prefer-proto.js',
       local: 'tools/eslint-rules/prefer-proto.js',
-      sha256: 'c4780e62bef7449bc40fae5bafbd139a934ae6cd62319607ad041312701b8a87',
-      mtime: '2024-06-27T02:38:57.589Z',
-      commit: '3c1069bb061c6aec46a64c6c7d2c4cc154c6e374'
+      sha256: 'cfc6f882cabedbaaf9e4adb9f776c6605c376a0330ca2f8ed0798a7fd2ee75e3',
+      mtime: '2025-08-16T12:56:09.739Z',
+      commit: '324d9fc9d4b3d9446fe3fbc48fb85b195fdf685c'
     },
     {
       name: 'tools/eslint-rules/prefer-util-format-errors.js',
@@ -183,23 +183,23 @@ module.exports = {
     {
       name: 'tools/eslint-rules/require-common-first.js',
       local: 'tools/eslint-rules/require-common-first.js',
-      sha256: '6bc72b25e803da7deeb53456611645fd194e24c9146e21007230271cd70f09bb',
-      mtime: '2025-04-19T14:46:57.379Z',
-      commit: '48c75bc02b24445199bc7cd3bc0cb54da369d197'
+      sha256: '624a9545987ab609de699bfc1b37367a3f0429a6735871741b8a601c9759fc4d',
+      mtime: '2025-08-16T12:56:09.739Z',
+      commit: '324d9fc9d4b3d9446fe3fbc48fb85b195fdf685c'
     },
     {
       name: 'tools/eslint-rules/required-modules.js',
       local: 'tools/eslint-rules/required-modules.js',
-      sha256: 'bddcdee0d545603b4af23ca96fdf8e75d7d484c19432de000669613232e653f7',
-      mtime: '2024-06-27T02:38:57.589Z',
-      commit: '7e6d92c485cbffdb7bec9cd6d57c824bda8a5913'
+      sha256: '8b33b2863d4bd73f943c4f40caf264993adb6d6a7381dc1658a36cc51f186215',
+      mtime: '2025-08-16T12:56:09.739Z',
+      commit: '324d9fc9d4b3d9446fe3fbc48fb85b195fdf685c'
     },
     {
       name: 'tools/eslint-rules/rules-utils.js',
       local: 'tools/eslint-rules/rules-utils.js',
-      sha256: '4b1b0da125c0c4756f4d4c6ffbf299e5677bc6574fe491ba177ed8c4381758eb',
-      mtime: '2024-10-17T04:41:42.555Z',
-      commit: '574f2dd517a0dbd2e85f8db067cc15822c772e85'
+      sha256: '791ceca24e0bf256ed91b636a6c8af294eb686d5c59020226d174d1558f04255',
+      mtime: '2025-08-16T12:56:09.739Z',
+      commit: '324d9fc9d4b3d9446fe3fbc48fb85b195fdf685c'
     },
     {
       name: 'tools/eslint-rules/set-proto-to-null-in-object.js',
@@ -211,23 +211,23 @@ module.exports = {
     {
       name: 'eslint.config.mjs',
       local: 'eslint.config.mjs',
-      sha256: '59faccb52f5cfb9fa88ab7394b85922d68657478c16b4ebe9ee5ba9c52697177',
-      mtime: '2025-07-28T13:04:39.217Z',
-      commit: '191396260c122e341009f4f4be04baf4b10e666f'
+      sha256: 'a467b9f29fe62b3fc69794c52eeff9e946537a2948e204cc6c09bc59575a182f',
+      mtime: '2025-08-16T12:56:09.658Z',
+      commit: '324d9fc9d4b3d9446fe3fbc48fb85b195fdf685c'
     },
     {
       name: 'lib/internal/per_context/primordials.js',
       local: 'src/primordials.js',
-      sha256: 'd8963f5cf16674c66193ed9203d7b8f00f369bbc53de960c161f9e59d36d0d77',
-      mtime: '2025-04-20T18:01:24.175Z',
-      commit: '7c58645aca2b53d15dbf698efa43cf934a436d91'
+      sha256: '82088f5d14a85a81b3165a330b2fb9efe9ace88be7d20d4528f68c2def47ecbd',
+      mtime: '2025-08-16T12:56:09.673Z',
+      commit: '324d9fc9d4b3d9446fe3fbc48fb85b195fdf685c'
     },
     {
       name: 'typings/primordials.d.ts',
       local: 'src/primordials.d.ts',
-      sha256: '4514fcbfb3d7ef7d3f7f0385996cffaecbe1ed119526c7da1b93d16d4c388ef0',
-      mtime: '2025-07-28T13:04:35.336Z',
-      commit: '17df800b90df9c0da05c9fe4bb15c754d7eb827b'
+      sha256: 'edecfb9378a7852fc0e555b229a1814ce1f26ddc48511679cd0c6da9891d1585',
+      mtime: '2025-08-16T12:56:34.553Z',
+      commit: '76bc4d659bb04f2c7b2cf661fc52083934737760'
     },
     {
       name: 'test/common/tmpdir.js',
@@ -239,23 +239,23 @@ module.exports = {
     {
       name: 'test/common/index.js',
       local: 'test/common/index.js',
-      mtime: '2025-07-28T13:04:35.288Z',
-      sha256: '61684dff07965c3d9251b6f725c5c4065bad0e49f6de781e84921f4b098db037',
-      commit: '97f80374a6110e5abf1f445a33a5217d7371d39d'
+      mtime: '2025-09-09T19:42:06.163Z',
+      sha256: 'dfa783e38f4f39bd291f86568f8631c7f03ab42867f74137038657dba713fa87',
+      commit: 'f78f47ca5a489e89e3fc499ff61241a88070f008'
     },
     {
       name: 'lib/internal/util/inspect.js',
       local: 'src/inspect.js',
-      mtime: '2025-07-28T13:04:35.256Z',
-      sha256: '5102cab8e5b7ded474d30c0bec372fa24369630aaa9c8923e6add01f1ead4b8f',
-      commit: '6f7b89516f3b32c58a2bf6ba262f1963b5bc06ff'
+      mtime: '2025-09-09T19:42:06.150Z',
+      sha256: '9cfa9532bc8fd6ef0c437b3fe9c68123f064c5e6dc3e0418ce51b6b56867acc9',
+      commit: 'b68e0d1ecade321622984e43c6b493ec467b4673'
     },
     {
       name: 'test/parallel/test-util-inspect.js',
       local: 'test/parallel/test-util-inspect.js',
-      sha256: '5e1c547b7f0cae4f8b4782369e9b6912f17ae6a46a56ec24088b88e5f5de7150',
-      mtime: '2025-07-07T11:38:54.041Z',
-      commit: '6f7b89516f3b32c58a2bf6ba262f1963b5bc06ff'
+      sha256: '301f76cb17bcc3125ea99baf779ec3a434ff6906bcd79cec3b29011be6e7b87f',
+      mtime: '2025-09-09T19:42:06.178Z',
+      commit: 'b68e0d1ecade321622984e43c6b493ec467b4673'
     },
     {
       name: 'test/parallel/test-util-inspect-proxy.js',

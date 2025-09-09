@@ -10,11 +10,11 @@ function errorForNode(node) {
 }
 
 const requireInternalErrorsSelector =
- 'VariableDeclarator' +
-   '[init.type="CallExpression"]' +
-   '[init.callee.name="require"]' +
-   '[init.arguments.length=1]' +
-   '[init.arguments.0.value="internal/errors"]';
+  'VariableDeclarator' +
+  '[init.type="CallExpression"]' +
+  '[init.callee.name="require"]' +
+  '[init.arguments.length=1]' +
+  '[init.arguments.0.value="internal/errors"]';
 const codesSelector = requireInternalErrorsSelector + '>*>Property[key.name="codes"]';
 
 module.exports = {

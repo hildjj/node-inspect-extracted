@@ -2,6 +2,8 @@
 
 const primordials = require('./primordials');
 const {
+  AggregateError,
+  AggregateErrorPrototype,
   Array,
   ArrayBuffer,
   ArrayBufferPrototype,
@@ -75,6 +77,8 @@ const {
   ObjectSetPrototypeOf,
   Promise,
   PromisePrototype,
+  RangeError,
+  RangeErrorPrototype,
   ReflectApply,
   ReflectOwnKeys,
   RegExp,
@@ -115,6 +119,8 @@ const {
   SymbolPrototypeValueOf,
   SymbolToPrimitive,
   SymbolToStringTag,
+  TypeError,
+  TypeErrorPrototype,
   TypedArray,
   TypedArrayPrototype,
   TypedArrayPrototypeGetLength,
@@ -212,7 +218,7 @@ function isURL(value) {
 }
 
 function removeInternalUrlContextSymbol(keys) {
-  internalUrlContextSymbols = internalUrlContextSymbols ||
+  internalUrlContextSymbols ||=
     ObjectGetOwnPropertySymbols(new internalUrl.URL('http://user:pass@localhost:8080/?foo=bar#baz'));
   return keys.filter((v) => internalUrlContextSymbols[v] === -1);
 }
@@ -303,7 +309,6 @@ const keyStrRegExp = /^[a-zA-Z_][a-zA-Z_0-9]*$/;
 const numberRegExp = /^(0|[1-9][0-9]*)$/;
 
 const coreModuleRegExp = /^ {4}at (?:[^/\\(]+ \(|)node:(.+):\d+:\d+\)?$/;
-const nodeModulesRegExp = /[/\\]node_modules[/\\](.+?)(?=[/\\])/g;
 
 const classRegExp = /^(\s+[^(]*?)\s*{/;
 // eslint-disable-next-line node-core/no-unescaped-regexp-dot
@@ -694,7 +699,12 @@ const wellKnownPrototypes = new SafeMap()
   .set(RegExpPrototype, { name: 'RegExp', constructor: RegExp })
   .set(DatePrototype, { name: 'Date', constructor: Date })
   .set(DataViewPrototype, { name: 'DataView', constructor: DataView })
+
   .set(ErrorPrototype, { name: 'Error', constructor: Error })
+  .set(AggregateErrorPrototype, { name: 'AggregateError', constructor: AggregateError })
+  .set(RangeErrorPrototype, { name: 'RangeError', constructor: RangeError })
+  .set(TypeErrorPrototype, { name: 'TypeError', constructor: TypeError })
+
   .set(BooleanPrototype, { name: 'Boolean', constructor: Boolean })
   .set(NumberPrototype, { name: 'Number', constructor: Number })
   .set(StringPrototype, { name: 'String', constructor: String })
@@ -1441,7 +1451,7 @@ function improveStack(stack, constructor, name, tag) {
       RegExpPrototypeExec(/^([a-z_A-Z0-9-]*Error)$/, stack);
       fallback = (start?.[1]) || '';
       len = fallback.length;
-      fallback = fallback || 'Error';
+      fallback ||= 'Error';
     }
     const prefix = StringPrototypeSlice(getPrefix(constructor, tag, fallback), 0, -1);
     if (name !== prefix) {
@@ -1473,16 +1483,45 @@ function removeDuplicateErrorKeys(ctx, keys, err, stack) {
 
 function markNodeModules(ctx, line) {
   let tempLine = '';
-  let nodeModule;
-  let pos = 0;
-  while ((nodeModule = nodeModulesRegExp.exec(line)) !== null) {
-    // '/node_modules/'.length === 14
-    tempLine += StringPrototypeSlice(line, pos, nodeModule.index + 14);
-    tempLine += ctx.stylize(nodeModule[1], 'module');
-    pos = nodeModule.index + nodeModule[0].length;
+  let lastPos = 0;
+  let searchFrom = 0;
+
+  while (true) {
+    const nodeModulePosition = StringPrototypeIndexOf(line, 'node_modules', searchFrom);
+    if (nodeModulePosition === -1) {
+      break;
+    }
+
+    // Ensure it's a path segment: must have a path separator before and after
+    const separator = line[nodeModulePosition - 1];
+    const after = line[nodeModulePosition + 12]; // 'node_modules'.length === 12
+
+    if ((after !== '/' && after !== '\\') || (separator !== '/' && separator !== '\\')) {
+      // Not a proper segment; continue searching
+      searchFrom = nodeModulePosition + 1;
+      continue;
+    }
+
+    const moduleStart = nodeModulePosition + 13; // Include trailing separator
+
+    // Append up to and including '/node_modules/'
+    tempLine += StringPrototypeSlice(line, lastPos, moduleStart);
+
+    let moduleEnd = StringPrototypeIndexOf(line, separator, moduleStart);
+    if (line[moduleStart] === '@') {
+      // Namespaced modules have an extra slash: @namespace/package
+      moduleEnd = StringPrototypeIndexOf(line, separator, moduleEnd + 1);
+    }
+
+    const nodeModule = StringPrototypeSlice(line, moduleStart, moduleEnd);
+    tempLine += ctx.stylize(nodeModule, 'module');
+
+    lastPos = moduleEnd;
+    searchFrom = moduleEnd;
   }
-  if (pos !== 0) {
-    line = tempLine + StringPrototypeSlice(line, pos);
+
+  if (lastPos !== 0) {
+    line = tempLine + StringPrototypeSlice(line, lastPos);
   }
   return line;
 }
@@ -2096,7 +2135,7 @@ function formatProperty(ctx, value, recurseTimes, key, type, desc,
                         original = value) {
   let name, str;
   let extra = ' ';
-  desc = desc || ObjectGetOwnPropertyDescriptor(value, key) ||
+  desc ||= ObjectGetOwnPropertyDescriptor(value, key) ||
     { value: value[key], enumerable: true };
   if (desc.value !== undefined) {
     const diff = (ctx.compact !== true || type !== kObjectType) ? 2 : 3;
@@ -2513,7 +2552,9 @@ if (internalBinding('config').hasIntl) {
   /* c8 ignore stop */
 } else {
   /**
-   * Returns the number of columns required to display the given string.
+   * @param {string} str
+   * @param {boolean} [removeControlChars]
+   * @returns {number} number of columns required to display the given string.
    */
   getStringWidth = function getStringWidth(str, removeControlChars = true) {
     let width = 0;
@@ -2536,6 +2577,8 @@ if (internalBinding('config').hasIntl) {
   /**
    * Returns true if the character represented by a given
    * Unicode code point is full-width. Otherwise returns false.
+   * @param {string} code
+   * @returns {boolean}
    */
   const isFullWidthCodePoint = (code) => {
     // Code points are partially derived from:
@@ -2579,6 +2622,8 @@ if (internalBinding('config').hasIntl) {
 
 /**
  * Remove all VT control characters. Use to estimate displayed string width.
+ * @param {string} str
+ * @returns {string}
  */
 function stripVTControlCharacters(str) {
   validateString(str, 'str');
