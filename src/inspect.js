@@ -204,16 +204,15 @@ let internalUrl;
 let internalUrlContextSymbols;
 
 function pathToFileUrlHref(filepath) {
-  // Maintain node 14 compat
-  // internalUrl ??= require('./internal/url');
-  internalUrl = (internalUrl == null) ? require('./internal/url') : internalUrl;
+  // @hildjj: Maintain node 14 compat
+  internalUrl = internalUrl || require('./internal/url');
   return internalUrl.pathToFileURL(filepath).href;
 }
 
 function isURL(value) {
-  // Maintain node 14 compat
+  // @hildjj: Maintain node 14 compat
   // internalUrl ??= require('./internal/url');
-  internalUrl = (internalUrl == null) ? require('./internal/url') : internalUrl;
+  internalUrl = internalUrl || require('./internal/url');
   return typeof value.href === 'string' && value instanceof internalUrl.URL;
 }
 
@@ -1609,10 +1608,8 @@ function formatError(err, constructor, tag, ctx, keys) {
           if (workingDirectory !== undefined) {
             let newLine = markCwd(ctx, line, workingDirectory);
             if (newLine === line) {
-              // Maintain node 14 compat
-              // esmWorkingDirectory ??= pathToFileUrlHref(workingDirectory);
-              esmWorkingDirectory =
-                (esmWorkingDirectory == null) ? pathToFileUrlHref(workingDirectory) : esmWorkingDirectory;
+              // @hildjj Maintain node 14 compat
+              esmWorkingDirectory = esmWorkingDirectory || pathToFileUrlHref(workingDirectory);
               newLine = markCwd(ctx, line, esmWorkingDirectory);
             }
             line = newLine;
