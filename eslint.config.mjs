@@ -185,7 +185,8 @@ export default [
           ignorePattern: '.*',
         },
       }],
-      'logical-assignment-operators': ['error', 'always', { enforceForIfStatements: true }],
+      // @hildjj: Support node 14.
+      'logical-assignment-operators': ['error', 'never'],
       'default-case-last': 'error',
       'dot-notation': 'error',
       'eqeqeq': ['error', 'smart'],

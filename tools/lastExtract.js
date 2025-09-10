@@ -10,287 +10,287 @@ module.exports = {
       local: 'test/eslint.config_partial.mjs',
       sha256: '4165b357d12f5c3a672eefe677c56b8dca749bb355b573d204f26f6131dcd893',
       mtime: '2025-08-16T12:56:09.701Z',
-      commit: '7e0a0fccc1e8c3840314a2a73d9cbd343ca358f3'
+      commit: '7e0a0fccc1e8c3840314a2a73d9cbd343ca358f3',
     },
     {
       name: 'tools/eslint/eslint-plugin-node-core.js',
       local: 'tools/eslint/eslint-plugin-node-core.js',
       sha256: '89557218315efe515737eb0cf5c19524230e8224e65c4f12750d3fe3537fb942',
       mtime: '2024-08-01T05:30:18.853Z',
-      commit: '94c81784422e3da2b4d2af96a1705d7a770ed4ed'
+      commit: '94c81784422e3da2b4d2af96a1705d7a770ed4ed',
     },
     {
       name: 'tools/eslint/eslint.config_partial.mjs',
       local: 'tools/eslint/eslint.config_partial.mjs',
       sha256: '27d3a8d0882e5e0d5f8ab5dd43ba3bf003e0b8622bb3a0a3e05a9997cacdbfea',
       mtime: '2025-04-19T14:46:57.379Z',
-      commit: 'd12ab0287c05d9828bc9addde4a63904147ef282'
+      commit: 'd12ab0287c05d9828bc9addde4a63904147ef282',
     },
     {
       name: 'tools/eslint/eslint.config_utils.mjs',
       local: 'tools/eslint/eslint.config_utils.mjs',
       sha256: '67e7e6e8c4331a7a47f420be91c210128e29451d6809b285508cfdd7d3443337',
       mtime: '2025-04-19T14:46:57.379Z',
-      commit: 'd12ab0287c05d9828bc9addde4a63904147ef282'
+      commit: 'd12ab0287c05d9828bc9addde4a63904147ef282',
     },
     {
       name: 'tools/eslint/package.json',
       local: 'tools/eslint/package.json',
       sha256: '381101f83c01874b89c18274544e2f444785f9aa862266d937f889cef6733bb1',
       mtime: '2025-07-28T13:04:39.242Z',
-      commit: '191396260c122e341009f4f4be04baf4b10e666f'
+      commit: '191396260c122e341009f4f4be04baf4b10e666f',
     },
     {
       name: 'tools/eslint-rules/alphabetize-errors.js',
       local: 'tools/eslint-rules/alphabetize-errors.js',
       sha256: 'ba02bb0b17eb22f64ebecd3cbee4ecd4d60b94687100ede1797bf0be76be2bff',
       mtime: '2024-05-12T17:17:51.567Z',
-      commit: '231548b5cf23a1e7a25d0c323bc5b485e10cbcea'
+      commit: '231548b5cf23a1e7a25d0c323bc5b485e10cbcea',
     },
     {
       name: 'tools/eslint-rules/alphabetize-primordials.js',
       local: 'tools/eslint-rules/alphabetize-primordials.js',
       sha256: '6a04e1b5e1d63298858ab51b01a33e99168d6d915e53c4f5100eed3653f4dbb4',
       mtime: '2024-05-12T17:17:51.567Z',
-      commit: 'a596af0819aeb9d607a722eaaa5a06aa9b22caec'
+      commit: 'a596af0819aeb9d607a722eaaa5a06aa9b22caec',
     },
     {
       name: 'tools/eslint-rules/async-iife-no-unused-result.js',
       local: 'tools/eslint-rules/async-iife-no-unused-result.js',
       sha256: 'cb8aaa10f9bba3feeab0a283954d652a0472bc7e2a77d9a0de671720c41d8362',
       mtime: '2023-02-28T15:38:51.296Z',
-      commit: '3ce4cef4e6674b8d32d9718de8c2d0a8882e2d59'
+      commit: '3ce4cef4e6674b8d32d9718de8c2d0a8882e2d59',
     },
     {
       name: 'tools/eslint-rules/avoid-prototype-pollution.js',
       local: 'tools/eslint-rules/avoid-prototype-pollution.js',
       sha256: 'cd09d1a615b11f00bf259f54844ae508ca198357631f791db33ba9214a42c755',
       mtime: '2024-06-27T02:38:57.588Z',
-      commit: '7e6d92c485cbffdb7bec9cd6d57c824bda8a5913'
+      commit: '7e6d92c485cbffdb7bec9cd6d57c824bda8a5913',
     },
     {
       name: 'tools/eslint-rules/crypto-check.js',
       local: 'tools/eslint-rules/crypto-check.js',
       sha256: 'c0ba7680522f0a9d1cb50e1feb83e9bedb428606d95c0617442e57c53d3fdaa2',
       mtime: '2025-08-16T12:56:09.738Z',
-      commit: '324d9fc9d4b3d9446fe3fbc48fb85b195fdf685c'
+      commit: '324d9fc9d4b3d9446fe3fbc48fb85b195fdf685c',
     },
     {
       name: 'tools/eslint-rules/eslint-check.js',
       local: 'tools/eslint-rules/eslint-check.js',
       sha256: 'de3ed501dc7fdbc2324bc882c5f75c304b3b5698050f9851dca4a4126c43776b',
       mtime: '2025-08-16T12:56:09.738Z',
-      commit: '324d9fc9d4b3d9446fe3fbc48fb85b195fdf685c'
+      commit: '324d9fc9d4b3d9446fe3fbc48fb85b195fdf685c',
     },
     {
       name: 'tools/eslint-rules/inspector-check.js',
       local: 'tools/eslint-rules/inspector-check.js',
       sha256: 'd1e5af08fbc66d87492bee2968b7016b2608a7b1703bf55b0344e39774322d92',
       mtime: '2025-08-16T12:56:09.738Z',
-      commit: '324d9fc9d4b3d9446fe3fbc48fb85b195fdf685c'
+      commit: '324d9fc9d4b3d9446fe3fbc48fb85b195fdf685c',
     },
     {
       name: 'tools/eslint-rules/lowercase-name-for-primitive.js',
       local: 'tools/eslint-rules/lowercase-name-for-primitive.js',
       sha256: 'eb4f26fff682f22d0af6326dd1bd4213749a2ed2878756aee3d77e8bec4e5763',
       mtime: '2025-08-16T12:56:09.738Z',
-      commit: '324d9fc9d4b3d9446fe3fbc48fb85b195fdf685c'
+      commit: '324d9fc9d4b3d9446fe3fbc48fb85b195fdf685c',
     },
     {
       name: 'tools/eslint-rules/no-array-destructuring.js',
       local: 'tools/eslint-rules/no-array-destructuring.js',
       sha256: '0575edbe8995e7d5f7b342d2b28b36fd7d0d6f72ac506643eaab2beca8c03f75',
       mtime: '2025-08-16T12:56:09.738Z',
-      commit: '324d9fc9d4b3d9446fe3fbc48fb85b195fdf685c'
+      commit: '324d9fc9d4b3d9446fe3fbc48fb85b195fdf685c',
     },
     {
       name: 'tools/eslint-rules/no-duplicate-requires.js',
       local: 'tools/eslint-rules/no-duplicate-requires.js',
       sha256: '79ac6739cb6e4245b9449cab8bb1967533b9fdd23fbdf899eb2148557b807422',
       mtime: '2025-08-16T12:56:09.738Z',
-      commit: '324d9fc9d4b3d9446fe3fbc48fb85b195fdf685c'
+      commit: '324d9fc9d4b3d9446fe3fbc48fb85b195fdf685c',
     },
     {
       name: 'tools/eslint-rules/no-unescaped-regexp-dot.js',
       local: 'tools/eslint-rules/no-unescaped-regexp-dot.js',
       sha256: '9f61312528e895d65f7bb91339f3fd7c925a4cdc5fed792e6ae94044848d0400',
       mtime: '2025-08-16T12:56:09.738Z',
-      commit: '324d9fc9d4b3d9446fe3fbc48fb85b195fdf685c'
+      commit: '324d9fc9d4b3d9446fe3fbc48fb85b195fdf685c',
     },
     {
       name: 'tools/eslint-rules/non-ascii-character.js',
       local: 'tools/eslint-rules/non-ascii-character.js',
       sha256: 'dde8603a5a6c1cd594b986d848db1a1fa6863608bbb2e0e89d935b47dd2f0d43',
       mtime: '2025-08-16T12:56:09.738Z',
-      commit: '324d9fc9d4b3d9446fe3fbc48fb85b195fdf685c'
+      commit: '324d9fc9d4b3d9446fe3fbc48fb85b195fdf685c',
     },
     {
       name: 'tools/eslint-rules/prefer-assert-iferror.js',
       local: 'tools/eslint-rules/prefer-assert-iferror.js',
       sha256: '8e60312a06a3906b571c4bdfd958ea8d213ab4f3dc63f9a6a2f690d49bd76696',
       mtime: '2025-08-16T12:56:09.738Z',
-      commit: '324d9fc9d4b3d9446fe3fbc48fb85b195fdf685c'
+      commit: '324d9fc9d4b3d9446fe3fbc48fb85b195fdf685c',
     },
     {
       name: 'tools/eslint-rules/prefer-assert-methods.js',
       local: 'tools/eslint-rules/prefer-assert-methods.js',
       sha256: 'f11debe7e9e9038019c66dc9fee31162873d1d646c69a925cf123c4a71234fad',
       mtime: '2025-08-16T12:56:09.739Z',
-      commit: '324d9fc9d4b3d9446fe3fbc48fb85b195fdf685c'
+      commit: '324d9fc9d4b3d9446fe3fbc48fb85b195fdf685c',
     },
     {
       name: 'tools/eslint-rules/prefer-common-mustnotcall.js',
       local: 'tools/eslint-rules/prefer-common-mustnotcall.js',
       sha256: '9beb174cb27193e4ff61822e16847769361f15bbfa444bf2fb1f2dd2d7f13feb',
       mtime: '2025-08-16T12:56:09.739Z',
-      commit: '324d9fc9d4b3d9446fe3fbc48fb85b195fdf685c'
+      commit: '324d9fc9d4b3d9446fe3fbc48fb85b195fdf685c',
     },
     {
       name: 'tools/eslint-rules/prefer-common-mustsucceed.js',
       local: 'tools/eslint-rules/prefer-common-mustsucceed.js',
       sha256: '133d2fbf69edafe07c212bd1620401f9a899b2ffb4e4b4d4a9338f63e2bbc194',
       mtime: '2024-06-27T02:38:57.589Z',
-      commit: '3c1069bb061c6aec46a64c6c7d2c4cc154c6e374'
+      commit: '3c1069bb061c6aec46a64c6c7d2c4cc154c6e374',
     },
     {
       name: 'tools/eslint-rules/prefer-optional-chaining.js',
       local: 'tools/eslint-rules/prefer-optional-chaining.js',
       sha256: '660dc3cc7770c133737b539ddbaa7d3b950c98e04023c59728ca33d972f89f23',
       mtime: '2024-10-17T04:41:42.555Z',
-      commit: '574f2dd517a0dbd2e85f8db067cc15822c772e85'
+      commit: '574f2dd517a0dbd2e85f8db067cc15822c772e85',
     },
     {
       name: 'tools/eslint-rules/prefer-primordials.js',
       local: 'tools/eslint-rules/prefer-primordials.js',
       sha256: '5bf610f28615c39c5921907bfa2579d1f830dce41f87be1cd749141b70219998',
       mtime: '2025-08-16T12:56:09.739Z',
-      commit: '324d9fc9d4b3d9446fe3fbc48fb85b195fdf685c'
+      commit: '324d9fc9d4b3d9446fe3fbc48fb85b195fdf685c',
     },
     {
       name: 'tools/eslint-rules/prefer-proto.js',
       local: 'tools/eslint-rules/prefer-proto.js',
       sha256: 'cfc6f882cabedbaaf9e4adb9f776c6605c376a0330ca2f8ed0798a7fd2ee75e3',
       mtime: '2025-08-16T12:56:09.739Z',
-      commit: '324d9fc9d4b3d9446fe3fbc48fb85b195fdf685c'
+      commit: '324d9fc9d4b3d9446fe3fbc48fb85b195fdf685c',
     },
     {
       name: 'tools/eslint-rules/prefer-util-format-errors.js',
       local: 'tools/eslint-rules/prefer-util-format-errors.js',
       sha256: '3aeb58a93e7a6ae435bb30e958fbfb3088456b8d3f3ca16b1029fa0caec09d92',
       mtime: '2023-02-28T15:38:51.319Z',
-      commit: '3ce4cef4e6674b8d32d9718de8c2d0a8882e2d59'
+      commit: '3ce4cef4e6674b8d32d9718de8c2d0a8882e2d59',
     },
     {
       name: 'tools/eslint-rules/require-common-first.js',
       local: 'tools/eslint-rules/require-common-first.js',
       sha256: '624a9545987ab609de699bfc1b37367a3f0429a6735871741b8a601c9759fc4d',
       mtime: '2025-08-16T12:56:09.739Z',
-      commit: '324d9fc9d4b3d9446fe3fbc48fb85b195fdf685c'
+      commit: '324d9fc9d4b3d9446fe3fbc48fb85b195fdf685c',
     },
     {
       name: 'tools/eslint-rules/required-modules.js',
       local: 'tools/eslint-rules/required-modules.js',
       sha256: '8b33b2863d4bd73f943c4f40caf264993adb6d6a7381dc1658a36cc51f186215',
       mtime: '2025-08-16T12:56:09.739Z',
-      commit: '324d9fc9d4b3d9446fe3fbc48fb85b195fdf685c'
+      commit: '324d9fc9d4b3d9446fe3fbc48fb85b195fdf685c',
     },
     {
       name: 'tools/eslint-rules/rules-utils.js',
       local: 'tools/eslint-rules/rules-utils.js',
       sha256: '791ceca24e0bf256ed91b636a6c8af294eb686d5c59020226d174d1558f04255',
       mtime: '2025-08-16T12:56:09.739Z',
-      commit: '324d9fc9d4b3d9446fe3fbc48fb85b195fdf685c'
+      commit: '324d9fc9d4b3d9446fe3fbc48fb85b195fdf685c',
     },
     {
       name: 'tools/eslint-rules/set-proto-to-null-in-object.js',
       local: 'tools/eslint-rules/set-proto-to-null-in-object.js',
       sha256: '92f2743f7b92464bba7dc998cdc2b33500f107f09acd71ca13644abbb900d0d3',
       mtime: '2024-06-27T02:38:57.589Z',
-      commit: '3c1069bb061c6aec46a64c6c7d2c4cc154c6e374'
+      commit: '3c1069bb061c6aec46a64c6c7d2c4cc154c6e374',
     },
     {
       name: 'eslint.config.mjs',
       local: 'eslint.config.mjs',
       sha256: 'a467b9f29fe62b3fc69794c52eeff9e946537a2948e204cc6c09bc59575a182f',
       mtime: '2025-08-16T12:56:09.658Z',
-      commit: '324d9fc9d4b3d9446fe3fbc48fb85b195fdf685c'
+      commit: '324d9fc9d4b3d9446fe3fbc48fb85b195fdf685c',
     },
     {
       name: 'lib/internal/per_context/primordials.js',
       local: 'src/primordials.js',
       sha256: '82088f5d14a85a81b3165a330b2fb9efe9ace88be7d20d4528f68c2def47ecbd',
       mtime: '2025-08-16T12:56:09.673Z',
-      commit: '324d9fc9d4b3d9446fe3fbc48fb85b195fdf685c'
+      commit: '324d9fc9d4b3d9446fe3fbc48fb85b195fdf685c',
     },
     {
       name: 'typings/primordials.d.ts',
       local: 'src/primordials.d.ts',
       sha256: 'edecfb9378a7852fc0e555b229a1814ce1f26ddc48511679cd0c6da9891d1585',
       mtime: '2025-08-16T12:56:34.553Z',
-      commit: '76bc4d659bb04f2c7b2cf661fc52083934737760'
+      commit: '76bc4d659bb04f2c7b2cf661fc52083934737760',
     },
     {
       name: 'test/common/tmpdir.js',
       local: 'test/common/tmpdir.js',
       mtime: '2025-06-22T15:05:33.683Z',
       sha256: '32001ed4697fccbe8d7c4b12312731d2d45d9272157c46b07d09d5ceaaf77727',
-      commit: 'a3af644dda43eb0e26f6404d426a723bb0159605'
+      commit: 'a3af644dda43eb0e26f6404d426a723bb0159605',
     },
     {
       name: 'test/common/index.js',
       local: 'test/common/index.js',
       mtime: '2025-09-09T19:42:06.163Z',
       sha256: 'dfa783e38f4f39bd291f86568f8631c7f03ab42867f74137038657dba713fa87',
-      commit: 'f78f47ca5a489e89e3fc499ff61241a88070f008'
+      commit: 'f78f47ca5a489e89e3fc499ff61241a88070f008',
     },
     {
       name: 'lib/internal/util/inspect.js',
       local: 'src/inspect.js',
       mtime: '2025-09-09T19:42:06.150Z',
       sha256: '9cfa9532bc8fd6ef0c437b3fe9c68123f064c5e6dc3e0418ce51b6b56867acc9',
-      commit: 'b68e0d1ecade321622984e43c6b493ec467b4673'
+      commit: 'b68e0d1ecade321622984e43c6b493ec467b4673',
     },
     {
       name: 'test/parallel/test-util-inspect.js',
       local: 'test/parallel/test-util-inspect.js',
       sha256: '301f76cb17bcc3125ea99baf779ec3a434ff6906bcd79cec3b29011be6e7b87f',
       mtime: '2025-09-09T19:42:06.178Z',
-      commit: 'b68e0d1ecade321622984e43c6b493ec467b4673'
+      commit: 'b68e0d1ecade321622984e43c6b493ec467b4673',
     },
     {
       name: 'test/parallel/test-util-inspect-proxy.js',
       local: 'test/parallel/test-util-inspect-proxy.js',
       sha256: '107995a0ded386c645839ac1cb8643974efbe01812e89e54ac8290e4f6c539f5',
       mtime: '2022-06-10T20:30:05.180Z',
-      commit: '285ef308777e040ffab54566dbd4ebc545a32ac8'
+      commit: '285ef308777e040ffab54566dbd4ebc545a32ac8',
     },
     {
       name: 'test/parallel/test-util-inspect-getters-accessing-this.js',
       local: 'test/parallel/test-util-inspect-getters-accessing-this.js',
       sha256: '7e8f55a19321e2dfeca5868d4ad498371894debed6d8bcf5b2a3af9c3126ce8f',
       mtime: '2021-05-03T22:16:13.727Z',
-      commit: 'ec5b06eae385700391ea1e6e56e751978f097212'
+      commit: 'ec5b06eae385700391ea1e6e56e751978f097212',
     },
     {
       name: 'test/parallel/test-util-inspect-namespace.js',
       local: 'test/parallel/test-util-inspect-namespace.js',
       sha256: 'd52207cf84432e47ce7264d12537dd856be8a71579169df21c84464448d1d932',
       mtime: '2021-02-05T17:22:35.532Z',
-      commit: 'f78da00ab7dd1341d8a2e7b4447fdc1c7b75913d'
+      commit: 'f78da00ab7dd1341d8a2e7b4447fdc1c7b75913d',
     },
     {
       name: 'test/parallel/test-util-inspect-long-running.js',
       local: 'test/parallel/test-util-inspect-long-running.js',
       sha256: '40992d84e063d8a40e966a69ca5cb8357a39728344ae125f6eb337e82386881d',
       mtime: '2020-12-03T20:22:01.782Z',
-      commit: 'eb61127c48ba59e52d7cea293ad80fa54000939c'
+      commit: 'eb61127c48ba59e52d7cea293ad80fa54000939c',
     },
     {
       name: 'test/parallel/test-util-format.js',
       local: 'test/parallel/test-util-format.js',
       sha256: '205b828bac38c66c398e1d7b041f41a2b640a1db13366d608c3e15165465de98',
       mtime: '2025-05-06T15:27:00.880Z',
-      commit: '594269fcca24a0ccc7995cd8997eae8110388e09'
-    }
-  ]
+      commit: '594269fcca24a0ccc7995cd8997eae8110388e09',
+    },
+  ],
 };

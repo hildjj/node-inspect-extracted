@@ -307,7 +307,6 @@ function platformTimeout(ms) {
 }
 
 const knownGlobals = new Set([
-  AbortController,
   atob,
   btoa,
   clearImmediate,
@@ -318,9 +317,14 @@ const knownGlobals = new Set([
   setInterval,
   setTimeout,
   queueMicrotask,
-  structuredClone,
-  fetch,
 ]);
+
+// @hildjj: Support node 14.
+for (const g of ['AbortController', 'fetch', 'structuredClone']) {
+  if (g in globalThis) {
+    knownGlobals.add(globalThis[g]);
+  }
+}
 
 ['gc',
  // The following are assumed to be conditionally available in the

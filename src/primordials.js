@@ -375,7 +375,8 @@ const makeSafe = (unsafe, safe) => {
           SymbolIterator in (FunctionPrototypeCall(desc.value, dummy) ?? {})
         ) {
           const createIterator = uncurryThis(desc.value);
-          next ||= uncurryThis(createIterator(dummy).next);
+          // @hildjj: support node 14.
+          next = next || uncurryThis(createIterator(dummy).next);
           const SafeIterator = createSafeIterator(createIterator, next);
           desc.value = function() {
             return new SafeIterator(this);
@@ -762,7 +763,9 @@ primordials._stringPrototypeReplaceAll = (obj, str, newStr) => {
   return obj.replace(new RegExp(str, 'g'), newStr);
 };
 
-primordials.StringPrototypeReplaceAll ||= primordials._stringPrototypeReplaceAll;
+// @hildjj: support node 14.
+primordials.StringPrototypeReplaceAll = primordials.StringPrototypeReplaceAll ||
+  primordials._stringPrototypeReplaceAll;
 
 ObjectSetPrototypeOf(primordials, null);
 ObjectFreeze(primordials);

@@ -218,7 +218,8 @@ function isURL(value) {
 }
 
 function removeInternalUrlContextSymbol(keys) {
-  internalUrlContextSymbols ||=
+  // @hildjj: support node 14.
+  internalUrlContextSymbols = internalUrlContextSymbols ||
     ObjectGetOwnPropertySymbols(new internalUrl.URL('http://user:pass@localhost:8080/?foo=bar#baz'));
   return keys.filter((v) => internalUrlContextSymbols[v] === -1);
 }
@@ -1451,7 +1452,7 @@ function improveStack(stack, constructor, name, tag) {
       RegExpPrototypeExec(/^([a-z_A-Z0-9-]*Error)$/, stack);
       fallback = (start?.[1]) || '';
       len = fallback.length;
-      fallback ||= 'Error';
+      fallback = fallback || 'Error';
     }
     const prefix = StringPrototypeSlice(getPrefix(constructor, tag, fallback), 0, -1);
     if (name !== prefix) {
@@ -2135,7 +2136,8 @@ function formatProperty(ctx, value, recurseTimes, key, type, desc,
                         original = value) {
   let name, str;
   let extra = ' ';
-  desc ||= ObjectGetOwnPropertyDescriptor(value, key) ||
+  // @hildjj: support node 14.
+  desc = desc || ObjectGetOwnPropertyDescriptor(value, key) ||
     { value: value[key], enumerable: true };
   if (desc.value !== undefined) {
     const diff = (ctx.compact !== true || type !== kObjectType) ? 2 : 3;
