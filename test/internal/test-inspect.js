@@ -73,3 +73,12 @@ if (semver.satisfies(process.version, '>=20')) {
     util.inspect({ u }, { customInspect: false, depth: 0 }),
     '{ u: URL {} }');
 }
+
+{
+  const er = new Error('testing markNodeModules');
+  const ers = er.stack.split('\n');
+  ers.splice(1, 0, `    at test (/dir/node_modules2/foo.js:1:1)`);
+  er.stack = ers.join('\n');
+  const res = util.inspect(er, { colors: true });
+  assert.match(res, /node_modules2/);
+}

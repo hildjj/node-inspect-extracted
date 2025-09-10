@@ -60,7 +60,7 @@ module.exports = {
       // eslint-disable-next-line no-restricted-syntax
       throw new Error('Invalid object');
     }
-    if (val.constructor && val.constructor.name) {
+    if (val.constructor?.name) {
       return val.constructor.name;
     }
     const str = ObjectPrototypeToString(val);

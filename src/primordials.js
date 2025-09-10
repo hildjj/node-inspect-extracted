@@ -375,6 +375,7 @@ const makeSafe = (unsafe, safe) => {
           SymbolIterator in (FunctionPrototypeCall(desc.value, dummy) ?? {})
         ) {
           const createIterator = uncurryThis(desc.value);
+          // @hildjj: support node 14.
           next = next || uncurryThis(createIterator(dummy).next);
           const SafeIterator = createSafeIterator(createIterator, next);
           desc.value = function() {
@@ -455,7 +456,7 @@ primordials.SafeWeakRef = makeSafe(
  * Prefer using async functions when possible.
  * @param {Promise<any>} thisPromise
  * @param {(() => void) | undefined | null} onFinally The callback to execute
- *        when the Promise is settled (fulfilled or rejected).
+ *   when the Promise is settled (fulfilled or rejected).
  * @returns {Promise} A Promise for the completion of the callback.
  */
 // primordials.SafePromisePrototypeFinally = (thisPromise, onFinally) =>
@@ -762,8 +763,9 @@ primordials._stringPrototypeReplaceAll = (obj, str, newStr) => {
   return obj.replace(new RegExp(str, 'g'), newStr);
 };
 
-primordials.StringPrototypeReplaceAll =
-  primordials.StringPrototypeReplaceAll || primordials._stringPrototypeReplaceAll;
+// @hildjj: support node 14.
+primordials.StringPrototypeReplaceAll = primordials.StringPrototypeReplaceAll ||
+  primordials._stringPrototypeReplaceAll;
 
 ObjectSetPrototypeOf(primordials, null);
 ObjectFreeze(primordials);

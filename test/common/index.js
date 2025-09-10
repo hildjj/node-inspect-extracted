@@ -32,8 +32,6 @@ const fs = require('fs');
 const path = require('path');
 const { inspect, getCallSites } = require('util');
 const { isMainThread } = require('worker_threads');
-// @hildjj
-// const { isModuleNamespaceObject } = require('util/types');
 
 const tmpdir = require('./tmpdir');
 const bits = ['arm64', 'loong64', 'mips', 'mipsel', 'ppc64', 'riscv64', 's390x', 'x64']
@@ -62,8 +60,16 @@ const hasSQLite = Boolean(process.versions.sqlite);
 
 const hasQuic = hasCrypto && !!process.config.variables.node_quic;
 
-function parseTestFlags(filename = process.argv[1]) {
-  // The copyright notice is relatively big and the flags could come afterwards.
+/**
+ * Parse test metadata from the specified file.
+ * @param {string} filename - The name of the file to parse.
+ * @returns {{
+ *   flags: string[],
+ *   envs: Record<string, string>
+ * }} An object containing the parsed flags and environment variables.
+ */
+function parseTestMetadata(filename = process.argv[1]) {
+  // The copyright notice is relatively big and the metadata could come afterwards.
   const bytesToRead = 1500;
   const buffer = Buffer.allocUnsafe(bytesToRead);
   const fd = fs.openSync(filename, 'r');
@@ -72,19 +78,33 @@ function parseTestFlags(filename = process.argv[1]) {
   const source = buffer.toString('utf8', 0, bytesRead);
 
   const flagStart = source.search(/\/\/ Flags:\s+--/) + 10;
+  let flags = [];
+  if (flagStart !== 9) {
+    let flagEnd = source.indexOf('\n', flagStart);
+    if (source[flagEnd - 1] === '\r') {
+      flagEnd--;
+    }
+    flags = source
+      .substring(flagStart, flagEnd)
+      .split(/\s+/)
+      .filter(Boolean);
+  }
 
-  if (flagStart === 9) {
-    return [];
+  const envStart = source.search(/\/\/ Env:\s+/) + 8;
+  let envs = {};
+  if (envStart !== 7) {
+    let envEnd = source.indexOf('\n', envStart);
+    if (source[envEnd - 1] === '\r') {
+      envEnd--;
+    }
+    const envArray = source
+      .substring(envStart, envEnd)
+      .split(/\s+/)
+      .filter(Boolean);
+    envs = Object.fromEntries(envArray.map((env) => env.split('=')));
   }
-  let flagEnd = source.indexOf('\n', flagStart);
-  // Normalize different EOL.
-  if (source[flagEnd - 1] === '\r') {
-    flagEnd--;
-  }
-  return source
-    .substring(flagStart, flagEnd)
-    .split(/\s+/)
-    .filter(Boolean);
+
+  return { flags, envs };
 }
 
 // Check for flags. Skip this for workers (both, the `cluster` module and
@@ -97,26 +117,39 @@ if (process.argv.length === 2 &&
     hasCrypto &&
     require('cluster').isPrimary &&
     fs.existsSync(process.argv[1])) {
-  const flags = parseTestFlags();
-  for (const flag of flags) {
-    if (!process.execArgv.includes(flag) &&
-        // If the binary is build without `intl` the inspect option is
-        // invalid. The test itself should handle this case.
-        (process.features.inspector || !flag.startsWith('--inspect'))) {
-      console.log(
-        'NOTE: The test started as a child_process using these flags:',
-        inspect(flags),
-        'Use NODE_SKIP_FLAG_CHECK to run the test with the original flags.',
-      );
-      const { spawnSync } = require('child_process');
-      const args = [...flags, ...process.execArgv, ...process.argv.slice(1)];
-      const options = { encoding: 'utf8', stdio: 'inherit' };
-      const result = spawnSync(process.execPath, args, options);
-      if (result.signal) {
-        process.kill(0, result.signal);
-      } else {
-        process.exit(result.status);
-      }
+  const { flags, envs } = parseTestMetadata();
+
+  const flagsTriggerSpawn = flags.some((flag) => (
+    !process.execArgv.includes(flag) &&
+    // If the binary is build without `intl` the inspect option is
+    // invalid. The test itself should handle this case.
+    (process.features.inspector || !flag.startsWith('--inspect'))
+  ));
+  const envsTriggerSpawn = Object.keys(envs).some((key) => process.env[key] !== envs[key]);
+
+  if (flagsTriggerSpawn || envsTriggerSpawn) {
+    console.log(
+      'NOTE: The test started as a child_process using these flags:',
+      inspect(flags),
+      'And these environment variables:',
+      inspect(envs),
+      'Use NODE_SKIP_FLAG_CHECK to run the test with the original flags.',
+    );
+    const { spawnSync } = require('child_process');
+    const args = [...flags, ...process.execArgv, ...process.argv.slice(1)];
+    const options = {
+      encoding: 'utf8',
+      stdio: 'inherit',
+      env: {
+        ...process.env,
+        ...envs,
+      },
+    };
+    const result = spawnSync(process.execPath, args, options);
+    if (result.signal) {
+      process.kill(0, result.signal);
+    } else {
+      process.exit(result.status);
     }
   }
 }
@@ -130,7 +163,7 @@ const isMacOS = process.platform === 'darwin';
 const isASan = process.config.variables.asan === 1;
 const isRiscv64 = process.arch === 'riscv64';
 const isDebug = process.features.debug;
-const isPi = () => {
+function isPi() {
   try {
     // Normal Raspberry Pi detection is to find the `Raspberry Pi` string in
     // the contents of `/sys/firmware/devicetree/base/model` but that doesn't
@@ -142,9 +175,10 @@ const isPi = () => {
   } catch {
     return false;
   }
-};
+}
 
 // When using high concurrency or in the CI we need much more time for each connection attempt
+// @hildjj
 // net.setDefaultAutoSelectFamilyAttemptTimeout(platformTimeout(net.getDefaultAutoSelectFamilyAttemptTimeout() * 10));
 // const defaultAutoSelectFamilyAttemptTimeout = net.getDefaultAutoSelectFamilyAttemptTimeout();
 
@@ -285,12 +319,14 @@ const knownGlobals = new Set([
   queueMicrotask,
 ]);
 
-['gc',
-  // hildjj: The following aren't in node 14:
- 'AbortController',
- 'structuredClone',
- 'fetch',
+// @hildjj: Support node 14.
+for (const g of ['AbortController', 'fetch', 'structuredClone']) {
+  if (g in globalThis) {
+    knownGlobals.add(globalThis[g]);
+  }
+}
 
+['gc',
  // The following are assumed to be conditionally available in the
  // global object currently. They can likely be added to the fixed
  // set of known globals, however.
@@ -329,16 +365,10 @@ const knownGlobals = new Set([
 });
 
 if (hasCrypto) {
-  [
-    'crypto',
-    'Crypto',
-    'CryptoKey',
-    'SubtleCrypto',
-  ].forEach((i) => {
-    if (globalThis[i] !== undefined) {
-      knownGlobals.add(globalThis[i]);
-    }
-  });
+  knownGlobals.add(globalThis.crypto);
+  knownGlobals.add(globalThis.Crypto);
+  knownGlobals.add(globalThis.CryptoKey);
+  knownGlobals.add(globalThis.SubtleCrypto);
 }
 
 function allowGlobals(...allowlist) {
@@ -715,17 +745,13 @@ function getArrayBufferViews(buf) {
     Uint16Array,
     Int32Array,
     Uint32Array,
+    Float16Array,
     Float32Array,
     Float64Array,
     BigInt64Array,
     BigUint64Array,
     DataView,
   ];
-  if ('Float16Array' in global) {
-    // Avoid compilation error
-    // eslint-disable-next-line dot-notation
-    arrayBufferViews.push(global['Float16Array']);
-  }
 
   for (const type of arrayBufferViews) {
     const { BYTES_PER_ELEMENT = 1 } = type;
@@ -843,7 +869,7 @@ function spawnPromisified(...args) {
  * values on tests which are skipped on Windows.
  * This function is meant to be used for tagged template strings.
  * @returns {[string, object | undefined]} An array that can be passed as
- *                                         arguments to `exec` or `execSync`.
+ *   arguments to `exec` or `execSync`.
  */
 function escapePOSIXShell(cmdParts, ...args) {
   if (common.isWindows) {
@@ -896,6 +922,7 @@ const common = {
   buildType,
   canCreateSymLink,
   childShouldThrowAndAbort,
+  // @hildjj
   // defaultAutoSelectFamilyAttemptTimeout,
   escapePOSIXShell,
   expectsError,
@@ -912,9 +939,9 @@ const common = {
   invalidArgTypeHelper,
   isAlive,
   isASan,
+  isDebug,
   isFreeBSD,
   isLinux,
-  isMainThread,
   isOpenBSD,
   isMacOS,
   isPi,
@@ -928,7 +955,7 @@ const common = {
   mustSucceed,
   nodeProcessAborted,
   PIPE,
-  parseTestFlags,
+  parseTestMetadata,
   platformTimeout,
   printSkipMessage,
   pwdCommand,
@@ -975,7 +1002,7 @@ const common = {
   },
 
   // On IBMi, process.platform and os.platform() both return 'aix',
-  // when built with Python versions earlier than 3.9
+  // when built with Python versions earlier than 3.9.
   // It is not enough to differentiate between IBMi and real AIX system.
   get isAIX() {
     return require('os').type() === 'AIX';

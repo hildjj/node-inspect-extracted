@@ -93,6 +93,12 @@ export default [
   {
     files: ['**/*.{js,cjs}'],
     languageOptions: {
+      // Specific to node-inspect-extracted
+      globals: {
+        require: 'readonly',
+        module: 'readonly',
+        __dirname: 'readonly',
+      },
       // The default is `commonjs` but it's not supported by the Babel parser.
       sourceType: 'script',
     },
@@ -123,11 +129,6 @@ export default [
   {
     languageOptions: {
       globals: {
-        // Locally need these three:
-        require: 'readonly',
-        module: 'readonly',
-        __dirname: 'readonly',
-
         AsyncDisposableStack: 'readonly',
         ByteLengthQueuingStrategy: 'readonly',
         CompressionStream: 'readonly',
@@ -184,7 +185,8 @@ export default [
           ignorePattern: '.*',
         },
       }],
-      // 'logical-assignment-operators': ['error', 'always', { enforceForIfStatements: true }],
+      // @hildjj: Support node 14.
+      'logical-assignment-operators': ['error', 'never'],
       'default-case-last': 'error',
       'dot-notation': 'error',
       'eqeqeq': ['error', 'smart'],
@@ -270,17 +272,21 @@ export default [
       // ESLint recommended rules that we disable.
       'no-inner-declarations': 'off',
 
-      // JSDoc recommended rules that we disable.
+      // JSDoc rules.
       'jsdoc/require-jsdoc': 'off',
       'jsdoc/require-param-description': 'off',
-      'jsdoc/newline-after-description': 'off',
       'jsdoc/require-returns-description': 'off',
-      'jsdoc/valid-types': 'off',
-      'jsdoc/no-defaults': 'off',
+      'jsdoc/valid-types': 'error',
+      'jsdoc/no-defaults': 'error',
       'jsdoc/no-undefined-types': 'off',
       'jsdoc/require-param': 'off',
-      'jsdoc/check-tag-names': 'off',
-      'jsdoc/require-returns': 'off',
+      'jsdoc/check-tag-names': 'error',
+      'jsdoc/require-returns': 'error',
+      'jsdoc/check-line-alignment': ['error', 'any', {
+        tags: ['param', 'property', 'returns', 'file'],
+        wrapIndent: '  ',
+      }],
+      'jsdoc/check-alignment': 'error',
 
       // Stylistic rules.
       '@stylistic/js/arrow-parens': 'error',
@@ -354,7 +360,7 @@ export default [
       'node-core/no-unescaped-regexp-dot': 'error',
       'node-core/no-duplicate-requires': 'error',
       'node-core/prefer-proto': 'error',
-      // 'node-core/prefer-optional-chaining': 'error',
+      'node-core/prefer-optional-chaining': 'error',
     },
   },
   // #endregion
@@ -369,6 +375,12 @@ export default [
   {
     files: ['**/*.md/*.{js,cjs}'],
     languageOptions: {
+      // Specific to node-inspect-extracted:
+      globals: {
+        require: 'readonly',
+        console: 'readonly',
+      },
+
       parserOptions: {
         ecmaFeatures: { impliedStrict: true },
       },
@@ -382,6 +394,11 @@ export default [
       'doc/api/packages.md/*.js',
     ],
     languageOptions: {
+      // Specific to node-inspect-extracted:
+      globals: {
+        console: 'readonly',
+      },
+
       sourceType: 'module',
     },
     rules: { 'no-restricted-globals': [
@@ -424,27 +441,4 @@ export default [
   ...testConfig,
   ...toolsConfig,
   // #endregion
-
-  // Local config
-  {
-    files: [
-      'tools/lastExtract.js',
-    ],
-    rules: {
-      'max-len': 'off',
-      '@stylistic/js/comma-dangle': 'off',
-    },
-  },
-  {
-    files: [
-      'README.md/*.js',
-    ],
-    languageOptions: {
-      sourceType: 'module',
-    },
-    rules: {
-      'no-undef': 'off',
-      'no-unused-vars': 'off',
-    },
-  },
 ];

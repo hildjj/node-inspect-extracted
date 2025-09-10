@@ -1,5 +1,5 @@
 /**
- * @fileoverview Look for unescaped "literal" dots in regular expressions
+ * @file Look for unescaped "literal" dots in regular expressions
  * @author Brian White
  */
 'use strict';
@@ -42,7 +42,8 @@ module.exports = {
               break;
             case ']':
               if (!escaping) {
-                inCharClass &&= false;
+                // @hildjj: support node 14.
+                inCharClass = inCharClass && false;
               } else {
                 escaping = false;
               }
@@ -62,7 +63,8 @@ module.exports = {
               }
               break;
             default:
-              escaping &&= false;
+              // @hildjj: support node 14.
+              escaping = escaping && false;
           }
         }
       }
