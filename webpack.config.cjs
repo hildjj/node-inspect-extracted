@@ -2,19 +2,9 @@
 
 const path = require('path');
 
-module.exports = {
+const base = {
   entry: './src/inspect.js',
   mode: 'production',
-  output: {
-    // eslint-disable-next-line no-undef
-    path: path.resolve(__dirname, 'dist'),
-    filename: 'inspect.js',
-    library: {
-      type: 'umd',
-      name: 'util',
-    },
-    globalObject: 'this',
-  },
   module: {
     rules: [
       {
@@ -32,3 +22,31 @@ module.exports = {
   },
   // devtool: 'source-map'
 };
+
+// eslint-disable-next-line no-undef
+const dist = path.resolve(__dirname, 'dist');
+
+module.exports = [{
+  ...base,
+  output: {
+    path: dist,
+    filename: 'inspect.js',
+    library: {
+      type: 'umd',
+      name: 'util',
+    },
+    globalObject: 'this',
+  },
+}, {
+  ...base,
+  experiments: {
+    outputModule: true,
+  },
+  output: {
+    path: dist,
+    filename: 'inspect.mjs',
+    library: {
+      type: 'module',
+    },
+  },
+}];
