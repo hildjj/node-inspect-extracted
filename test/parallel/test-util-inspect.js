@@ -122,7 +122,7 @@ assert.strictEqual(util.inspect({}), '{}');
 assert.strictEqual(util.inspect({ a: 1 }), '{ a: 1 }');
 assert.strictEqual(util.inspect({ a: function() {} }), '{ a: [Function: a] }');
 assert.strictEqual(util.inspect({ a: () => {} }), '{ a: [Function: a] }');
-// eslint-disable-next-line func-name-matching
+// eslint-disable-next-line node-core/func-name-matching
 assert.strictEqual(util.inspect({ a: async function abc() {} }),
                    '{ a: [AsyncFunction: abc] }');
 assert.strictEqual(util.inspect({ a: async () => {} }),
@@ -224,7 +224,7 @@ assert.doesNotMatch(
   const dv = new DataView(ab);
 
   assert.strictEqual(ab.byteLength, 42);
-  // hildjj: Detactching DataViews added in node 18
+  // hildjj: Detaching DataViews added in node 18
   if (semver.satisfies(process.version, '>=18')) {
     new MessageChannel().port1.postMessage(ab, [ ab ]);
     assert.strictEqual(ab.byteLength, 0);
@@ -236,10 +236,10 @@ assert.doesNotMatch(
     assert.strictEqual(
       util.inspect(dv).replace(/^\s+/gm, ''),
       ('DataView {\n' +
-      '      [byteLength]: 0,\n' +
-      '      [byteOffset]: undefined,\n' +
-      '      [buffer]: ArrayBuffer { (detached), [byteLength]: 0 }\n' +
-      '    }').replace(/^\s+/gm, ''),
+      '  [byteLength]: 0,\n' +
+      '  [byteOffset]: undefined,\n' +
+      '  [buffer]: ArrayBuffer { (detached), [byteLength]: 0 }\n' +
+      '}').replace(/^\s+/gm, ''),
     );
   }
 }
@@ -760,6 +760,57 @@ assert.strictEqual(util.inspect(-5e-324), '-5e-324');
 
     Error.stackTraceLimit = stackTraceLimit;
   }
+}
+
+{
+  // The `error` and `suppressed` properties of a SuppressedError should be
+  // shown during inspection, same as `cause` and AggregateError's `errors`.
+  const { stackTraceLimit } = Error;
+  Error.stackTraceLimit = 0;
+
+  const disposeError = new Error('dispose error');
+  const bodyError = new Error('body error');
+
+  // @hildjj: SuppressedError new in node 24
+  if (typeof SuppressedError === 'function') {
+    const suppressedError = new SuppressedError(
+      disposeError,
+      bodyError,
+      'An error was suppressed during disposal',
+    );
+
+    assert.strictEqual(
+      util.inspect(suppressedError),
+      '[SuppressedError: An error was suppressed during disposal] ' +
+      '{\n  [error]: [Error: dispose error],\n  [suppressed]: [Error: body error]\n}',
+    );
+
+    // Nested SuppressedErrors (multiple failed disposals) must recurse.
+    const outer = new SuppressedError(
+      new Error('second dispose error'),
+      suppressedError,
+      'outer',
+    );
+    assert.strictEqual(
+      util.inspect(outer),
+      '[SuppressedError: outer] {\n' +
+      '  [error]: [Error: second dispose error],\n' +
+      '  [suppressed]: [SuppressedError: An error was suppressed during disposal] {\n' +
+      '    [error]: [Error: dispose error],\n' +
+      '    [suppressed]: [Error: body error]\n' +
+      '  }\n' +
+      '}',
+    );
+
+    const custom = new Error('No own error/suppressed property');
+    Object.setPrototypeOf(custom, suppressedError);
+    assert.strictEqual(
+      util.inspect(custom),
+      '[SuppressedError: No own error/suppressed property]',
+    );
+  }
+
+  Error.stackTraceLimit = stackTraceLimit;
 }
 
 {
@@ -1542,11 +1593,11 @@ if (typeof Symbol !== 'undefined') {
   assert.strictEqual(util.inspect(new ArraySubclass(1, 2, 3)),
                      'ArraySubclass(3) [ 1, 2, 3 ]');
   assert.strictEqual(util.inspect(new SetSubclass([1, 2, 3])),
-                     'SetSubclass(3) { 1, 2, 3 }');
+                     'SetSubclass(3) [Set] { 1, 2, 3 }');
   assert.strictEqual(util.inspect(new MapSubclass([['foo', 42]])),
-                     "MapSubclass(1) { 'foo' => 42 }");
+                     "MapSubclass(1) [Map] { 'foo' => 42 }");
   assert.strictEqual(util.inspect(new PromiseSubclass(() => {})),
-                     'PromiseSubclass { <pending> }');
+                     'PromiseSubclass [Promise] { <pending> }');
   assert.strictEqual(util.inspect(new SymbolNameClass()),
                      'Symbol(name) {}');
   assert.strictEqual(
@@ -1558,29 +1609,6 @@ if (typeof Symbol !== 'undefined') {
     // TODO: '[ObjectSubclass: null prototype] { foo: 42 }'
     '[Object: null prototype] { foo: 42 }'
   );
-
-  class MiddleErrorPart extends Error {}
-  assert(util.inspect(new MiddleErrorPart('foo')).includes('MiddleErrorPart: foo'));
-
-  class MapClass extends Map {}
-  assert.strictEqual(util.inspect(new MapClass([['key', 'value']])),
-                     "MapClass(1) { 'key' => 'value' }");
-
-  class AbcMap extends Map {}
-  assert.strictEqual(util.inspect(new AbcMap([['key', 'value']])),
-                     "AbcMap(1) { 'key' => 'value' }");
-
-  class SetAbc extends Set {}
-  assert.strictEqual(util.inspect(new SetAbc([1, 2, 3])),
-                     'SetAbc(3) { 1, 2, 3 }');
-
-  class FooSet extends Set {}
-  assert.strictEqual(util.inspect(new FooSet([1, 2, 3])),
-                     'FooSet(3) { 1, 2, 3 }');
-
-  class Settings extends Set {}
-  assert.strictEqual(util.inspect(new Settings([1, 2, 3])),
-                     'Settings(3) [Set] { 1, 2, 3 }');
 }
 
 // Empty and circular before depth.
@@ -2742,6 +2770,16 @@ assert.strictEqual(
     '{\n  foo: [Getter/Setter] Set(3) { [ [Object], 2, {} ], ' +
       "'foobar', { x: 1 } },\n  inc: [Getter: NaN]\n}");
 }
+
+// Getter returning a function.
+// https://github.com/nodejs/node/issues/64838
+{
+  const obj = { get foo() { return function bar() {}; } };
+  assert.strictEqual(
+    inspect(obj, { getters: true }),
+    '{ foo: [Getter] [Function: bar] }');
+}
+
 // Property getter throwing an error
 {
   const error = new Error('Oops');
@@ -2822,7 +2860,7 @@ assert.strictEqual(
   }
 }
 
-// Property getter throwing an error with getters that throws recursivly.
+// Property getter throwing an error with getters that throws recursively.
 {
   // TODO(@hildjj): infloop in earlier node versions
   if (semver.satisfies(process.version, '>=22')) {
@@ -3705,20 +3743,18 @@ if (semver.satisfies(process.version, '>=15')) {
       '\x1B[2mdef: \x1B[33m5\x1B[39m\x1B[22m }'
   );
 
-  assert.match(
+  assert.strictEqual(
     inspect(Object.getPrototypeOf(bar), { showHidden: true, getters: true }),
-    new RegExp('^' + RegExp_escape(
-      '<ref *1> Foo [Map] {\n' +
-      '  [constructor]: [class Bar extends Foo] {\n' +
+    '<ref *2> Foo [Map] {\n' +
+    '  [constructor]: <ref *1> [class Bar extends Foo] {\n' +
       '    [length]: 0,\n' +
       // Different order starting in node 16
-      (semver.satisfies(process.version, '>=16') ?
+      ((semver.satisfies(process.version, '>=16') ?
         "    [name]: 'Bar',\n" +
-        '    [prototype]: [Circular *1],\n' :
-        '    [prototype]: [Circular *1],\n' +
-        "    [name]: 'Bar',\n") +
-      '    [Symbol(Symbol.species)]: [Getter: <Inspection threw ' +
-      "(TypeError: Symbol.prototype.toString requires that 'this' be a Symbol") + '.*' + RegExp_escape(')>]\n' +
+        '    [prototype]: [Circular *2],\n' :
+        '    [prototype]: [Circular *2],\n' +
+        "    [name]: 'Bar',\n")) +
+      '    [Symbol(Symbol.species)]: [Getter] [Circular *1]\n' +
       '  },\n' +
       "  [xyz]: [Getter: 'YES!'],\n" +
       '  [Symbol(nodejs.util.inspect.custom)]: [Function: [nodejs.util.inspect.custom]] {\n' +
@@ -3728,7 +3764,6 @@ if (semver.satisfies(process.version, '>=15')) {
       '  [abc]: [Getter: true],\n' +
       '  [def]: [Getter/Setter: false]\n' +
       '}'
-    ) + '$', 's')
   );
 
   assert.strictEqual(
@@ -4246,4 +4281,23 @@ if (semver.satisfies(process.version, '>=22')) {
   assert.strictEqual(inspect(error), `[object Error] {\n  stack: [Getter/Setter],\n  name: [Getter],\n  cause: [Getter]\n}`);
   assert.match(inspect(DOMException.prototype), /^\[object DOMException\] \{/);
   delete Error[Symbol.hasInstance];
+}
+
+{
+  const obj = { a: 'short string', b: [1, 2], c: { d: true } };
+  const expected = "{ a: 'short string', b: [ 1, 2 ], c: { d: true } }";
+  assert.strictEqual(util.inspect(obj, { breakLength: Infinity }), expected);
+}
+
+{
+  class Class {
+    get [Symbol.toStringTag]() {
+      return 'Namespaced.Class';
+    }
+  }
+
+  class DerivedClass extends Class {}
+
+  assert.strictEqual(inspect(new Class()), 'Namespaced.Class {}');
+  assert.strictEqual(inspect(new DerivedClass()), 'DerivedClass [Namespaced.Class] {}');
 }

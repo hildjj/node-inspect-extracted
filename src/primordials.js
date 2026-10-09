@@ -195,6 +195,7 @@ function copyPrototype(src, dest, prefix) {
   'Error',
   'EvalError',
   'FinalizationRegistry',
+  'Float16Array',
   'Float32Array',
   'Float64Array',
   'Function',
