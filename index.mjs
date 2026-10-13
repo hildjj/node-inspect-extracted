@@ -1,4 +1,4 @@
-import util from './dist/inspect.js';
+import util from './dist/inspect.mjs';
 
 export default util;
 
