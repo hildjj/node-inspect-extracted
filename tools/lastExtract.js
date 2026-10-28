@@ -3,7 +3,7 @@
 // This file is generated from `node tools/check.js -u`
 // DO NOT MODIFY BY HAND
 module.exports = {
-  time: '2026-10-09T20:36:56.670Z',
+  time: '2026-10-28T19:21:55.121Z',
   files: [
     {
       name: 'eslint.config.mjs',
@@ -36,9 +36,9 @@ module.exports = {
     {
       name: 'test/common/tmpdir.js',
       local: 'test/common/tmpdir.js',
-      mtime: '2025-06-22T15:05:33.683Z',
-      sha256: '32001ed4697fccbe8d7c4b12312731d2d45d9272157c46b07d09d5ceaaf77727',
-      commit: 'a3af644dda43eb0e26f6404d426a723bb0159605'
+      mtime: '2026-10-28T16:34:09.827Z',
+      sha256: 'b59ceadb44175081bc39f264a2190e07240136483e126337aed5782a4e044ef8',
+      commit: 'cc244131aaeef774effdc94b59a8a2de84a2d262'
     },
     {
       name: 'test/eslint.config_partial.mjs',
@@ -301,9 +301,9 @@ module.exports = {
     {
       name: 'tools/eslint/package.json',
       local: 'tools/eslint/package.json',
-      sha256: '8af2130f9039c2966a9d4db92179f0068c4c2ef868690609b3e47b70b557e610',
-      mtime: '2026-10-09T18:42:03.119Z',
-      commit: '6105b37a3d24347c4664c2dfa14fb3a6b51abe59'
+      sha256: 'f2e7e638cee93ee8b7a6c4093dbc99ce704095aef55f3b51625f9ea9bcb885ad',
+      mtime: '2026-10-28T16:34:09.858Z',
+      commit: '4760c2790477c9cf21939ae2aa2876992f115492'
     },
     {
       name: 'typings/primordials.d.ts',
