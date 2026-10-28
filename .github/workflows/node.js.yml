@@ -10,6 +10,6 @@ jobs:
     with:
       nve: true
       script: ci
-      versions: '[24]'
+      versions: '[26]'
     secrets:
       CODECOV_TOKEN: ${{ secrets.CODECOV_TOKEN }}
