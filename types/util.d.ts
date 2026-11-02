@@ -10,7 +10,7 @@
  * ```
  * @see [source](https://github.com/nodejs/node/blob/v17.6.0/lib/util.js)
  */
-declare module 'node-inspect-extracted' {
+
     export interface InspectOptions {
         /**
          * If set to `true`, getters are going to be
@@ -328,4 +328,3 @@ declare module 'node-inspect-extracted' {
      * **Do not use in production code! Only use during testing.**
      */
     export const Proxy: new <T>(target: T, handler: ProxyHandler<T>) => T;
-}
