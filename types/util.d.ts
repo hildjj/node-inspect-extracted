@@ -1,34 +1,89 @@
-/**
- * The `util` module supports the needs of Node.js internal APIs. Many of the
- * utilities are useful for application and module developers as well. To access
- * it:
- *
- * ```js
- * const util = require('node-inspect-extracted');
- * // or
- * import * as util from 'node-inspect-extracted';
- * ```
- * @see [source](https://github.com/nodejs/node/blob/v17.6.0/lib/util.js)
- */
-declare module 'node-inspect-extracted' {
+declare module "node:util" {
+    export * as types from "node:util/types";
+    export type InspectStyle =
+        | "special"
+        | "number"
+        | "bigint"
+        | "boolean"
+        | "undefined"
+        | "null"
+        | "string"
+        | "symbol"
+        | "date"
+        | "name"
+        | "regexp"
+        | "module";
+    export interface InspectStyles extends Record<InspectStyle, InspectColor | ((value: string) => string)> {
+        regexp: {
+            (value: string): string;
+            colors: InspectColor[];
+        };
+    }
+    export type InspectColorModifier =
+        | "reset"
+        | "bold"
+        | "dim"
+        | "italic"
+        | "underline"
+        | "blink"
+        | "inverse"
+        | "hidden"
+        | "strikethrough"
+        | "doubleunderline";
+    export type InspectColorForeground =
+        | "black"
+        | "red"
+        | "green"
+        | "yellow"
+        | "blue"
+        | "magenta"
+        | "cyan"
+        | "white"
+        | "gray"
+        | "redBright"
+        | "greenBright"
+        | "yellowBright"
+        | "blueBright"
+        | "magentaBright"
+        | "cyanBright"
+        | "whiteBright";
+    export type InspectColorBackground = `bg${Capitalize<InspectColorForeground>}`;
+    export type InspectColor = InspectColorModifier | InspectColorForeground | InspectColorBackground;
+    export interface InspectColors extends Record<InspectColor, [number, number]> {}
     export interface InspectOptions {
         /**
-         * If set to `true`, getters are going to be
-         * inspected as well. If set to `'get'` only getters without setter are going
-         * to be inspected. If set to `'set'` only getters having a corresponding
-         * setter are going to be inspected. This might cause side effects depending on
-         * the getter function.
-         * @default `false`
+         * If `true`, object's non-enumerable symbols and properties are included in the formatted result.
+         * `WeakMap` and `WeakSet` entries are also included as well as user defined prototype properties (excluding method properties).
+         * @default false
          */
-        getters?: 'get' | 'set' | boolean | undefined;
         showHidden?: boolean | undefined;
         /**
+         * Specifies the number of times to recurse while formatting object.
+         * This is useful for inspecting large objects.
+         * To recurse up to the maximum call stack size pass `Infinity` or `null`.
          * @default 2
          */
         depth?: number | null | undefined;
+        /**
+         * If `true`, the output is styled with ANSI color codes. Colors are customizable.
+         */
         colors?: boolean | undefined;
+        /**
+         * If `false`, `[util.inspect.custom](depth, opts, inspect)` functions are not invoked.
+         * @default true
+         */
         customInspect?: boolean | undefined;
+        /**
+         * If `true`, `Proxy` inspection includes the target and handler objects.
+         * @default false
+         */
         showProxy?: boolean | undefined;
+        /**
+         * Specifies the maximum number of `Array`, `TypedArray`, `WeakMap`, and `WeakSet` elements
+         * to include when formatting. Set to `null` or `Infinity` to show all elements.
+         * Set to `0` or negative to show no elements.
+         * @default 100
+         */
         maxArrayLength?: number | null | undefined;
         /**
          * Specifies the maximum number of characters to
@@ -37,6 +92,12 @@ declare module 'node-inspect-extracted' {
          * @default 10000
          */
         maxStringLength?: number | null | undefined;
+        /**
+         * The length at which input values are split across multiple lines.
+         * Set to `Infinity` to format the input as a single line
+         * (in combination with `compact` set to `true` or any number >= `1`).
+         * @default 80
+         */
         breakLength?: number | undefined;
         /**
          * Setting this to `false` causes each object key
@@ -46,27 +107,118 @@ declare module 'node-inspect-extracted' {
          * `breakLength`. Short array elements are also grouped together. Note that no
          * text will be reduced below 16 characters, no matter the `breakLength` size.
          * For more information, see the example below.
-         * @default `true`
+         * @default true
          */
         compact?: boolean | number | undefined;
+        /**
+         * If set to `true` or a function, all properties of an object, and `Set` and `Map`
+         * entries are sorted in the resulting string.
+         * If set to `true` the default sort is used.
+         * If set to a function, it is used as a compare function.
+         */
         sorted?: boolean | ((a: string, b: string) => number) | undefined;
+        /**
+         * If set to `true`, getters are going to be
+         * inspected as well. If set to `'get'` only getters without setter are going
+         * to be inspected. If set to `'set'` only getters having a corresponding
+         * setter are going to be inspected. This might cause side effects depending on
+         * the getter function.
+         * @default false
+         */
+        getters?: "get" | "set" | boolean | undefined;
+        /**
+         * If set to `true`, an underscore is used to separate every three digits in all bigints and numbers.
+         * @default false
+         */
         numericSeparator?: boolean | undefined;
     }
-
-    // Not exposed from node's `util` package.
-    // export const inspectDefaultOptions: Required<InspectOptions>;
-
-    export type Style = 'special' | 'number' | 'bigint' | 'boolean' | 'undefined' | 'null' | 'string' | 'symbol' | 'date' | 'regexp' | 'module';
-    export type CustomInspectFunction = (depth: number, options: InspectOptionsStylized) => string;
-    export interface InspectOptionsStylized extends InspectOptions {
-      /**
-       * Write your own function for adding color to the output, or use one of the built-in stylize* functions.
-       */
-        stylize(text: string, styleType: Style): string;
+    export interface InspectContext extends Required<InspectOptions> {
+        stylize(text: string, styleType: InspectStyle): string;
     }
+    import _inspect = inspect;
+    export interface Inspectable {
+        [inspect.custom](depth: number, options: InspectContext, inspect: typeof _inspect): any;
+    }
+    export interface CallSiteObject {
+        /**
+         * Returns the name of the function associated with this call site.
+         */
+        functionName: string;
+        /**
+         * Returns the name of the resource that contains the script for the
+         * function for this call site.
+         */
+        scriptName: string;
+        /**
+         * Returns the unique id of the script, as in Chrome DevTools protocol
+         * [`Runtime.ScriptId`](https://chromedevtools.github.io/devtools-protocol/1-3/Runtime/#type-ScriptId).
+         * @since v22.14.0
+         */
+        scriptId: string;
+        /**
+         * Returns the number, 1-based, of the line for the associate function call.
+         */
+        lineNumber: number;
+        /**
+         * Returns the 1-based column offset on the line for the associated function call.
+         */
+        columnNumber: number;
+    }
+    export type DiffEntry = [operation: -1 | 0 | 1, value: string];
+    /**
+     * `util.diff()` compares two string or array values and returns an array of difference entries.
+     * It uses the Myers diff algorithm to compute minimal differences, which is the same algorithm
+     * used internally by assertion error messages.
+     *
+     * If the values are equal, an empty array is returned.
+     *
+     * ```js
+     * const { diff } = require('node:util');
+     *
+     * // Comparing strings
+     * const actualString = '12345678';
+     * const expectedString = '12!!5!7!';
+     * console.log(diff(actualString, expectedString));
+     * // [
+     * //   [0, '1'],
+     * //   [0, '2'],
+     * //   [1, '3'],
+     * //   [1, '4'],
+     * //   [-1, '!'],
+     * //   [-1, '!'],
+     * //   [0, '5'],
+     * //   [1, '6'],
+     * //   [-1, '!'],
+     * //   [0, '7'],
+     * //   [1, '8'],
+     * //   [-1, '!'],
+     * // ]
+     * // Comparing arrays
+     * const actualArray = ['1', '2', '3'];
+     * const expectedArray = ['1', '3', '4'];
+     * console.log(diff(actualArray, expectedArray));
+     * // [
+     * //   [0, '1'],
+     * //   [1, '2'],
+     * //   [0, '3'],
+     * //   [-1, '4'],
+     * // ]
+     * // Equal values return empty array
+     * console.log(diff('same', 'same'));
+     * // []
+     * ```
+     * @since v22.15.0
+     * @experimental
+     * @param actual The first value to compare
+     * @param expected The second value to compare
+     * @returns An array of difference entries. Each entry is an array with two elements:
+     * * Index 0: `number` Operation code: `-1` for delete, `0` for no-op/unchanged, `1` for insert
+     * * Index 1: `string` The value associated with the operation
+     */
+    export function diff(actual: string | readonly string[], expected: string | readonly string[]): DiffEntry[];
     /**
      * The `util.format()` method returns a formatted string using the first argument
-     * as a `printf`\-like format string which can contain zero or more format
+     * as a `printf`-like format string which can contain zero or more format
      * specifiers. Each specifier is replaced with the converted value from the
      * corresponding argument. Supported specifiers are:
      *
@@ -77,7 +229,7 @@ declare module 'node-inspect-extracted' {
      * // Returns: 'foo:%s'
      * ```
      *
-     * Values that are not part of the format string are formatted using`util.inspect()` if their type is not `string`.
+     * Values that are not part of the format string are formatted using `util.inspect()` if their type is not `string`.
      *
      * If there are more arguments passed to the `util.format()` method than the
      * number of specifiers, the extra arguments are concatenated to the returned
@@ -88,7 +240,7 @@ declare module 'node-inspect-extracted' {
      * // Returns: 'foo:bar baz'
      * ```
      *
-     * If the first argument does not contain a valid format specifier, `util.format()`returns a string that is the concatenation of all arguments separated by spaces:
+     * If the first argument does not contain a valid format specifier, `util.format()` returns a string that is the concatenation of all arguments separated by spaces:
      *
      * ```js
      * util.format(1, 2, 3);
@@ -126,8 +278,9 @@ declare module 'node-inspect-extracted' {
      * The `util.inspect()` method returns a string representation of `object` that is
      * intended for debugging. The output of `util.inspect` may change at any time
      * and should not be depended upon programmatically. Additional `options` may be
-     * passed that alter the result.`util.inspect()` will use the constructor's name and/or `@@toStringTag` to make
-     * an identifiable tag for an inspected value.
+     * passed that alter the result.
+     * `util.inspect()` will use the constructor's name and/or `Symbol.toStringTag`
+     * property to make an identifiable tag for an inspected value.
      *
      * ```js
      * class Foo {
@@ -148,7 +301,7 @@ declare module 'node-inspect-extracted' {
      * Circular references point to their anchor by using a reference index:
      *
      * ```js
-     * const { inspect } = require('util');
+     * import { inspect } from 'node:util';
      *
      * const obj = {};
      * obj.a = [obj];
@@ -166,7 +319,7 @@ declare module 'node-inspect-extracted' {
      * The following example inspects all properties of the `util` object:
      *
      * ```js
-     * const util = require('util');
+     * import util from 'node:util';
      *
      * console.log(util.inspect(util, { showHidden: true, depth: null }));
      * ```
@@ -174,7 +327,7 @@ declare module 'node-inspect-extracted' {
      * The following example highlights the effect of the `compact` option:
      *
      * ```js
-     * const util = require('util');
+     * import { inspect } from 'node:util';
      *
      * const o = {
      *   a: [1, 2, [[
@@ -182,9 +335,9 @@ declare module 'node-inspect-extracted' {
      *       'eiusmod \ntempor incididunt ut labore et dolore magna aliqua.',
      *     'test',
      *     'foo']], 4],
-     *   b: new Map([['za', 1], ['zb', 'test']])
+     *   b: new Map([['za', 1], ['zb', 'test']]),
      * };
-     * console.log(util.inspect(o, { compact: true, depth: 5, breakLength: 80 }));
+     * console.log(inspect(o, { compact: true, depth: 5, breakLength: 80 }));
      *
      * // { a:
      * //   [ 1,
@@ -196,7 +349,7 @@ declare module 'node-inspect-extracted' {
      * //   b: Map(2) { 'za' => 1, 'zb' => 'test' } }
      *
      * // Setting `compact` to false or an integer creates more reader friendly output.
-     * console.log(util.inspect(o, { compact: false, depth: 5, breakLength: 80 }));
+     * console.log(inspect(o, { compact: false, depth: 5, breakLength: 80 }));
      *
      * // {
      * //   a: [
@@ -223,15 +376,14 @@ declare module 'node-inspect-extracted' {
      * // single line.
      * ```
      *
-     * The `showHidden` option allows [`WeakMap`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakMap) and
-     * [`WeakSet`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakSet) entries to be
+     * The `showHidden` option allows `WeakMap` and `WeakSet` entries to be
      * inspected. If there are more entries than `maxArrayLength`, there is no
-     * guarantee which entries are displayed. That means retrieving the same [`WeakSet`](https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/WeakSet) entries twice may
-     * result in different output. Furthermore, entries
+     * guarantee which entries are displayed. That means retrieving the same
+     * `WeakSet` entries twice may result in different output. Furthermore, entries
      * with no remaining strong references may be garbage collected at any time.
      *
      * ```js
-     * const { inspect } = require('util');
+     * import { inspect } from 'node:util';
      *
      * const obj = { a: 1 };
      * const obj2 = { b: 2 };
@@ -245,13 +397,13 @@ declare module 'node-inspect-extracted' {
      * impact the result of `util.inspect()`.
      *
      * ```js
-     * const { inspect } = require('util');
-     * const assert = require('assert');
+     * import { inspect } from 'node:util';
+     * import assert from 'node:assert';
      *
      * const o1 = {
      *   b: [2, 3, 1],
      *   a: '`a` comes before `b`',
-     *   c: new Set([2, 3, 1])
+     *   c: new Set([2, 3, 1]),
      * };
      * console.log(inspect(o1, { sorted: true }));
      * // { a: '`a` comes before `b`', b: [ 2, 3, 1 ], c: Set(3) { 1, 2, 3 } }
@@ -261,16 +413,37 @@ declare module 'node-inspect-extracted' {
      * const o2 = {
      *   c: new Set([2, 1, 3]),
      *   a: '`a` comes before `b`',
-     *   b: [2, 3, 1]
+     *   b: [2, 3, 1],
      * };
      * assert.strict.equal(
      *   inspect(o1, { sorted: true }),
-     *   inspect(o2, { sorted: true })
+     *   inspect(o2, { sorted: true }),
      * );
      * ```
      *
+     * The `numericSeparator` option adds an underscore every three digits to all
+     * numbers.
+     *
+     * ```js
+     * import { inspect } from 'node:util';
+     *
+     * const thousand = 1000;
+     * const million = 1000000;
+     * const bigNumber = 123456789n;
+     * const bigDecimal = 1234.12345;
+     *
+     * console.log(inspect(thousand, { numericSeparator: true }));
+     * // 1_000
+     * console.log(inspect(million, { numericSeparator: true }));
+     * // 1_000_000
+     * console.log(inspect(bigNumber, { numericSeparator: true }));
+     * // 123_456_789n
+     * console.log(inspect(bigDecimal, { numericSeparator: true }));
+     * // 1_234.123_45
+     * ```
+     *
      * `util.inspect()` is a synchronous method intended for debugging. Its maximum
-     * output length is approximately 128 MB. Inputs that result in longer output will
+     * output length is approximately 128 MiB. Inputs that result in longer output will
      * be truncated.
      * @since v0.3.0
      * @param object Any JavaScript primitive or `Object`.
@@ -279,21 +452,13 @@ declare module 'node-inspect-extracted' {
     export function inspect(object: any, showHidden?: boolean, depth?: number | null, color?: boolean): string;
     export function inspect(object: any, options?: InspectOptions): string;
     export namespace inspect {
-        let colors: { [key:number]: number };
-        let styles: {
-            [K in Style]: string;
-        };
-        let defaultOptions: InspectOptions;
-        /**
-         * Allows changing inspect settings from the repl.
-         */
-        let replDefaults: InspectOptions;
-        /**
-         * That can be used to declare custom inspect functions.
-         */
         const custom: unique symbol;
+        let colors: InspectColors;
+        let styles: InspectStyles;
+        let defaultOptions: InspectOptions;
+        let replDefaults: InspectOptions;
     }
-    /**
+   /**
      * Returns `str` with any ANSI escape codes removed.
      *
      * ```js
@@ -303,29 +468,7 @@ declare module 'node-inspect-extracted' {
      * @since v16.11.0
      */
     export function stripVTControlCharacters(str: string): string;
-
-    /**
-     * Colorize `text` with ANSI escapes according to the styleType. Mostly used in inspect() options.
-     *
-     * ```typescript
-     * inspect({ a: 'b' }, { stylize: stylizeWithColor });
-     * ```
-     */
-    export function stylizeWithColor(text: string, styleType: Style): string;
-
-    /**
-     * Colorize `text` using HTML span tags and style. Mostly used in inspect() options.
-     *
-     * ```typescript
-     * inspect({ a: 'b' }, { stylize: stylizeWithHTML });
-     * ```
-     */
-    export function stylizeWithHTML(text: string, styleType: Style): string;
-
-    /**
-     * A wrapper around the built-in Proxy constructor that allows the `showProxy` option of inspect to work.
-     *
-     * **Do not use in production code! Only use during testing.**
-     */
-    export const Proxy: new <T>(target: T, handler: ProxyHandler<T>) => T;
+}
+declare module "util" {
+    export * from "node:util";
 }

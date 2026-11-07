@@ -222,6 +222,9 @@ importers:
       '@stylistic/eslint-plugin-js':
         specifier: ^4.4.1
         version: 4.4.1(eslint@10.14.0(supports-color@10.2.2))
+      '@types/node':
+        specifier: ^26.6.6
+        version: 26.6.6
       babel-loader:
         specifier: ^10.1.1
         version: 10.1.1(@babel/core@8.1.0)(webpack@5.112.2)

@@ -64,6 +64,7 @@
     "@eslint/markdown": "^8.0.3",
     "@stylistic/eslint-plugin": "^5.10.0",
     "@stylistic/eslint-plugin-js": "^4.4.1",
+    "@types/node": "^26.6.6",
     "babel-loader": "^10.1.1",
     "baseline-browser-mapping": "^2.11.34",
     "eslint": "^10.14.0",
