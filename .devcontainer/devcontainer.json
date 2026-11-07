@@ -2,6 +2,12 @@
   "$schema": "https://raw.githubusercontent.com/devcontainers/spec/refs/heads/main/schemas/devContainer.schema.json",
   "name": "node",
   "image": "mcr.microsoft.com/devcontainers/javascript-node",
+  "features": {
+    "ghcr.io/devcontainers/features/node": {
+        "version": "26",
+        "pnpmVersion": "latest"
+    }
+  },
   "customizations": {
     "vscode": {
       "extensions": [
