@@ -3,3 +3,6 @@ auditConfig:
     - GHSA-238p-pmpm-9mq7
     - GHSA-vfj7-8cjw-p6xm
     - GHSA-gcqx-w48m-w2h4
+overrides:
+  glob: 14.0.4
+  minimatch: 11.0.5
