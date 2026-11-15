@@ -55,7 +55,7 @@
   ],
   "license": "MIT",
   "devDependencies": {
-    "@babel/core": "^8.0.10",
+    "@babel/core": "^8.1.0",
     "@babel/eslint-parser": "^8.0.7",
     "@babel/plugin-syntax-import-defer": "^8.0.1",
     "@babel/plugin-syntax-import-source": "^8.0.1",
@@ -66,19 +66,19 @@
     "@stylistic/eslint-plugin-js": "^4.4.1",
     "@types/node": "^26.6.6",
     "babel-loader": "^10.1.1",
-    "baseline-browser-mapping": "^2.11.34",
+    "baseline-browser-mapping": "^2.11.35",
     "eslint": "^10.14.0",
-    "eslint-plugin-jsdoc": "^65.4.2",
-    "eslint-plugin-regexp": "^3.3.2",
+    "eslint-plugin-jsdoc": "^65.4.5",
+    "eslint-plugin-regexp": "^3.3.3",
     "esutils": "^2.0.3",
-    "globals": "^17.13.0",
+    "globals": "^17.14.0",
     "nve": "^18.0.3",
-    "semver": "^7.8.5",
+    "semver": "^7.8.6",
     "superc8": "^12.7.0",
     "webpack": "^5.112.2",
     "webpack-cli": "^7.3.1"
   },
-  "packageManager": "pnpm@12.17.0",
+  "packageManager": "pnpm@12.18.0",
   "engines": {
     "node": ">=14"
   }
