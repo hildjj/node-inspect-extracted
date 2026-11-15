@@ -1,4 +1,4 @@
-declare module "node:util" {
+declare module "node-inspect-extracted" {
     export * as types from "node:util/types";
     export type InspectStyle =
         | "special"
